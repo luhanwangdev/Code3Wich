@@ -14,9 +14,6 @@ const languages = Object.entries(LANGUAGE_VERSIONS);
 const LanguageSelector = ({ language, onSelect }) => {
   return (
     <Box>
-      <Text mb={2} fontSize="lg">
-        Language:
-      </Text>
       <Menu>
         <MenuButton as={Button}>{language}</MenuButton>
         <MenuList>

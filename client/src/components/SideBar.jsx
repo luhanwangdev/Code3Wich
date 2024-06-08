@@ -1,19 +1,39 @@
-import { Button, Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/react";
+import { Box, List, ListItem, Text, Link } from "@chakra-ui/react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHtml5, faCss3, faJs } from "@fortawesome/free-brands-svg-icons";
+import { ICON } from "../constants";
 
-const SideBar = () => {
+const SideBar = ({ files, setFiles, activeFile, setActiveFile }) => {
+  console.log(ICON.html);
+
   return (
     <>
-      <h1>SideBar</h1>
-      <Menu>
-        <MenuList>
-          <MenuButton as={Button}>Actions</MenuButton>
-          <MenuItem>Download</MenuItem>
-          <MenuItem>Create a Copy</MenuItem>
-          <MenuItem>Mark as Draft</MenuItem>
-          <MenuItem>Delete</MenuItem>
-          <MenuItem>Attend a Workshop</MenuItem>
-        </MenuList>
-      </Menu>
+      <Box
+        as="nav"
+        width="200px"
+        padding="5"
+        boxShadow="md"
+        mt="5rem"
+        bg="gray.900"
+      >
+        <List spacing={3}>
+          {files.map((file) => (
+            <ListItem>
+              <Link
+                display="flex"
+                alignItems="center"
+                onClick={() => setActiveFile(`${file.name}`)}
+              >
+                <FontAwesomeIcon
+                  icon={ICON[file.type].icon}
+                  style={ICON[file.type].style}
+                />
+                <Text mx="0.5rem">{file.name}</Text>
+              </Link>
+            </ListItem>
+          ))}
+        </List>
+      </Box>
     </>
   );
 };
