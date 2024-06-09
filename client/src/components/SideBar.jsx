@@ -1,9 +1,22 @@
-import { Box, List, ListItem, Text, Link } from "@chakra-ui/react";
+import { useRef } from "react";
+import {
+  Box,
+  List,
+  ListItem,
+  Text,
+  Link,
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  Select,
+} from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ICON } from "../constants";
 
 const SideBar = ({ files, setFiles, activeFile, setActiveFile }) => {
-  console.log(ICON.html);
+  const fileNameRef = useRef();
+  const fileTypeRef = useRef();
 
   return (
     <>
@@ -21,7 +34,7 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile }) => {
               <Link
                 display="flex"
                 alignItems="center"
-                onClick={() => setActiveFile(`${file.name}`)}
+                onClick={() => setActiveFile(file.name)}
               >
                 <FontAwesomeIcon
                   icon={ICON[file.type].icon}
@@ -32,6 +45,31 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile }) => {
             </ListItem>
           ))}
         </List>
+
+        <FormControl mt="2rem">
+          <FormLabel>file name:</FormLabel>
+          <Input type="email" ref={fileNameRef} />
+          <FormLabel>file type</FormLabel>
+          <Select placeholder="Select file type" ref={fileTypeRef}>
+            <option>html</option>
+            <option>javascript</option>
+            <option>css</option>
+          </Select>
+          <Button
+            my="1rem"
+            onClick={() =>
+              setFiles((prevFiles) => [
+                ...prevFiles,
+                {
+                  name: fileNameRef.current.value,
+                  type: fileTypeRef.current.value,
+                },
+              ])
+            }
+          >
+            +
+          </Button>
+        </FormControl>
       </Box>
     </>
   );

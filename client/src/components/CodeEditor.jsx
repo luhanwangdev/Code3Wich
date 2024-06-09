@@ -10,7 +10,7 @@ const CodeEditor = () => {
   const editorRef = useRef();
   const [value, setValue] = useState("");
   const [language, setLanguage] = useState("javascript");
-  const [activeFile, setActiveFile] = useState("html");
+  const [activeFile, setActiveFile] = useState("");
   const [files, setFiles] = useState([]);
 
   const onMount = (editor) => {
@@ -23,24 +23,22 @@ const CodeEditor = () => {
     setValue(CODE_SNIPPETS[language]);
   };
 
-  useEffect(
-    () =>
-      setFiles([
-        {
-          name: "index.html",
-          type: "html",
-        },
-        {
-          name: "index.js",
-          type: "javascript",
-        },
-        {
-          name: "style.css",
-          type: "css",
-        },
-      ]),
-    []
-  );
+  useEffect(() => {
+    setFiles([
+      {
+        name: "index.html",
+        type: "html",
+      },
+      {
+        name: "index.js",
+        type: "javascript",
+      },
+      {
+        name: "style.css",
+        type: "css",
+      },
+    ]);
+  }, []);
 
   return (
     <Flex>
