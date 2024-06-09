@@ -5,10 +5,12 @@ import { ICON } from "../constants";
 const TabNavigation = ({ files, activeFile, setActiveFile }) => {
   const fileNames = files.map((file) => file.name);
   return (
-    <Tabs index={fileNames.indexOf(activeFile)}>
+    <Tabs index={fileNames.indexOf(activeFile.name)}>
       <TabList>
         {files.map((file) => (
-          <Tab onClick={() => setActiveFile(file.name)}>
+          <Tab
+            onClick={() => setActiveFile({ name: file.name, type: file.type })}
+          >
             <FontAwesomeIcon
               icon={ICON[file.type].icon}
               style={ICON[file.type].style}

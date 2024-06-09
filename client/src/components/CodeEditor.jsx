@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Box, Flex } from "@chakra-ui/react";
+import { Box, Button, Flex } from "@chakra-ui/react";
 import { Editor } from "@monaco-editor/react";
 import SideBar from "./SideBar.jsx";
 import LanguageSelector from "./LanguageSelector";
@@ -10,7 +10,7 @@ const CodeEditor = () => {
   const editorRef = useRef();
   const [value, setValue] = useState("");
   const [language, setLanguage] = useState("javascript");
-  const [activeFile, setActiveFile] = useState("");
+  const [activeFile, setActiveFile] = useState({});
   const [files, setFiles] = useState([]);
 
   const onMount = (editor) => {
@@ -18,10 +18,13 @@ const CodeEditor = () => {
     editor.focus();
   };
 
-  const onSelect = (language) => {
-    setLanguage(language);
-    setValue(CODE_SNIPPETS[language]);
-  };
+  // const onSelect = (activeFile) => {
+  //   // setLanguage(language);
+  //   console.log(activeFile);
+  //   console.log(activeFile.type);
+  //   console.log(CODE_SNIPPETS[activeFile.type]);
+  //   setValue(CODE_SNIPPETS[activeFile.type]);
+  // };
 
   useEffect(() => {
     setFiles([
@@ -51,7 +54,7 @@ const CodeEditor = () => {
         />
       </Box>
       <Box flex="6">
-        <LanguageSelector language={language} onSelect={onSelect} />
+        {/* <LanguageSelector language={language} onSelect={onSelect} /> */}
         <TabNavigation
           files={files}
           activeFile={activeFile}
@@ -61,12 +64,13 @@ const CodeEditor = () => {
           height="75vh"
           theme="vs-dark"
           defaultLanguage="javascript"
-          language={language}
-          defaultValue={CODE_SNIPPETS[language]}
+          language={activeFile.type}
+          defaultValue={CODE_SNIPPETS[activeFile.type]}
           value={value}
           onChange={(value) => setValue(value)}
           onMount={onMount}
         />
+        <Button mt="0.5rem">Save</Button>
       </Box>
     </Flex>
   );

@@ -25,7 +25,7 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile }) => {
         width="200px"
         padding="5"
         boxShadow="md"
-        mt="5rem"
+        mt="2.5rem"
         bg="gray.900"
       >
         <List spacing={3}>
@@ -34,7 +34,9 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile }) => {
               <Link
                 display="flex"
                 alignItems="center"
-                onClick={() => setActiveFile(file.name)}
+                onClick={() =>
+                  setActiveFile({ name: file.name, type: file.type })
+                }
               >
                 <FontAwesomeIcon
                   icon={ICON[file.type].icon}
