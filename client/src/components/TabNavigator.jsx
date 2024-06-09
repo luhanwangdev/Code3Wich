@@ -1,23 +1,21 @@
 import { Tabs, TabList, Tab, Text } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHtml5, faCss3, faJs } from "@fortawesome/free-brands-svg-icons";
+import { ICON } from "../constants";
 
-const TabNavigation = ({ activeFile, setActiveFile }) => {
+const TabNavigation = ({ files, activeFile, setActiveFile }) => {
+  const fileNames = files.map((file) => file.name);
   return (
-    <Tabs index={["html", "js", "css"].indexOf(activeFile)}>
+    <Tabs index={fileNames.indexOf(activeFile)}>
       <TabList>
-        <Tab onClick={() => setActiveFile("html")}>
-          <FontAwesomeIcon icon={faHtml5} style={{ color: "#ff6e3d" }} />
-          <Text mx="0.5rem">index.html</Text>
-        </Tab>
-        <Tab onClick={() => setActiveFile("js")}>
-          <FontAwesomeIcon icon={faJs} style={{ color: "#ffce47" }} />
-          <Text mx="0.5rem">index.js</Text>
-        </Tab>
-        <Tab onClick={() => setActiveFile("css")}>
-          <FontAwesomeIcon icon={faCss3} style={{ color: "#1899fb" }} />
-          <Text mx="0.5rem">style.css</Text>
-        </Tab>
+        {files.map((file) => (
+          <Tab onClick={() => setActiveFile(file.name)}>
+            <FontAwesomeIcon
+              icon={ICON[file.type].icon}
+              style={ICON[file.type].style}
+            />
+            <Text mx="0.5rem">{file.name}</Text>
+          </Tab>
+        ))}
       </TabList>
     </Tabs>
   );

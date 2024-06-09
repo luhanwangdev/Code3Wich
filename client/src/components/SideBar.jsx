@@ -1,6 +1,5 @@
 import { Box, List, ListItem, Text, Link } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHtml5, faCss3, faJs } from "@fortawesome/free-brands-svg-icons";
 import { ICON } from "../constants";
 
 const SideBar = ({ files, setFiles, activeFile, setActiveFile }) => {

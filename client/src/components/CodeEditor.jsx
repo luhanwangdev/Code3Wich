@@ -54,7 +54,11 @@ const CodeEditor = () => {
       </Box>
       <Box flex="6">
         <LanguageSelector language={language} onSelect={onSelect} />
-        <TabNavigation activeFile={activeFile} setActiveFile={setActiveFile} />
+        <TabNavigation
+          files={files}
+          activeFile={activeFile}
+          setActiveFile={setActiveFile}
+        />
         <Editor
           height="75vh"
           theme="vs-dark"
