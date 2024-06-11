@@ -42,5 +42,21 @@ export const updateFile = async (req: Request, res: Response) => {
     }
   });
 
-  res.status(200).json({ path: filePath });
+  res.status(200).json({ success: true, path: filePath });
+};
+
+export const loadFile = async (req: Request, res: Response) => {
+  const { name, projectId } = req.query as unknown as {
+    name: string;
+    projectId: number;
+  };
+
+  const filePath = `codeFiles/project${projectId}/${name}`;
+
+  fs.readFile(filePath, "utf8", (err, data) => {
+    if (err) {
+      throw new AppError(err.message, 500);
+    }
+    res.status(200).json({ status: true, code: data });
+  });
 };
