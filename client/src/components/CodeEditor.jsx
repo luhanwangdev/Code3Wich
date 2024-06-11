@@ -69,6 +69,9 @@ const CodeEditor = () => {
           value={value}
           onChange={(value) => setValue(value)}
           onMount={onMount}
+          options={{
+            fontSize: 20,
+          }}
         />
         <Button mt="0.5rem">Save</Button>
       </Box>
