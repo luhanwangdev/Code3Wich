@@ -27,20 +27,17 @@ const CodeEditor = () => {
   // };
 
   useEffect(() => {
-    setFiles([
-      {
-        name: "index.html",
-        type: "html",
-      },
-      {
-        name: "index.js",
-        type: "javascript",
-      },
-      {
-        name: "style.css",
-        type: "css",
-      },
-    ]);
+    const fetchFile = async () => {
+      const fileResponse = await fetch(
+        "http://localhost:3000/api/file/project?projectId=1"
+      );
+      const fileData = await fileResponse.json();
+
+      setFiles(fileData);
+      setActiveFile(fileData[0]);
+    };
+
+    fetchFile();
   }, []);
 
   return (

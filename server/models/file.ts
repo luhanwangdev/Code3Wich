@@ -41,9 +41,6 @@ export const getFile = async (id: number) => {
     [id]
   );
 
-  console.log("getFile");
-  console.log(results);
-
   const file = z.array(FileSchema).parse(results[0]);
   return file[0];
 };
@@ -56,9 +53,6 @@ export const getFilesByProjectId = async (projectId: number) => {
       `,
     [projectId]
   );
-
-  console.log("getFilesByProjectId");
-  console.log(results);
 
   const files = results
     .slice(0, -1)
