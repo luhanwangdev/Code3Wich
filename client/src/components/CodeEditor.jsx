@@ -27,18 +27,22 @@ const CodeEditor = () => {
   // };
 
   useEffect(() => {
-    const fetchFile = async () => {
-      const fileResponse = await fetch(
+    const fetchFiles = async () => {
+      const filesResponse = await fetch(
         "http://localhost:3000/api/file/project?projectId=1"
       );
-      const fileData = await fileResponse.json();
+      const files = await filesResponse.json();
 
-      setFiles(fileData);
-      setActiveFile(fileData[0]);
+      setFiles(files);
+      setActiveFile(files[0]);
     };
 
-    fetchFile();
+    fetchFiles();
   }, []);
+
+  useEffect(() => {
+    console.log("change");
+  }, [activeFile]);
 
   return (
     <Flex>

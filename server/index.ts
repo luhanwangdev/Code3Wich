@@ -3,6 +3,7 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import projectRoutes from "./routers/project.js";
 import fileRoutes from "./routers/file.js";
+import globalErrorHandlerMiddleware from "./middlewares/errorHandler.js";
 
 const app = express();
 
@@ -13,9 +14,7 @@ app.use(cors());
 app.use(`/api/project`, projectRoutes);
 app.use(`/api/file`, fileRoutes);
 
-app.get("/", (req, res) => {
-  res.send("Hello from port 3000");
-});
+app.use(globalErrorHandlerMiddleware);
 
 app.listen(3000, () => {
   console.log("Server is listening on port 3000");

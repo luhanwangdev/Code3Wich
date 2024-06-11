@@ -11,7 +11,7 @@ export const createFile = async (
 ) => {
   const results = await pool.query(
     `
-    INSERT INTO file(name, type, location, projectId)
+    INSERT INTO file(name, type, location, project_id)
     VALUES (?, ?, ?, ?)
     `,
     [name, type, location, projectId]
@@ -59,4 +59,20 @@ export const getFilesByProjectId = async (projectId: number) => {
     .map((result) => z.array(FileSchema).parse(result));
 
   return files[0];
+};
+
+export const getFileByFileNameandProjectId = async (
+  name: string,
+  projectId: number
+) => {
+  const results = await pool.query(
+    `
+        SELECT * FROM file
+        WHERE name = ? AND project_id = ?
+        `,
+    [name, projectId]
+  );
+
+  const file = z.array(FileSchema).parse(results[0]);
+  return file[0];
 };
