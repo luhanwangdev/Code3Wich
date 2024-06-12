@@ -35,7 +35,12 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile }) => {
                 display="flex"
                 alignItems="center"
                 onClick={() =>
-                  setActiveFile({ name: file.name, type: file.type })
+                  setActiveFile({
+                    name: file.name,
+                    type: file.type,
+                    location: file.location,
+                    project_id: file.project_id,
+                  })
                 }
               >
                 <FontAwesomeIcon

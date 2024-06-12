@@ -41,8 +41,37 @@ const CodeEditor = () => {
   }, []);
 
   useEffect(() => {
-    console.log("change");
+    const fetchCode = async () => {
+      const codeResponse = await fetch(
+        `http://localhost:3000/api/file/edit?name=${activeFile.name}&projectId=${activeFile.project_id}`
+      );
+      const code = await codeResponse.json();
+      setValue(code.code);
+    };
+
+    if (activeFile.name !== undefined) {
+      fetchCode();
+    }
   }, [activeFile]);
+
+  const saveFile = async () => {
+    const { name, type, project_id } = activeFile;
+    await fetch(
+      `http://localhost:3000/api/file/edit?name=${activeFile.name}&projectId=${activeFile.project_id}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          type,
+          projectId: project_id,
+          code: value,
+        }),
+      }
+    );
+  };
 
   return (
     <Flex>
@@ -74,7 +103,9 @@ const CodeEditor = () => {
             fontSize: 20,
           }}
         />
-        <Button mt="0.5rem">Save</Button>
+        <Button mt="0.5rem" onClick={() => saveFile()}>
+          Save
+        </Button>
       </Box>
     </Flex>
   );

@@ -9,7 +9,14 @@ const TabNavigation = ({ files, activeFile, setActiveFile }) => {
       <TabList>
         {files.map((file) => (
           <Tab
-            onClick={() => setActiveFile({ name: file.name, type: file.type })}
+            onClick={() =>
+              setActiveFile({
+                name: file.name,
+                type: file.type,
+                location: file.location,
+                project_id: file.project_id,
+              })
+            }
           >
             <FontAwesomeIcon
               icon={ICON[file.type].icon}

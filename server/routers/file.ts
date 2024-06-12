@@ -13,6 +13,9 @@ router.route("/single").get(asyncWrapper(getSingleFile));
 
 router.route("/project").get(asyncWrapper(getFilesByProject));
 
-router.route("/test").get(loadFile).post(updateFile);
+router
+  .route("/edit")
+  .get(asyncWrapper(loadFile))
+  .post(asyncWrapper(updateFile));
 
 export default router;

@@ -42,7 +42,7 @@ export const updateFile = async (req: Request, res: Response) => {
     }
   });
 
-  res.status(200).json({ success: true, path: filePath });
+  res.status(200).json({ success: true, path: filePath, code });
 };
 
 export const loadFile = async (req: Request, res: Response) => {
