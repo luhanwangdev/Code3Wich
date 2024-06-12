@@ -38,46 +38,12 @@ export const packageProject = async (req: Request, res: Response) => {
     `docker container run -d -p 0:80 --name ${containerName} ${imageName}`
   );
 
-  const { stdout } = await execAsync(
+  const { stdout: inspectStdout } = await execAsync(
     `docker inspect --format="{{(index (index .NetworkSettings.Ports \\"80/tcp\\") 0).HostPort}}" ${containerName}`
   );
 
-  const containerPort = stdout.trim();
+  const containerPort = inspectStdout.trim();
   const containerUrl = `http://localhost:${containerPort}`;
 
   res.status(200).json({ status: true, projectId: id, url: containerUrl });
-
-  // exec(`docker image build -t ${imageName} .`, (err, stdout, stderr) => {
-  //   if (err) {
-  //     throw new AppError(`Error building image: ${stderr}`, 500);
-  //   }
-
-  //   exec(
-  //     `docker container run -d -p 0:80 --name ${containerName} ${imageName}`,
-  //     (err, stdout, stderr) => {
-  //       if (err) {
-  //         throw new AppError(`Error running container: ${stderr}`, 500);
-  //       }
-
-  //       exec(
-  //         `docker inspect --format="{{(index (index .NetworkSettings.Ports \\"80/tcp\\") 0).HostPort}}" ${containerName}`,
-  //         (err, stdout, stderr) => {
-  //           if (err) {
-  //             throw new AppError(
-  //               `Error getting container port: ${stderr}`,
-  //               500
-  //             );
-  //           }
-
-  //           const containerPort = stdout.trim();
-  //           const containerUrl = `http://localhost:${containerPort}`;
-
-  //           res
-  //             .status(200)
-  //             .json({ status: true, projectId: id, url: containerUrl });
-  //         }
-  //       );
-  //     }
-  //   );
-  // });
 };
