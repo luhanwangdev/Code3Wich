@@ -9,6 +9,7 @@ const CodeEditor = () => {
   const editorRef = useRef();
   const [value, setValue] = useState("");
   const [activeFile, setActiveFile] = useState({});
+  const [activeProject, setActiveProject] = useState({});
   const [files, setFiles] = useState([]);
 
   const onMount = (editor) => {
@@ -25,6 +26,7 @@ const CodeEditor = () => {
 
       setFiles(files);
       setActiveFile(files[0]);
+      setActiveProject({ projectId: 1 });
     };
 
     fetchFiles();
@@ -47,7 +49,7 @@ const CodeEditor = () => {
   const saveFile = async () => {
     const { name, type, project_id } = activeFile;
     await fetch(
-      `http://localhost:3000/api/file/edit?name=${activeFile.name}&projectId=${activeFile.project_id}`,
+      `http://localhost:3000/api/file/edit?name=${name}&projectId=${project_id}`,
       {
         method: "POST",
         headers: {
@@ -71,6 +73,7 @@ const CodeEditor = () => {
           setFiles={setFiles}
           activeFile={activeFile}
           setActiveFile={setActiveFile}
+          activeProject={activeProject}
         />
       </Box>
       <Box flex="6">

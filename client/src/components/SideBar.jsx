@@ -14,9 +14,45 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ICON } from "../constants";
 
-const SideBar = ({ files, setFiles, activeFile, setActiveFile }) => {
+const SideBar = ({
+  files,
+  setFiles,
+  activeFile,
+  setActiveFile,
+  activeProject,
+}) => {
   const fileNameRef = useRef();
   const fileTypeRef = useRef();
+
+  const createFile = async (name, type) => {
+    const { projectId } = activeProject;
+    console.log(projectId);
+
+    await fetch(
+      `http://localhost:3000/api/file/edit?name=${name}&projectId=${projectId}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          type,
+          projectId,
+          code: "",
+        }),
+      }
+    );
+  };
+
+  const updateFiles = async () => {
+    const filesResponse = await fetch(
+      "http://localhost:3000/api/file/project?projectId=1"
+    );
+    const files = await filesResponse.json();
+
+    setFiles(files);
+  };
 
   return (
     <>
@@ -64,15 +100,10 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile }) => {
           </Select>
           <Button
             my="1rem"
-            onClick={() =>
-              setFiles((prevFiles) => [
-                ...prevFiles,
-                {
-                  name: fileNameRef.current.value,
-                  type: fileTypeRef.current.value,
-                },
-              ])
-            }
+            onClick={() => {
+              createFile(fileNameRef.current.value, fileTypeRef.current.value);
+              updateFiles();
+            }}
           >
             +
           </Button>
