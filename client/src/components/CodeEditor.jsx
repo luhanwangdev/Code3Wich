@@ -11,6 +11,7 @@ const CodeEditor = () => {
   const [activeFile, setActiveFile] = useState({});
   const [activeProject, setActiveProject] = useState({});
   const [files, setFiles] = useState([]);
+  const [url, setUrl] = useState("");
 
   const onMount = (editor) => {
     editorRef.current = editor;
@@ -65,6 +66,26 @@ const CodeEditor = () => {
     );
   };
 
+  const packageProject = async () => {
+    const { project_id } = activeProject;
+
+    const packageResponse = await fetch(
+      `http://localhost:3000/api/project/package`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: project_id,
+        }),
+      }
+    );
+
+    const packageData = await packageResponse.json();
+    setUrl(packageData.url);
+  };
+
   return (
     <Flex>
       <Box flex="1">
@@ -97,13 +118,18 @@ const CodeEditor = () => {
           <Button mt="0.5rem" onClick={() => saveFile()}>
             Save
           </Button>
-          <Link
-            href={`http://localhost:3000/project${activeProject.project_id}/index.html`}
-            color="white"
+
+          <Button
             ml="2rem"
-            isExternal
+            mt="0.5rem"
+            backgroundColor="orange"
+            onClick={() => packageProject()}
           >
-            Click here to go to your website!
+            Generate your URL!
+          </Button>
+
+          <Link href={url} color="white" ml="2rem" isExternal>
+            {url}
           </Link>
         </Flex>
       </Box>
