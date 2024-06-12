@@ -48,9 +48,9 @@ export const getFile = async (id: number) => {
 export const getFilesByProjectId = async (projectId: number) => {
   const results = await pool.query(
     `
-      SELECT * FROM file
-      WHERE project_id = ?
-      `,
+    SELECT * FROM file
+    WHERE project_id = ?
+    `,
     [projectId]
   );
 
@@ -67,9 +67,9 @@ export const getFileByFileNameandProjectId = async (
 ) => {
   const results = await pool.query(
     `
-        SELECT * FROM file
-        WHERE name = ? AND project_id = ?
-        `,
+    SELECT * FROM file
+    WHERE name = ? AND project_id = ?
+    `,
     [name, projectId]
   );
 

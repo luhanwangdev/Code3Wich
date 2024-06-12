@@ -14,21 +14,14 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ICON } from "../constants";
 
-const SideBar = ({
-  files,
-  setFiles,
-  activeFile,
-  setActiveFile,
-  activeProject,
-}) => {
+const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
   const fileNameRef = useRef();
   const fileTypeRef = useRef();
 
   const createFile = async (name, type) => {
-    const { project_id } = activeProject;
-
+    console.log(projectId);
     await fetch(
-      `http://localhost:3000/api/file/edit?name=${name}&projectId=${project_id}`,
+      `http://localhost:3000/api/file/edit?name=${name}&projectId=${projectId}`,
       {
         method: "POST",
         headers: {
@@ -37,7 +30,7 @@ const SideBar = ({
         body: JSON.stringify({
           name,
           type,
-          projectId: project_id,
+          projectId,
           code: "",
         }),
       }

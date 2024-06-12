@@ -1,10 +1,8 @@
 import { Request, Response } from "express";
 import fs from "fs";
-import path from "path";
 import { promisify } from "util";
 import { exec } from "child_process";
 import * as projectModel from "../models/project.js";
-import AppError from "../utils/appError.js";
 
 const execAsync = promisify(exec);
 
