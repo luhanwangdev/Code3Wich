@@ -2,14 +2,12 @@ import { useState, useRef, useEffect } from "react";
 import { Box, Button, Flex } from "@chakra-ui/react";
 import { Editor } from "@monaco-editor/react";
 import SideBar from "./SideBar.jsx";
-import LanguageSelector from "./LanguageSelector";
 import TabNavigation from "./TabNavigator";
 import { CODE_SNIPPETS } from "../constants";
 
 const CodeEditor = () => {
   const editorRef = useRef();
   const [value, setValue] = useState("");
-  const [language, setLanguage] = useState("javascript");
   const [activeFile, setActiveFile] = useState({});
   const [files, setFiles] = useState([]);
 
@@ -17,14 +15,6 @@ const CodeEditor = () => {
     editorRef.current = editor;
     editor.focus();
   };
-
-  // const onSelect = (activeFile) => {
-  //   // setLanguage(language);
-  //   console.log(activeFile);
-  //   console.log(activeFile.type);
-  //   console.log(CODE_SNIPPETS[activeFile.type]);
-  //   setValue(CODE_SNIPPETS[activeFile.type]);
-  // };
 
   useEffect(() => {
     const fetchFiles = async () => {
@@ -84,7 +74,6 @@ const CodeEditor = () => {
         />
       </Box>
       <Box flex="6">
-        {/* <LanguageSelector language={language} onSelect={onSelect} /> */}
         <TabNavigation
           files={files}
           activeFile={activeFile}
