@@ -25,11 +25,10 @@ const SideBar = ({
   const fileTypeRef = useRef();
 
   const createFile = async (name, type) => {
-    const { projectId } = activeProject;
-    console.log(projectId);
+    const { project_id } = activeProject;
 
     await fetch(
-      `http://localhost:3000/api/file/edit?name=${name}&projectId=${projectId}`,
+      `http://localhost:3000/api/file/edit?name=${name}&projectId=${project_id}`,
       {
         method: "POST",
         headers: {
@@ -38,7 +37,7 @@ const SideBar = ({
         body: JSON.stringify({
           name,
           type,
-          projectId,
+          projectId: project_id,
           code: "",
         }),
       }

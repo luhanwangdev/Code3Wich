@@ -26,7 +26,7 @@ const CodeEditor = () => {
 
       setFiles(files);
       setActiveFile(files[0]);
-      setActiveProject({ projectId: 1 });
+      setActiveProject({ project_id: 1 });
     };
 
     fetchFiles();
@@ -85,9 +85,7 @@ const CodeEditor = () => {
         <Editor
           height="75vh"
           theme="vs-dark"
-          defaultLanguage="javascript"
           language={activeFile.type}
-          defaultValue={CODE_SNIPPETS[activeFile.type]}
           value={value}
           onChange={(value) => setValue(value)}
           onMount={onMount}
@@ -100,12 +98,12 @@ const CodeEditor = () => {
             Save
           </Button>
           <Link
-            href={`http://localhost:3000/project${activeProject.projectId}/index.html`}
+            href={`http://localhost:3000/project${activeProject.project_id}/index.html`}
             color="white"
             ml="2rem"
             isExternal
           >
-            Click here!
+            Click here to go to your website!
           </Link>
         </Flex>
       </Box>
