@@ -14,6 +14,8 @@ app.use(cors());
 app.use(`/api/project`, projectRoutes);
 app.use(`/api/file`, fileRoutes);
 
+app.use("/", express.static("codeFiles"));
+
 app.use(globalErrorHandlerMiddleware);
 
 app.listen(3000, () => {

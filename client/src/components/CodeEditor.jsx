@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Box, Button, Flex } from "@chakra-ui/react";
+import { Box, Button, Flex, Link } from "@chakra-ui/react";
 import { Editor } from "@monaco-editor/react";
 import SideBar from "./SideBar.jsx";
 import TabNavigation from "./TabNavigator";
@@ -95,9 +95,19 @@ const CodeEditor = () => {
             fontSize: 20,
           }}
         />
-        <Button mt="0.5rem" onClick={() => saveFile()}>
-          Save
-        </Button>
+        <Flex alignItems="center">
+          <Button mt="0.5rem" onClick={() => saveFile()}>
+            Save
+          </Button>
+          <Link
+            href={`http://localhost:3000/project${activeProject.projectId}/index.html`}
+            color="white"
+            ml="2rem"
+            isExternal
+          >
+            Click here!
+          </Link>
+        </Flex>
       </Box>
     </Flex>
   );
