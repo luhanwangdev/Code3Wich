@@ -53,9 +53,6 @@ function App() {
   return (
     <Box minH="100vh" bg="#2C2C32" color="gray.500" px={6} py={8}>
       <Header />
-      <Text color="white" fontSize={40} fontWeight="bold">
-        Welcome to mySandBox!
-      </Text>
       <Text my="2rem" color="white" fontSize={32}>
         {`${user.name}'s Projects:`}
       </Text>

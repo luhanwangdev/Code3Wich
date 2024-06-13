@@ -110,15 +110,11 @@ const CodeEditor = () => {
               Save
             </Button>
 
-            <Link
-              href={url}
-              color="white"
-              backgroundColor="orange"
-              ml="2rem"
-              isExternal
-            >
-              {url}
-            </Link>
+            <Button mt="0.5rem" ml="2rem" bg="orange">
+              <Link href={url} color="white" isExternal>
+                {url}
+              </Link>
+            </Button>
           </Flex>
         </Box>
       </Flex>
