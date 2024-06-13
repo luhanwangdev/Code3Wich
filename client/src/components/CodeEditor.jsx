@@ -4,6 +4,7 @@ import { Box, Button, Flex, Link } from "@chakra-ui/react";
 import { Editor } from "@monaco-editor/react";
 import SideBar from "./SideBar.jsx";
 import TabNavigation from "./TabNavigator";
+import Header from "./Header.jsx";
 
 const CodeEditor = () => {
   const { id } = useParams();
@@ -76,6 +77,7 @@ const CodeEditor = () => {
 
   return (
     <Box minH="100vh" bg="#2C2C32" color="gray.500" px={6} py={8}>
+      <Header />
       <Flex>
         <Box flex="1">
           <SideBar
@@ -93,7 +95,7 @@ const CodeEditor = () => {
             setActiveFile={setActiveFile}
           />
           <Editor
-            height="75vh"
+            height="70vh"
             theme="vs-dark"
             language={activeFile.type}
             value={value}

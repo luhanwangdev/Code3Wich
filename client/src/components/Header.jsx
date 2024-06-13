@@ -1,36 +1,18 @@
 import { Link } from "react-router-dom";
-import { Box, Flex, IconButton, Text } from "@chakra-ui/react";
+import { Box, Flex, Image } from "@chakra-ui/react";
 
 const Header = () => {
   return (
-    <Box bg="pink" w="100vw" h="10vh">
-      <Flex justify="space-between" align="center" w="90%" h="100%" ml="4rem">
+    <Box w="90vw" h="10vh">
+      <Flex align="center" w="90%" h="100%" ml="0.5rem">
         <Link to="/">
-          <Text fontSize="25" fontWeight="bold" color="red">
-            mySandBox
-          </Text>
+          <Image
+            w="15rem"
+            src="/src/assets/logo.png"
+            border="2px solid gray"
+            borderRadius="md"
+          ></Image>
         </Link>
-
-        <Flex>
-          <Link to="/signin">
-            <IconButton
-              aria-label="Sign In"
-              icon={<InfoIcon w={30} h={30} color="black" />}
-              variant="ghost"
-              colorScheme="red"
-              mr={2}
-            />
-          </Link>
-          <Link to="/saved-list/:userId">
-            <IconButton
-              aria-label="Saved List"
-              icon={<StarIcon w={30} h={30} color="black" />}
-              variant="outline"
-              colorScheme="black"
-              mr={2}
-            />
-          </Link>
-        </Flex>
       </Flex>
     </Box>
   );

@@ -8,6 +8,7 @@ import {
   Input,
   Text,
 } from "@chakra-ui/react";
+import Header from "./components/Header";
 
 function App() {
   const [user, setUser] = useState({});
@@ -51,6 +52,7 @@ function App() {
 
   return (
     <Box minH="100vh" bg="#2C2C32" color="gray.500" px={6} py={8}>
+      <Header />
       <Text color="white" fontSize={40} fontWeight="bold">
         Welcome to mySandBox!
       </Text>
