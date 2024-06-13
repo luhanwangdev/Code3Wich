@@ -35,11 +35,13 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
         }),
       }
     );
+
+    updateFiles();
   };
 
   const updateFiles = async () => {
     const filesResponse = await fetch(
-      "http://localhost:3000/api/file/project?projectId=1"
+      `http://localhost:3000/api/file/project?projectId=${projectId}`
     );
     const files = await filesResponse.json();
 
@@ -94,7 +96,6 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
             my="1rem"
             onClick={() => {
               createFile(fileNameRef.current.value, fileTypeRef.current.value);
-              updateFiles();
             }}
           >
             +
