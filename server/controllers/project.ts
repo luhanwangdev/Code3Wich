@@ -1,11 +1,10 @@
 import { Request, Response } from "express";
 import fs from "fs";
-import { promisify } from "util";
-import { exec } from "child_process";
+import path from "path";
 import * as projectModel from "../models/project.js";
 import * as fileModel from "../models/file.js";
-
-const execAsync = promisify(exec);
+import AppError from "../utils/appError.js";
+import setUpContainer from "../utils/container.js";
 
 export const getProject = async (req: Request, res: Response) => {
   const { id } = req.query as unknown as { id: number };
@@ -23,33 +22,19 @@ export const createProject = async (req: Request, res: Response) => {
 
   const project = await projectModel.createProject(name, userId);
 
-  fileModel.createFile(
-    "index.html",
-    "html",
-    `codeFile/project${project.id}/index.html`,
-    project.id
-  );
+  createFile("index.html", "html", project.id, "");
+  createFile("index.js", "javascript", project.id, "");
+  createFile("style.css", "css", project.id, "");
 
-  fileModel.createFile(
-    "index.js",
-    "javascript",
-    `codeFile/project${project.id}/index.js`,
-    project.id
-  );
+  const containerUrl = await setUpContainer(project.id);
+  await projectModel.updateProjectUrl(containerUrl, project.id);
 
-  fileModel.createFile(
-    "style.css",
-    "css",
-    `codeFile/project${project.id}/style.css`,
-    project.id
-  );
-
-  res.status(200).json(project);
+  res
+    .status(200)
+    .json({ status: true, projectId: project.id, url: containerUrl });
 };
 
 export const getAllProjects = async (req: Request, res: Response) => {
-  const { id } = req.query as unknown as { id: number };
-
   const projects = await projectModel.getAllProjects();
 
   res.status(200).send(projects);
@@ -63,34 +48,23 @@ export const getProjectsByUserId = async (req: Request, res: Response) => {
   res.status(200).send(projects);
 };
 
-export const packageProject = async (req: Request, res: Response) => {
-  const { id } = req.body as unknown as { id: number };
+const createFile = async (
+  name: string,
+  type: string,
+  projectId: number,
+  code: string
+) => {
+  const file = await fileModel.getFileByFileNameandProjectId(name, projectId);
+  const filePath = `codeFiles/project${projectId}/${name}`;
 
-  const projectDir = `codeFiles/project${id}`;
-  const dockerfilePath = "Dockerfile";
-  const imageName = `project_${id}_image`;
-  const containerName = `project_${id}_container`;
+  if (!file) {
+    fileModel.createFile(name, type, filePath, projectId);
+  }
 
-  const dockerfileContent = `
-  FROM nginx:1.27.0-alpine
-  COPY ${projectDir} /usr/share/nginx/html
-  EXPOSE 80
-  CMD ["nginx", "-g", "daemon off;"]
-  `;
-  fs.writeFileSync(dockerfilePath, dockerfileContent);
-
-  await execAsync(`docker image build -t ${imageName} .`);
-
-  await execAsync(
-    `docker container run -d -p 0:80 --name ${containerName} ${imageName}`
-  );
-
-  const { stdout: inspectStdout } = await execAsync(
-    `docker inspect --format="{{(index (index .NetworkSettings.Ports \\"80/tcp\\") 0).HostPort}}" ${containerName}`
-  );
-
-  const containerPort = inspectStdout.trim();
-  const containerUrl = `http://localhost:${containerPort}`;
-
-  res.status(200).json({ status: true, projectId: id, url: containerUrl });
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  fs.writeFile(filePath, code, (err) => {
+    if (err) {
+      throw new AppError(err.message, 500);
+    }
+  });
 };

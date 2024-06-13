@@ -31,11 +31,24 @@ export const createProject = async (name: string, userId: number) => {
   throw new AppError("create file failed", 400);
 };
 
+export const updateProjectUrl = async (url: string, id: number) => {
+  const result = await pool.query(
+    `
+    UPDATE project
+    SET url = ?
+    WHERE id = ?
+    `,
+    [url, id]
+  );
+  return result;
+};
+
 const PorjectSchema = z.object({
   id: z.number(),
   name: z.string(),
   location: z.string(),
   user_id: z.number(),
+  url: z.string(),
 });
 
 export const getProject = async (id: number) => {

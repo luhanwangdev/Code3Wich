@@ -37,47 +37,38 @@ const CodeEditor = () => {
     );
   };
 
-  const packageProject = async () => {
-    const packageResponse = await fetch(
-      `http://localhost:3000/api/project/package`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id,
-        }),
-      }
+  const fetchFiles = async () => {
+    const filesResponse = await fetch(
+      `http://localhost:3000/api/file/project?projectId=${id}`
     );
+    const files = await filesResponse.json();
 
-    const packageData = await packageResponse.json();
-    setUrl(packageData.url);
+    setFiles(files);
+    setActiveFile(files[0]);
+  };
+
+  const fetchCode = async () => {
+    const codeResponse = await fetch(
+      `http://localhost:3000/api/file/edit?name=${activeFile.name}&projectId=${activeFile.project_id}`
+    );
+    const code = await codeResponse.json();
+    setValue(code.code);
+  };
+
+  const fetchProject = async () => {
+    const projectResponse = await fetch(
+      `http://localhost:3000/api/project?id=${id}`
+    );
+    const project = await projectResponse.json();
+    setUrl(project.url);
   };
 
   useEffect(() => {
-    const fetchFiles = async () => {
-      const filesResponse = await fetch(
-        `http://localhost:3000/api/file/project?projectId=${id}`
-      );
-      const files = await filesResponse.json();
-
-      setFiles(files);
-      setActiveFile(files[0]);
-    };
-
+    fetchProject();
     fetchFiles();
   }, []);
 
   useEffect(() => {
-    const fetchCode = async () => {
-      const codeResponse = await fetch(
-        `http://localhost:3000/api/file/edit?name=${activeFile.name}&projectId=${activeFile.project_id}`
-      );
-      const code = await codeResponse.json();
-      setValue(code.code);
-    };
-
     if (activeFile.name !== undefined) {
       fetchCode();
     }
@@ -117,16 +108,13 @@ const CodeEditor = () => {
               Save
             </Button>
 
-            <Button
-              ml="2rem"
-              mt="0.5rem"
+            <Link
+              href={url}
+              color="white"
               backgroundColor="orange"
-              onClick={() => packageProject()}
+              ml="2rem"
+              isExternal
             >
-              Generate your URL!
-            </Button>
-
-            <Link href={url} color="white" ml="2rem" isExternal>
               {url}
             </Link>
           </Flex>
