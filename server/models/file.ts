@@ -2,19 +2,22 @@ import { z } from "zod";
 import pool from "./databasePool.js";
 import instanceOfSetHeader from "../utils/instanceOfSetHeader.js";
 import AppError from "../utils/appError.js";
+import { RowDataPacket } from "mysql2";
 
 export const createFile = async (
   name: string,
   type: string,
   location: string,
-  projectId: number
+  projectId: number,
+  isFolder: boolean,
+  parentId: number
 ) => {
   const results = await pool.query(
     `
-    INSERT INTO file(name, type, location, project_id)
-    VALUES (?, ?, ?, ?)
+    INSERT INTO file(name, type, location, project_id, isFolder, parent_file_id)
+    VALUES (?, ?, ?, ?, ?, ?)
     `,
-    [name, type, location, projectId]
+    [name, type, location, projectId, isFolder, parentId]
   );
 
   if (Array.isArray(results) && instanceOfSetHeader(results[0])) {
@@ -30,7 +33,19 @@ const FileSchema = z.object({
   type: z.string(),
   location: z.string(),
   project_id: z.number(),
+  isFolder: z.number(),
+  parent_file_id: z.number(),
 });
+
+interface FileRow extends RowDataPacket {
+  id: number;
+  name: string;
+  type: string;
+  location: string;
+  project_id: number;
+  isFolder: number;
+  parent_file_id: number;
+}
 
 export const getFile = async (id: number) => {
   const results = await pool.query(
@@ -43,6 +58,18 @@ export const getFile = async (id: number) => {
 
   const file = z.array(FileSchema).parse(results[0]);
   return file[0];
+};
+
+export const getFilePath = async (id: number): Promise<string> => {
+  const results = await pool.query<FileRow[]>(
+    `
+    SELECT location FROM file
+    WHERE id = ?
+    `,
+    [id]
+  );
+
+  return results[0][0].location;
 };
 
 export const getFilesByProjectId = async (projectId: number) => {

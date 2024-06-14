@@ -21,18 +21,40 @@ export const getFilesByProject = async (req: Request, res: Response) => {
 };
 
 export const updateFile = async (req: Request, res: Response) => {
-  const { name, type, projectId, code } = req.body as unknown as {
+  const { name, type, projectId, parentId, code } = req.body as unknown as {
     name: string;
     type: string;
     projectId: number;
+    parentId: number;
     code: string;
   };
 
   const file = await fileModel.getFileByFileNameandProjectId(name, projectId);
-  const filePath = `codeFiles/project${projectId}/${name}`;
+
+  let filePath;
 
   if (!file) {
-    fileModel.createFile(name, type, filePath, projectId);
+    let isFolder = false;
+    if (type === "folder") {
+      isFolder = true;
+    }
+
+    if (parentId === 0) {
+      filePath = `codeFiles/project${projectId}/${name}`;
+    } else {
+      const parentPath = await fileModel.getFilePath(parentId);
+      filePath = `${parentPath}/${name}`;
+    }
+
+    fileModel.createFile(name, type, filePath, projectId, isFolder, parentId);
+
+    if (isFolder) {
+      fs.mkdirSync(filePath, { recursive: true });
+      res.status(200).json({ success: true, path: filePath });
+      return;
+    }
+  } else {
+    filePath = file.location;
   }
 
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
@@ -46,12 +68,11 @@ export const updateFile = async (req: Request, res: Response) => {
 };
 
 export const loadFile = async (req: Request, res: Response) => {
-  const { name, projectId } = req.query as unknown as {
-    name: string;
-    projectId: number;
+  const { id } = req.query as unknown as {
+    id: number;
   };
 
-  const filePath = `codeFiles/project${projectId}/${name}`;
+  const filePath = await fileModel.getFilePath(id);
 
   fs.readFile(filePath, "utf8", (err, data) => {
     if (err) {

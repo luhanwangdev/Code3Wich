@@ -21,22 +21,20 @@ const CodeEditor = () => {
   };
 
   const saveFile = async () => {
-    const { name, type, project_id } = activeFile;
-    await fetch(
-      `http://localhost:3000/api/file/edit?name=${name}&projectId=${project_id}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name,
-          type,
-          projectId: project_id,
-          code: value,
-        }),
-      }
-    );
+    const { name, type, project_id, parentId } = activeFile;
+    await fetch(`http://localhost:3000/api/file/edit`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name,
+        type,
+        projectId: project_id,
+        parentId,
+        code: value,
+      }),
+    });
   };
 
   const fetchFiles = async () => {
@@ -51,7 +49,7 @@ const CodeEditor = () => {
 
   const fetchCode = async () => {
     const codeResponse = await fetch(
-      `http://localhost:3000/api/file/edit?name=${activeFile.name}&projectId=${activeFile.project_id}`
+      `http://localhost:3000/api/file/edit?id=${activeFile.id}`
     );
     const code = await codeResponse.json();
     setValue(code.code);
@@ -71,7 +69,8 @@ const CodeEditor = () => {
   }, []);
 
   useEffect(() => {
-    if (activeFile.name !== undefined) {
+    console.log(activeFile);
+    if (activeFile.id !== undefined) {
       fetchCode();
     }
   }, [activeFile]);

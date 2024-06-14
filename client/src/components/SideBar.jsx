@@ -17,26 +17,25 @@ import { ICON } from "../constants";
 const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
   const fileNameRef = useRef();
   const fileTypeRef = useRef();
+  const fileParentRef = useRef();
 
   const [showFiles, setShowFiles] = useState([]);
 
-  const createFile = async (name, type) => {
-    console.log(projectId);
-    await fetch(
-      `http://localhost:3000/api/file/edit?name=${name}&projectId=${projectId}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name,
-          type,
-          projectId,
-          code: "",
-        }),
-      }
-    );
+  const createFile = async (name, type, parentId) => {
+    console.log({ name, type, projectId, parentId, code: "" });
+    await fetch(`http://localhost:3000/api/file/edit`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name,
+        type,
+        projectId,
+        parentId,
+        code: "",
+      }),
+    });
 
     updateFiles();
   };
@@ -113,17 +112,24 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
 
         <FormControl mt="2rem">
           <FormLabel>file name:</FormLabel>
-          <Input type="email" ref={fileNameRef} />
+          <Input type="text" ref={fileNameRef} />
           <FormLabel>file type</FormLabel>
           <Select placeholder="Select file type" ref={fileTypeRef}>
             <option>html</option>
             <option>javascript</option>
             <option>css</option>
+            <option>folder</option>
           </Select>
+          <FormLabel>parent file id:</FormLabel>
+          <Input type="text" ref={fileParentRef} />
           <Button
             my="1rem"
             onClick={() => {
-              createFile(fileNameRef.current.value, fileTypeRef.current.value);
+              createFile(
+                fileNameRef.current.value,
+                fileTypeRef.current.value,
+                parseInt(fileParentRef.current.value)
+              );
             }}
           >
             +

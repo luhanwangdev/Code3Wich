@@ -8,16 +8,7 @@ const TabNavigation = ({ files, activeFile, setActiveFile }) => {
     <Tabs index={fileNames.indexOf(activeFile.name)}>
       <TabList>
         {files.map((file) => (
-          <Tab
-            onClick={() =>
-              setActiveFile({
-                name: file.name,
-                type: file.type,
-                location: file.location,
-                project_id: file.project_id,
-              })
-            }
-          >
+          <Tab onClick={() => setActiveFile(file)}>
             <FontAwesomeIcon
               icon={ICON[file.type].icon}
               style={ICON[file.type].style}

@@ -6,7 +6,7 @@ import { exec } from "child_process";
 const execAsync = promisify(exec);
 dotenv.config();
 
-const setUpContainer = async (id: number) => {
+export const setUpContainer = async (id: number) => {
   const projectDir = `codeFiles/project${id}`;
   const absolutePath = process.env.SERVER_PATH + projectDir;
   const containerPath = "/usr/share/nginx/html";
@@ -29,14 +29,26 @@ const setUpContainer = async (id: number) => {
     `docker container run -d -p 0:80 --name ${containerName} -v "${absolutePath}:${containerPath}" ${imageName}`
   );
 
-  const { stdout: inspectStdout } = await execAsync(
+  const { stdout: urlStdout } = await execAsync(
     `docker inspect --format="{{(index (index .NetworkSettings.Ports \\"80/tcp\\") 0).HostPort}}" ${containerName}`
   );
 
-  const containerPort = inspectStdout.trim();
-  const containerUrl = `http://localhost:${containerPort}`;
+  const { stdout: idStdout } = await execAsync(
+    `docker ps -aqf "name=${containerName}"`
+  );
 
-  return containerUrl;
+  const containerPort = urlStdout.trim();
+  const containerUrl = `http://localhost:${containerPort}`;
+  const containerId = idStdout.trim();
+
+  return { containerId, containerUrl };
 };
 
-export default setUpContainer;
+export const execContainer = async (containerId: string) => {
+  await execAsync(`docker container exec -it ${containerId} ash`);
+};
+
+export const runCommand = async (command: string) => {
+  const { stdout } = await execAsync(command);
+  return stdout;
+};

@@ -4,7 +4,11 @@ import path from "path";
 import * as projectModel from "../models/project.js";
 import * as fileModel from "../models/file.js";
 import AppError from "../utils/appError.js";
-import setUpContainer from "../utils/container.js";
+import {
+  setUpContainer,
+  execContainer,
+  runCommand,
+} from "../utils/container.js";
 
 export const getProject = async (req: Request, res: Response) => {
   const { id } = req.query as unknown as { id: number };
@@ -26,8 +30,12 @@ export const createProject = async (req: Request, res: Response) => {
   createFile("index.js", "javascript", project.id, "");
   createFile("style.css", "css", project.id, "");
 
-  const containerUrl = await setUpContainer(project.id);
-  await projectModel.updateProjectUrl(containerUrl, project.id);
+  const { containerId, containerUrl } = await setUpContainer(project.id);
+  await projectModel.updateProjectAboutContainer(
+    containerId,
+    containerUrl,
+    project.id
+  );
 
   res
     .status(200)
@@ -48,6 +56,19 @@ export const getProjectsByUserId = async (req: Request, res: Response) => {
   res.status(200).send(projects);
 };
 
+export const sendCommandToContainer = async (req: Request, res: Response) => {
+  const { projectId } = req.body as unknown as {
+    projectId: number;
+  };
+
+  const containerId = await projectModel.getProjectContainerId(projectId);
+  await execContainer(containerId);
+  const response = await runCommand("ls");
+  await runCommand("exit");
+
+  res.status(200).json({ containerId, response });
+};
+
 const createFile = async (
   name: string,
   type: string,
@@ -58,7 +79,7 @@ const createFile = async (
   const filePath = `codeFiles/project${projectId}/${name}`;
 
   if (!file) {
-    fileModel.createFile(name, type, filePath, projectId);
+    fileModel.createFile(name, type, filePath, projectId, false, 0);
   }
 
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
