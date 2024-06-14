@@ -5,6 +5,7 @@ import { Editor } from "@monaco-editor/react";
 import SideBar from "./SideBar.jsx";
 import TabNavigation from "./TabNavigator";
 import Header from "./Header.jsx";
+import Terminal from "./Terminal.jsx";
 
 const CodeEditor = () => {
   const { id } = useParams();
@@ -105,16 +106,17 @@ const CodeEditor = () => {
               fontSize: 20,
             }}
           />
+          <Terminal url={url} />
           <Flex alignItems="center">
             <Button mt="0.5rem" onClick={() => saveFile()}>
               Save
             </Button>
 
-            <Button mt="0.5rem" ml="2rem" bg="orange">
+            {/* <Button mt="0.5rem" ml="2rem" bg="orange">
               <Link href={url} color="white" isExternal>
                 {url}
               </Link>
-            </Button>
+            </Button> */}
           </Flex>
         </Box>
       </Flex>
