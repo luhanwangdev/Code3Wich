@@ -18,12 +18,14 @@ const Terminal = ({ url }) => {
 
     term.loadAddon(webLinksAddon);
     term.open(terminalRef.current);
-    term.write("Hello from \x1B[1;3;32mCode3Wich\x1B[0m $ ");
+    term.write(
+      "\x1B[38;5;208mCode3Wich\x1B[0m $ Welcome to \x1B[38;5;208mCode3Wich\x1B[0m!\r\n"
+    );
 
     term.onData((data) => {
       term.write(data);
       if (data === "\r") {
-        term.write("\n\x1B[1;3;32mCode3Wich\x1B[0m $ ");
+        term.write("\n\x1B[38;5;208mCode3Wich\x1B[0m $ ");
       }
     });
 
@@ -35,7 +37,10 @@ const Terminal = ({ url }) => {
 
   useEffect(() => {
     if (termRef.current && url) {
-      termRef.current.write(`Visit ${url}`);
+      termRef.current.write(
+        `\x1B[38;5;208mCode3Wich\x1B[0m $ Your website is host on \x1B[38;5;208m${url}\x1B[0m`
+      );
+      termRef.current.write("\r\n\x1B[38;5;208mCode3Wich\x1B[0m $ ");
     }
   }, [url]);
 
