@@ -13,7 +13,7 @@ const CodeEditor = () => {
   const [value, setValue] = useState("");
   const [activeFile, setActiveFile] = useState({});
   const [files, setFiles] = useState([]);
-  const [url, setUrl] = useState("");
+  const [project, serProject] = useState({});
 
   const onMount = (editor) => {
     editorRef.current = editor;
@@ -62,7 +62,7 @@ const CodeEditor = () => {
       `http://localhost:3000/api/project?id=${id}`
     );
     const project = await projectResponse.json();
-    setUrl(project.url);
+    serProject(project);
   };
 
   useEffect(() => {
@@ -91,7 +91,7 @@ const CodeEditor = () => {
         </Box>
         <Box flex="6">
           <TabNavigation
-            files={files}
+            files={files.filter((file) => !file.isFolder)}
             activeFile={activeFile}
             setActiveFile={setActiveFile}
           />
@@ -106,7 +106,7 @@ const CodeEditor = () => {
               fontSize: 20,
             }}
           />
-          <Terminal url={url} />
+          <Terminal project={project} />
           <Flex alignItems="center">
             <Button mt="0.5rem" onClick={() => saveFile()}>
               Save

@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Box,
   List,
@@ -17,6 +17,8 @@ import { ICON } from "../constants";
 const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
   const fileNameRef = useRef();
   const fileTypeRef = useRef();
+
+  const [showFiles, setShowFiles] = useState([]);
 
   const createFile = async (name, type) => {
     console.log(projectId);
@@ -48,6 +50,39 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
     setFiles(files);
   };
 
+  const clickFile = async (file) => {
+    if (!file.isFolder) {
+      setActiveFile({
+        name: file.name,
+        type: file.type,
+        location: file.location,
+        project_id: file.project_id,
+      });
+      return;
+    }
+
+    const folder = file;
+
+    if (!folder.isOpen) {
+      folder.isOpen = true;
+
+      setShowFiles((prevShowFiles) => [
+        ...prevShowFiles,
+        ...files.filter((file) => file.parent_file_id === folder.id),
+      ]);
+    } else {
+      folder.isOpen = false;
+
+      setShowFiles((prevShowFiles) =>
+        prevShowFiles.filter((file) => file.parent_file_id !== folder.id)
+      );
+    }
+  };
+
+  useEffect(() => {
+    setShowFiles(files.filter((file) => file.parent_file_id === 0));
+  }, [files]);
+
   return (
     <>
       <Box
@@ -59,19 +94,12 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
         bg="gray.900"
       >
         <List spacing={3}>
-          {files.map((file) => (
+          {showFiles.map((file) => (
             <ListItem>
               <Link
                 display="flex"
                 alignItems="center"
-                onClick={() =>
-                  setActiveFile({
-                    name: file.name,
-                    type: file.type,
-                    location: file.location,
-                    project_id: file.project_id,
-                  })
-                }
+                onClick={() => clickFile(file)}
               >
                 <FontAwesomeIcon
                   icon={ICON[file.type].icon}

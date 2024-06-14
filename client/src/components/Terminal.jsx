@@ -4,9 +4,11 @@ import "@xterm/xterm/css/xterm.css";
 import { WebLinksAddon } from "@xterm/addon-web-links";
 import { Box } from "@chakra-ui/react";
 
-const Terminal = ({ url }) => {
+const Terminal = ({ project }) => {
   const terminalRef = useRef(null);
   const termRef = useRef(null);
+
+  const runCommand = async () => {};
 
   useEffect(() => {
     const term = new xterm.Terminal({
@@ -17,15 +19,14 @@ const Terminal = ({ url }) => {
     const webLinksAddon = new WebLinksAddon();
 
     term.loadAddon(webLinksAddon);
+
     term.open(terminalRef.current);
-    term.write(
-      "\x1B[38;5;208mCode3Wich\x1B[0m $ Welcome to \x1B[38;5;208mCode3Wich\x1B[0m!\r\n"
-    );
+    term.write("Code3Wich $ Welcome to \x1B[38;5;208mCode3Wich\x1B[0m!\r\n");
 
     term.onData((data) => {
       term.write(data);
       if (data === "\r") {
-        term.write("\n\x1B[38;5;208mCode3Wich\x1B[0m $ ");
+        term.write(`\nCode3Wich/${project.name} $ `);
       }
     });
 
@@ -33,16 +34,16 @@ const Terminal = ({ url }) => {
       term.dispose();
       termRef.current = null;
     };
-  }, []);
+  }, [project]);
 
   useEffect(() => {
-    if (termRef.current && url) {
+    if (termRef.current && project.url) {
       termRef.current.write(
-        `\x1B[38;5;208mCode3Wich\x1B[0m $ Your website is host on \x1B[38;5;208m${url}\x1B[0m`
+        `Code3Wich $ Your website is host on \x1B[38;5;208m${project.url}\x1B[0m`
       );
-      termRef.current.write("\r\n\x1B[38;5;208mCode3Wich\x1B[0m $ ");
+      termRef.current.write("\r\n" + `Code3Wich/${project.name} $ `);
     }
-  }, [url]);
+  }, [project]);
 
   return (
     <Box>
