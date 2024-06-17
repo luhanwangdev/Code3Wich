@@ -64,36 +64,36 @@ const CodeEditor = () => {
     setProject(project);
   };
 
-  const socketWithServer = (socket) => {
-    socket.on("connect", () => {
-      console.log("Connected to server");
-      socket.emit("register", "terminal");
-    });
+  // const socketWithServer = (socket) => {
+  //   socket.on("connect", () => {
+  //     console.log("Connected to server");
+  //     socket.emit("register", "terminal");
+  //   });
 
-    socket.on("execStart", (message) => {
-      console.log(message);
-    });
+  //   socket.on("execStart", (message) => {
+  //     console.log(message);
+  //   });
 
-    socket.on("execOutput", (data) => {
-      console.log("Output from container:", data);
-    });
+  //   socket.on("execOutput", (data) => {
+  //     console.log("Output from container:", data);
+  //   });
 
-    socket.on("execComplete", (output) => {
-      console.log("Command execution complete:", output);
-    });
+  //   socket.on("execComplete", (output) => {
+  //     console.log("Command execution complete:", output);
+  //   });
 
-    socket.on("execError", (error) => {
-      console.error("Error during command execution:", error);
-    });
+  //   socket.on("execError", (error) => {
+  //     console.error("Error during command execution:", error);
+  //   });
 
-    socket.on("execEnd", (message) => {
-      console.log(message);
-    });
+  //   socket.on("execEnd", (message) => {
+  //     console.log(message);
+  //   });
 
-    socket.on("disconnect", () => {
-      console.log("Terminal is disconnected from server");
-    });
-  };
+  //   socket.on("disconnect", () => {
+  //     console.log("Terminal is disconnected from server");
+  //   });
+  // };
 
   useEffect(() => {
     fetchProject();
@@ -103,7 +103,6 @@ const CodeEditor = () => {
   }, []);
 
   useEffect(() => {
-    console.log(activeFile);
     if (activeFile.id !== undefined) {
       fetchCode();
       // fetchProject();
@@ -140,7 +139,7 @@ const CodeEditor = () => {
               fontSize: 20,
             }}
           />
-          <Terminal project={project} />
+          {project && <Terminal project={project} />}
           <Flex alignItems="center">
             <Button mt="0.5rem" onClick={() => saveFile()}>
               Save

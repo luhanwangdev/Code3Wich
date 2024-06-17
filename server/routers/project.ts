@@ -5,6 +5,7 @@ import {
   getAllProjects,
   getProjectsByUserId,
   createProject,
+  connectProjectTerminal,
 } from "../controllers/project.js";
 
 const router = Router();
@@ -17,5 +18,7 @@ router
 router.route("/all").get(asyncWrapper(getAllProjects));
 
 router.route("/user").get(asyncWrapper(getProjectsByUserId));
+
+router.route("/terminal").get(asyncWrapper(connectProjectTerminal));
 
 export default router;

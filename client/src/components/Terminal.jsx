@@ -38,6 +38,7 @@ const Terminal = ({ project }) => {
   };
 
   useEffect(() => {
+    console.log(project);
     const term = new xterm.Terminal({
       rows: 7,
     });
@@ -49,6 +50,7 @@ const Terminal = ({ project }) => {
 
     term.open(terminalRef.current);
     term.write("Code3Wich $ Welcome to \x1B[38;5;208mCode3Wich\x1B[0m!\r\n");
+
     socketWithServer(socket, term);
 
     term.onKey((e) => {
@@ -85,6 +87,8 @@ const Terminal = ({ project }) => {
       );
       termRef.current.write("\r\n" + `Code3Wich/${project.name} $ `);
     }
+
+    fetch(`http://localhost:3000/api/project/terminal?id=${project.id}`);
   }, [project]);
 
   return (

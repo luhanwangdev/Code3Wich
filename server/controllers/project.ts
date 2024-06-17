@@ -9,6 +9,14 @@ import { setUpContainer, execContainer } from "../utils/container.js";
 export const getProject = async (req: Request, res: Response) => {
   const { id } = req.query as unknown as { id: number };
 
+  const project = await projectModel.getProject(id);
+
+  res.status(200).send(project);
+};
+
+export const connectProjectTerminal = async (req: Request, res: Response) => {
+  const { id } = req.query as unknown as { id: number };
+
   const io = req.app.get("socketio");
   const userSocketMap = req.app.get("userSocketMap");
   const userSocketId = userSocketMap.terminal;
@@ -18,12 +26,8 @@ export const getProject = async (req: Request, res: Response) => {
     throw new AppError("User socket not found", 500);
   }
 
-  const project = await projectModel.getProject(id);
-
   const containerId = await projectModel.getProjectContainerId(id);
   execContainer(userSocket, containerId);
-
-  res.status(200).send(project);
 };
 
 export const createProject = async (req: Request, res: Response) => {
