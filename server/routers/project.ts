@@ -5,7 +5,6 @@ import {
   getAllProjects,
   getProjectsByUserId,
   createProject,
-  sendCommandToContainer,
 } from "../controllers/project.js";
 
 const router = Router();
@@ -18,7 +17,5 @@ router
 router.route("/all").get(asyncWrapper(getAllProjects));
 
 router.route("/user").get(asyncWrapper(getProjectsByUserId));
-
-router.route("/terminal").post(asyncWrapper(sendCommandToContainer));
 
 export default router;

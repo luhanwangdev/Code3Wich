@@ -98,7 +98,6 @@ const CodeEditor = () => {
   useEffect(() => {
     fetchProject();
     fetchFiles();
-    console.log("Refresh");
 
     // socketWithServer(socket);
   }, []);

@@ -34,27 +34,7 @@ const Terminal = ({ project }) => {
   };
 
   const runCommand = async (socket, command) => {
-    console.log(`command: ${command}`);
-
     socket.emit("execCommand", command);
-
-    // const terminalResponse = await fetch(
-    //   "http://localhost:3000/api/project/terminal",
-    //   {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify({
-    //       projectId: project.id,
-    //       command,
-    //     }),
-    //   }
-    // );
-    // const terminal = await terminalResponse.json();
-
-    // term.write(`\n${terminal.response}`);
-    // term.write(`\nCode3Wich/${project.name} $ `);
   };
 
   useEffect(() => {

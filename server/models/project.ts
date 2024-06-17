@@ -4,13 +4,17 @@ import { RowDataPacket } from "mysql2/promise";
 import instanceOfSetHeader from "../utils/instanceOfSetHeader.js";
 import AppError from "../utils/appError.js";
 
-export const createProject = async (name: string, userId: number) => {
+export const createProject = async (
+  name: string,
+  userId: number,
+  isDynamic: boolean
+) => {
   const results = await pool.query(
     `
-    INSERT INTO project(name, user_id)
-    VALUES (?, ?)
+    INSERT INTO project(name, user_id, isDynamic)
+    VALUES (?, ?, ?)
     `,
-    [name, userId]
+    [name, userId, isDynamic]
   );
 
   if (Array.isArray(results) && instanceOfSetHeader(results[0])) {
@@ -55,6 +59,7 @@ const PorjectSchema = z.object({
   user_id: z.number(),
   url: z.string(),
   container_id: z.string(),
+  isDynamic: z.number(),
 });
 
 interface ProjectRow extends RowDataPacket {
@@ -64,6 +69,7 @@ interface ProjectRow extends RowDataPacket {
   user_id: number;
   url: string;
   container_id: string;
+  isDynamic: number;
 }
 
 export const getProject = async (id: number) => {

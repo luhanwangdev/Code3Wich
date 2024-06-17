@@ -4,11 +4,7 @@ import path from "path";
 import * as projectModel from "../models/project.js";
 import * as fileModel from "../models/file.js";
 import AppError from "../utils/appError.js";
-import {
-  setUpContainer,
-  execContainer,
-  runCommand,
-} from "../utils/container.js";
+import { setUpContainer, execContainer } from "../utils/container.js";
 
 export const getProject = async (req: Request, res: Response) => {
   const { id } = req.query as unknown as { id: number };
@@ -31,18 +27,40 @@ export const getProject = async (req: Request, res: Response) => {
 };
 
 export const createProject = async (req: Request, res: Response) => {
-  const { name, userId } = req.body as unknown as {
+  const { name, userId, isDynamic } = req.body as unknown as {
     name: string;
     userId: number;
+    isDynamic: boolean;
   };
 
-  const project = await projectModel.createProject(name, userId);
+  const project = await projectModel.createProject(name, userId, isDynamic);
 
-  createFile("index.html", "html", project.id, "");
-  createFile("index.js", "javascript", project.id, "");
-  createFile("style.css", "css", project.id, "");
+  if (isDynamic) {
+    createFile(
+      "index.js",
+      "javascript",
+      project.id,
+      `const http = require('http');
 
-  const { containerId, containerUrl } = await setUpContainer(project.id);
+      const server = http.createServer((req, res) => {
+        res.writeHead(200, { 'Content-Type': 'text/plain' });
+        res.end('Hello, Docker World!');
+      });
+
+      server.listen(3000, () => {
+        console.log('Server is running on http://localhost:3000');
+      });`
+    );
+  } else {
+    createFile("index.html", "html", project.id, "");
+    createFile("style.css", "css", project.id, "");
+    createFile("index.js", "javascript", project.id, "");
+  }
+
+  const { containerId, containerUrl } = await setUpContainer(
+    project.id,
+    isDynamic
+  );
   await projectModel.updateProjectAboutContainer(
     containerId,
     containerUrl,
@@ -66,26 +84,6 @@ export const getProjectsByUserId = async (req: Request, res: Response) => {
   const projects = await projectModel.getProjectsByUserId(id);
 
   res.status(200).send(projects);
-};
-
-export const sendCommandToContainer = async (req: Request, res: Response) => {
-  const { projectId, command } = req.body as unknown as {
-    projectId: number;
-    command: string;
-  };
-
-  const io = req.app.get("socketio");
-  const userSocketMap = req.app.get("userSocketMap");
-
-  const userSocketId = userSocketMap.terminal;
-  const userSocket = io.sockets.sockets.get(userSocketId);
-
-  const containerId = await projectModel.getProjectContainerId(projectId);
-  const response = await execContainer(userSocket, containerId);
-  // const response = await runCommand("ls");
-  // await runCommand("exit");
-
-  res.status(200).json({ containerId, response });
 };
 
 const createFile = async (

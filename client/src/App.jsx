@@ -6,6 +6,7 @@ import {
   FormControl,
   FormLabel,
   Input,
+  Select,
   Text,
 } from "@chakra-ui/react";
 import Header from "./components/Header";
@@ -14,6 +15,7 @@ function App() {
   const [user, setUser] = useState({});
   const [projects, setProjects] = useState([]);
   const projectNameRef = useRef();
+  const projectTypeRef = useRef();
 
   const fetchProjects = async () => {
     const projectReponse = await fetch(
@@ -24,7 +26,12 @@ function App() {
     console.log(projects);
   };
 
-  const createProject = async (name) => {
+  const createProject = async (name, type) => {
+    let isDynamic = false;
+    if (type === "Dynamic") {
+      isDynamic = true;
+    }
+
     await fetch("http://localhost:3000/api/project", {
       method: "POST",
       headers: {
@@ -33,6 +40,7 @@ function App() {
       body: JSON.stringify({
         name,
         userId: user.id,
+        isDynamic,
       }),
     });
 
@@ -66,10 +74,22 @@ function App() {
       <FormControl mt="2rem">
         <FormLabel>Project Name:</FormLabel>
         <Input type="text" ref={projectNameRef} width="200px" />
+        <FormLabel>Project Type:</FormLabel>
+        <Select
+          placeholder="Select project type"
+          ref={projectTypeRef}
+          width="200px"
+        >
+          <option>Static</option>
+          <option>Dynamic</option>
+        </Select>
         <Button
           m="1rem"
           onClick={() => {
-            createProject(projectNameRef.current.value);
+            createProject(
+              projectNameRef.current.value,
+              projectTypeRef.current.value
+            );
           }}
         >
           +
