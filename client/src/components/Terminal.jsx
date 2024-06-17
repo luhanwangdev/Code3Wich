@@ -17,44 +17,16 @@ const Terminal = ({ project }) => {
       socket.emit("register", "terminal");
     });
 
-    // socket.on("execStart", (message) => {
-    //   console.log(message);
-    // });
-
     socket.on("execOutput", (data) => {
       console.log("Output from container:", data);
-
-      const cleanData = data.replace(
-        /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,
-        ""
-      );
-      // const lines = cleanData.split("\n\r");
-      // lines.pop();
-
-      // console.log(lines);
-      // console.log(finalOutput);
-
-      // const finalOutput = lines.join("\n");
-      console.log("Output from container:", cleanData);
-
-      term.write(`\r\n${cleanData} $ `);
-      // term.write(`\r\napple\nbbbccccc $ `);
-      // term.write(`\r\nCode3Wich/${project.name} $ `);
+      term.write(`\r\n${data} $ `);
     });
-
-    // socket.on("execComplete", (output) => {
-    //   console.log("Command execution complete:", output);
-    // });
 
     socket.on("execError", (error) => {
       console.error("Error during command execution:", error);
       term.write(`\n${error}`);
       term.write(`\nCode3Wich/${project.name} $ `);
     });
-
-    // socket.on("execEnd", (message) => {
-    //   console.log(message);
-    // });
 
     socket.on("disconnect", () => {
       console.log("Terminal is disconnected from server");

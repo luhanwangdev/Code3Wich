@@ -53,7 +53,7 @@ export const execContainer = async (
   socket: Socket,
   containerId: string
   // command: string
-): Promise<string> => {
+): Promise<void> => {
   // await execAsync(`docker container exec -it ${containerId} ash`);
 
   const container = docker.getContainer(containerId);
@@ -62,46 +62,8 @@ export const execContainer = async (
     AttachStdin: true,
     AttachStderr: true,
     Tty: true,
-    // Cmd: ["ash", "-c", "cd usr/share/nginx/html && ls "],
     Cmd: ["ash"],
   });
-
-  // return new Promise((resolve, reject) => {
-  //   let output = "";
-
-  //   exec.start({ hijack: true, stdin: true }, (err: Error, stream: Duplex) => {
-  //     if (err) {
-  //       reject(new AppError(err.message, 500));
-  //       return;
-  //     }
-
-  //     stream.on("data", (data) => {
-  //       output += data.toString();
-  //     });
-
-  //     stream.on("end", () => {
-  //       resolve(output);
-  //     });
-
-  //     stream.on("error", (error) => {
-  //       console.error("Error during stream:", error);
-  //       reject(new AppError(error.message, 500));
-  //     });
-
-  //     socket.on("execCommand", (command) => {
-  //       if (stream.writable) {
-  //         stream.write(command + "\n");
-  //       } else {
-  //         socket.emit("execError", "Stream is not writable");
-  //       }
-  //     });
-
-  //     socket.on("disconnect", () => {
-  //       stream.end();
-  //       socket.emit("execEnd", "Socket disconnected and stream ended");
-  //     });
-  //   });
-  // });
 
   exec.start({ hijack: true, stdin: true }, (err: Error, stream: Duplex) => {
     if (err) {
@@ -110,18 +72,39 @@ export const execContainer = async (
     }
 
     console.log("Container exec session started");
-    let dataCount = 0;
+    let dataOutput = "";
 
     stream.on("data", (data) => {
-      dataCount += 1;
-      const dataStr = data.toString();
+      const dataStr = data
+        .toString("utf8")
+        .replace(
+          /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,
+          ""
+        );
 
-      console.log("Received data from container:", dataStr);
-      console.log(dataCount);
+      const lines = dataStr.split("\n");
 
-      if (dataCount % 2 === 1) {
-        socket.emit("execOutput", dataStr);
+      if (lines[lines.length - 1].slice(-2) === "# ") {
+        lines.splice(-2, 1);
+
+        dataOutput += lines.join("\n");
+
+        const contentList = dataOutput.split("\n");
+        contentList.shift();
+        const output = contentList.join("\n");
+        const finalOutput = output.trim();
+
+        console.log("Received data from container:", finalOutput);
+        socket.emit("execOutput", finalOutput);
+
+        dataOutput = "";
+      } else {
+        dataOutput += dataStr;
       }
+    });
+
+    stream.on("end", () => {
+      console.log("End of stream");
     });
 
     stream.on("error", (error) => {
