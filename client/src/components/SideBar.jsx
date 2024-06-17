@@ -22,7 +22,6 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
   const [showFiles, setShowFiles] = useState([]);
 
   const createFile = async (name, type, parentId) => {
-    console.log({ name, type, projectId, parentId, code: "" });
     await fetch(`http://localhost:3000/api/file/edit`, {
       method: "POST",
       headers: {

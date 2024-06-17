@@ -13,7 +13,19 @@ import {
 export const getProject = async (req: Request, res: Response) => {
   const { id } = req.query as unknown as { id: number };
 
+  const io = req.app.get("socketio");
+  const userSocketMap = req.app.get("userSocketMap");
+  const userSocketId = userSocketMap.terminal;
+  const userSocket = io.sockets.sockets.get(userSocketId);
+
+  if (!userSocket) {
+    throw new AppError("User socket not found", 500);
+  }
+
   const project = await projectModel.getProject(id);
+
+  const containerId = await projectModel.getProjectContainerId(id);
+  execContainer(userSocket, containerId);
 
   res.status(200).send(project);
 };
@@ -57,14 +69,21 @@ export const getProjectsByUserId = async (req: Request, res: Response) => {
 };
 
 export const sendCommandToContainer = async (req: Request, res: Response) => {
-  const { projectId } = req.body as unknown as {
+  const { projectId, command } = req.body as unknown as {
     projectId: number;
+    command: string;
   };
 
+  const io = req.app.get("socketio");
+  const userSocketMap = req.app.get("userSocketMap");
+
+  const userSocketId = userSocketMap.terminal;
+  const userSocket = io.sockets.sockets.get(userSocketId);
+
   const containerId = await projectModel.getProjectContainerId(projectId);
-  await execContainer(containerId);
-  const response = await runCommand("ls");
-  await runCommand("exit");
+  const response = await execContainer(userSocket, containerId);
+  // const response = await runCommand("ls");
+  // await runCommand("exit");
 
   res.status(200).json({ containerId, response });
 };

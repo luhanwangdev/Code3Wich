@@ -6,6 +6,7 @@ import SideBar from "./SideBar.jsx";
 import TabNavigation from "./TabNavigator";
 import Header from "./Header.jsx";
 import Terminal from "./Terminal.jsx";
+import { socket } from "../socket.js";
 
 const CodeEditor = () => {
   const { id } = useParams();
@@ -13,7 +14,7 @@ const CodeEditor = () => {
   const [value, setValue] = useState("");
   const [activeFile, setActiveFile] = useState({});
   const [files, setFiles] = useState([]);
-  const [project, serProject] = useState({});
+  const [project, setProject] = useState({});
 
   const onMount = (editor) => {
     editorRef.current = editor;
@@ -60,18 +61,53 @@ const CodeEditor = () => {
       `http://localhost:3000/api/project?id=${id}`
     );
     const project = await projectResponse.json();
-    serProject(project);
+    setProject(project);
+  };
+
+  const socketWithServer = (socket) => {
+    socket.on("connect", () => {
+      console.log("Connected to server");
+      socket.emit("register", "terminal");
+    });
+
+    socket.on("execStart", (message) => {
+      console.log(message);
+    });
+
+    socket.on("execOutput", (data) => {
+      console.log("Output from container:", data);
+    });
+
+    socket.on("execComplete", (output) => {
+      console.log("Command execution complete:", output);
+    });
+
+    socket.on("execError", (error) => {
+      console.error("Error during command execution:", error);
+    });
+
+    socket.on("execEnd", (message) => {
+      console.log(message);
+    });
+
+    socket.on("disconnect", () => {
+      console.log("Terminal is disconnected from server");
+    });
   };
 
   useEffect(() => {
     fetchProject();
     fetchFiles();
+    console.log("Refresh");
+
+    // socketWithServer(socket);
   }, []);
 
   useEffect(() => {
     console.log(activeFile);
     if (activeFile.id !== undefined) {
       fetchCode();
+      // fetchProject();
     }
   }, [activeFile]);
 
