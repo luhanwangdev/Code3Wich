@@ -37,6 +37,8 @@ io.on("connection", (socket) => {
   socket.on("register", (user: string) => {
     userSocketMap[user] = socket.id;
     console.log(userSocketMap);
+
+    socket.emit("registered", "success");
   });
 });
 // app.listen(3000, () => {

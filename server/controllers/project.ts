@@ -19,7 +19,7 @@ export const connectProjectTerminal = async (req: Request, res: Response) => {
 
   const io = req.app.get("socketio");
   const userSocketMap = req.app.get("userSocketMap");
-  const userSocketId = userSocketMap[`terminal_${id}`];
+  const userSocketId = userSocketMap[`project${id}`];
   const userSocket = io.sockets.sockets.get(userSocketId);
 
   if (!userSocket) {

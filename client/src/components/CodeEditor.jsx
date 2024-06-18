@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Box, Button, Flex, Link } from "@chakra-ui/react";
+import { Box, Button, Flex } from "@chakra-ui/react";
 import { Editor } from "@monaco-editor/react";
 import SideBar from "./SideBar.jsx";
 import TabNavigation from "./TabNavigator";
@@ -64,43 +64,30 @@ const CodeEditor = () => {
     setProject(project);
   };
 
-  // const socketWithServer = (socket) => {
-  //   socket.on("connect", () => {
-  //     console.log("Connected to server");
-  //     socket.emit("register", "terminal");
-  //   });
-
-  //   socket.on("execStart", (message) => {
-  //     console.log(message);
-  //   });
-
-  //   socket.on("execOutput", (data) => {
-  //     console.log("Output from container:", data);
-  //   });
-
-  //   socket.on("execComplete", (output) => {
-  //     console.log("Command execution complete:", output);
-  //   });
-
-  //   socket.on("execError", (error) => {
-  //     console.error("Error during command execution:", error);
-  //   });
-
-  //   socket.on("execEnd", (message) => {
-  //     console.log(message);
-  //   });
-
-  //   socket.on("disconnect", () => {
-  //     console.log("Terminal is disconnected from server");
-  //   });
-  // };
-
   useEffect(() => {
     fetchProject();
     fetchFiles();
 
-    // socketWithServer(socket);
+    socket.on("connect", () => {
+      console.log("Connected to server");
+    });
+
+    return () => {
+      socket.off();
+      socket.disconnect();
+    };
   }, []);
+
+  useEffect(() => {
+    console.log(project);
+    if (project.id && socket.connected) {
+      socket.emit("register", `project${project.id}`);
+
+      socket.on("registered", () => {
+        fetch(`http://localhost:3000/api/project/terminal?id=${project.id}`);
+      });
+    }
+  }, [project]);
 
   useEffect(() => {
     if (activeFile.id !== undefined) {
@@ -139,7 +126,7 @@ const CodeEditor = () => {
               fontSize: 20,
             }}
           />
-          {project.id && <Terminal project={project} />}
+          {project.id && <Terminal socket={socket} project={project} />}
           <Flex alignItems="center">
             <Button mt="0.5rem" onClick={() => saveFile()}>
               Save

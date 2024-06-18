@@ -1,46 +1,14 @@
 import React, { useEffect, useRef } from "react";
-// import { socket } from "../socket.js";
 import * as xterm from "@xterm/xterm";
 import "@xterm/xterm/css/xterm.css";
 import { WebLinksAddon } from "@xterm/addon-web-links";
 import { Box } from "@chakra-ui/react";
-import { io } from "socket.io-client";
 
-const Terminal = ({ project }) => {
+const Terminal = ({ socket, project }) => {
   const terminalRef = useRef(null);
   const termRef = useRef(null);
 
   let command = "";
-
-  const URL = "http://localhost:3000";
-  const socket = io(URL);
-
-  const socketWithServer = (socket, term) => {
-    console.log(socket);
-    socket.on("connect", () => {
-      console.log("in on connection");
-      console.log("Connected to server");
-      socket.emit("register", `terminal_${project.id}`);
-      console.log(project.id);
-
-      fetch(`http://localhost:3000/api/project/terminal?id=${project.id}`);
-    });
-
-    socket.on("execOutput", (data) => {
-      console.log("Output from container:", data);
-      term.write(`\r\n${data} $ `);
-    });
-
-    socket.on("execError", (error) => {
-      console.error("Error during command execution:", error);
-      term.write(`\n${error}`);
-      term.write(`\nCode3Wich/${project.name} $ `);
-    });
-
-    socket.on("disconnect", () => {
-      console.log("Terminal is disconnected from server");
-    });
-  };
 
   const runCommand = async (socket, command) => {
     socket.emit("execCommand", command);
@@ -59,7 +27,20 @@ const Terminal = ({ project }) => {
     term.open(terminalRef.current);
     term.write("Code3Wich $ Welcome to \x1B[38;5;208mCode3Wich\x1B[0m!\r\n");
 
-    socketWithServer(socket, term);
+    socket.on("execOutput", (data) => {
+      console.log("Output from container:", data);
+      term.write(`\r\n${data} $ `);
+    });
+
+    socket.on("execError", (error) => {
+      console.error("Error during command execution:", error);
+      term.write(`\n${error}`);
+      term.write(`\nCode3Wich/${project.name} $ `);
+    });
+
+    socket.on("disconnect", () => {
+      console.log("Terminal is disconnected from server");
+    });
 
     term.onKey((e) => {
       if (e.key === "\x7F" && command.length > 0) {
@@ -85,7 +66,6 @@ const Terminal = ({ project }) => {
       termRef.current = null;
 
       socket.off();
-      socket.disconnect();
     };
   }, []);
 
