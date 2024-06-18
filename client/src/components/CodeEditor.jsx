@@ -70,7 +70,6 @@ const CodeEditor = () => {
 
   const renderView = () => {
     setRender(!render);
-    console.log(render);
   };
 
   useEffect(() => {
