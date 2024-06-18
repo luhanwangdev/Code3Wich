@@ -38,7 +38,7 @@ export const setUpContainer = async (id: number, isDynamic: boolean) => {
     COPY ${projectDir} .
     RUN npm init -y && npm install -g nodemon
     EXPOSE ${port}
-    CMD ["nodemon", "index.js"]
+    CMD ["nodemon", "-L", "index.js"]
     `;
   } else {
     dockerfileContent = `
