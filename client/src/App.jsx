@@ -23,7 +23,6 @@ function App() {
     );
     const projects = await projectReponse.json();
     setProjects(projects);
-    console.log(projects);
   };
 
   const createProject = async (name, type) => {

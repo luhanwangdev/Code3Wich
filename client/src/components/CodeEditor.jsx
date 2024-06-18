@@ -6,15 +6,17 @@ import SideBar from "./SideBar.jsx";
 import TabNavigation from "./TabNavigator";
 import Header from "./Header.jsx";
 import Terminal from "./Terminal.jsx";
-import { socket } from "../socket.js";
+import { io } from "socket.io-client";
 
 const CodeEditor = () => {
   const { id } = useParams();
   const editorRef = useRef();
+  const socketRef = useRef(null);
   const [value, setValue] = useState("");
   const [activeFile, setActiveFile] = useState({});
   const [files, setFiles] = useState([]);
   const [project, setProject] = useState({});
+  const URL = "http://localhost:3000";
 
   const onMount = (editor) => {
     editorRef.current = editor;
@@ -67,25 +69,27 @@ const CodeEditor = () => {
   useEffect(() => {
     fetchProject();
     fetchFiles();
-
-    socket.on("connect", () => {
-      console.log("Connected to server");
-    });
-
-    return () => {
-      socket.off();
-      socket.disconnect();
-    };
   }, []);
 
   useEffect(() => {
     console.log(project);
-    if (project.id && socket.connected) {
-      socket.emit("register", `project${project.id}`);
+    if (project.id) {
+      socketRef.current = io(URL);
 
-      socket.on("registered", () => {
-        fetch(`http://localhost:3000/api/project/terminal?id=${project.id}`);
+      socketRef.current.on("connect", () => {
+        console.log("Connected to server");
+
+        socketRef.current.emit("register", `project${project.id}`);
+
+        socketRef.current.on("registered", () => {
+          fetch(`http://localhost:3000/api/project/terminal?id=${project.id}`);
+        });
       });
+
+      return () => {
+        socketRef.current.off("connect");
+        socketRef.current.disconnect();
+      };
     }
   }, [project]);
 
@@ -126,7 +130,9 @@ const CodeEditor = () => {
               fontSize: 20,
             }}
           />
-          {project.id && <Terminal socket={socket} project={project} />}
+          {socketRef.current && project.id && (
+            <Terminal socket={socketRef.current} project={project} />
+          )}
           <Flex alignItems="center">
             <Button mt="0.5rem" onClick={() => saveFile()}>
               Save
