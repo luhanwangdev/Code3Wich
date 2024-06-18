@@ -6,6 +6,7 @@ import SideBar from "./SideBar.jsx";
 import TabNavigation from "./TabNavigator";
 import Header from "./Header.jsx";
 import Terminal from "./Terminal.jsx";
+import WebView from "./WebView.jsx";
 import { io } from "socket.io-client";
 
 const CodeEditor = () => {
@@ -16,6 +17,7 @@ const CodeEditor = () => {
   const [activeFile, setActiveFile] = useState({});
   const [files, setFiles] = useState([]);
   const [project, setProject] = useState({});
+  const [render, setRender] = useState(false);
   const URL = "http://localhost:3000";
 
   const onMount = (editor) => {
@@ -66,6 +68,11 @@ const CodeEditor = () => {
     setProject(project);
   };
 
+  const renderView = () => {
+    setRender(!render);
+    console.log(render);
+  };
+
   useEffect(() => {
     fetchProject();
     fetchFiles();
@@ -113,7 +120,7 @@ const CodeEditor = () => {
             projectId={id}
           />
         </Box>
-        <Box flex="6">
+        <Box flex="3">
           <TabNavigation
             files={files.filter((file) => !file.isFolder)}
             activeFile={activeFile}
@@ -134,7 +141,13 @@ const CodeEditor = () => {
             <Terminal socket={socketRef.current} project={project} />
           )}
           <Flex alignItems="center">
-            <Button mt="0.5rem" onClick={() => saveFile()}>
+            <Button
+              mt="0.5rem"
+              onClick={() => {
+                saveFile();
+                renderView();
+              }}
+            >
               Save
             </Button>
 
@@ -144,6 +157,9 @@ const CodeEditor = () => {
               </Link>
             </Button> */}
           </Flex>
+        </Box>
+        <Box flex="3">
+          {project.id && <WebView url={project.url} key={render} />}
         </Box>
       </Flex>
     </Box>
