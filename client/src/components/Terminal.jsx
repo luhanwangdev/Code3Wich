@@ -1,9 +1,10 @@
 import React, { useEffect, useRef } from "react";
-import { socket } from "../socket.js";
+// import { socket } from "../socket.js";
 import * as xterm from "@xterm/xterm";
 import "@xterm/xterm/css/xterm.css";
 import { WebLinksAddon } from "@xterm/addon-web-links";
 import { Box } from "@chakra-ui/react";
+import { io } from "socket.io-client";
 
 const Terminal = ({ project }) => {
   const terminalRef = useRef(null);
@@ -11,10 +12,18 @@ const Terminal = ({ project }) => {
 
   let command = "";
 
+  const URL = "http://localhost:3000";
+  const socket = io(URL);
+
   const socketWithServer = (socket, term) => {
+    console.log(socket);
     socket.on("connect", () => {
+      console.log("in on connection");
       console.log("Connected to server");
-      socket.emit("register", "terminal");
+      socket.emit("register", `terminal_${project.id}`);
+      console.log(project.id);
+
+      fetch(`http://localhost:3000/api/project/terminal?id=${project.id}`);
     });
 
     socket.on("execOutput", (data) => {
@@ -38,7 +47,6 @@ const Terminal = ({ project }) => {
   };
 
   useEffect(() => {
-    console.log(project);
     const term = new xterm.Terminal({
       rows: 7,
     });
@@ -77,6 +85,7 @@ const Terminal = ({ project }) => {
       termRef.current = null;
 
       socket.off();
+      socket.disconnect();
     };
   }, []);
 
@@ -87,8 +96,6 @@ const Terminal = ({ project }) => {
       );
       termRef.current.write("\r\n" + `Code3Wich/${project.name} $ `);
     }
-
-    fetch(`http://localhost:3000/api/project/terminal?id=${project.id}`);
   }, [project]);
 
   return (

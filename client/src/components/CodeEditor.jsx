@@ -139,7 +139,7 @@ const CodeEditor = () => {
               fontSize: 20,
             }}
           />
-          {project && <Terminal project={project} />}
+          {project.id && <Terminal project={project} />}
           <Flex alignItems="center">
             <Button mt="0.5rem" onClick={() => saveFile()}>
               Save

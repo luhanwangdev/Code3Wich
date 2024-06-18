@@ -19,7 +19,7 @@ export const connectProjectTerminal = async (req: Request, res: Response) => {
 
   const io = req.app.get("socketio");
   const userSocketMap = req.app.get("userSocketMap");
-  const userSocketId = userSocketMap.terminal;
+  const userSocketId = userSocketMap[`terminal_${id}`];
   const userSocket = io.sockets.sockets.get(userSocketId);
 
   if (!userSocket) {
@@ -52,8 +52,18 @@ export const createProject = async (req: Request, res: Response) => {
       });
 
       server.listen(3000, () => {
-        console.log('Server is running on http://localhost:3000');
+        console.log('Server is running on port 3000');
       });`
+      // `const express = require('express');
+      // const app = express();
+
+      // app.get('/', (req, res) => {
+      //   res.send("Hello from express!");
+      // })
+
+      // app.listen(3000, () => {
+      //   console.log("Server is listening on port 3000!");
+      // })`
     );
   } else {
     createFile("index.html", "html", project.id, "");

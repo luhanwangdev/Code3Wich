@@ -24,12 +24,21 @@ export const setUpContainer = async (id: number, isDynamic: boolean) => {
   let dockerfileContent;
 
   if (isDynamic) {
+    // dockerfileContent = `
+    // FROM node:22-alpine
+    // WORKDIR /app
+    // COPY ${projectDir} .
+    // EXPOSE ${port}
+    // CMD ["node", "index.js"]
+    // `;
+
     dockerfileContent = `
     FROM node:22-alpine
     WORKDIR /app
     COPY ${projectDir} .
+    RUN npm init -y && npm install -g nodemon
     EXPOSE ${port}
-    CMD ["node", "index.js"]
+    CMD ["nodemon", "index.js"]
     `;
   } else {
     dockerfileContent = `
@@ -43,6 +52,13 @@ export const setUpContainer = async (id: number, isDynamic: boolean) => {
   fs.writeFileSync(dockerfilePath, dockerfileContent);
 
   await execAsync(`docker image build -t ${imageName} .`);
+
+  if (isDynamic) {
+    await execAsync(`docker run -d --name temp-container ${imageName}`);
+    await execAsync(`docker cp temp-container:/app/. ${projectDir}`);
+    await execAsync(`docker stop temp-container`);
+    await execAsync(`docker rm temp-container`);
+  }
 
   await execAsync(
     `docker container run -d -p 0:${port} --name ${containerName} -v "${absolutePath}:${containerPath}" ${imageName}`
@@ -133,7 +149,9 @@ export const execContainer = async (
     });
 
     socket.on("disconnect", () => {
+      // userSocketMap[user] = socket.id;
       stream.end();
+      console.log("client disconnect");
       socket.emit("execEnd", "Socket disconnected and stream ended");
     });
   });
