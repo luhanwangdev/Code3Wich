@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import fs from "fs";
 import path from "path";
+import chokidar from "chokidar";
 import * as projectModel from "../models/project.js";
 import * as fileModel from "../models/file.js";
 import AppError from "../utils/appError.js";
@@ -40,38 +41,56 @@ export const createProject = async (req: Request, res: Response) => {
   };
 
   const project = await projectModel.createProject(name, userId, isDynamic);
+  const projectPath = `codeFiles/project${project.id}`;
+  const serverCode = `
+  const http = require('http');
+
+  const server = http.createServer((req, res) => {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('Hello, Docker World!');
+  });
+
+  server.listen(3000, () => {
+    console.log('Server is running on port 3000');
+  });
+  `;
 
   if (isDynamic) {
-    createFile(
-      "index.js",
-      "javascript",
-      project.id,
-      `const http = require('http');
-
-      const server = http.createServer((req, res) => {
-        res.writeHead(200, { 'Content-Type': 'text/plain' });
-        res.end('Hello, Docker World!');
-      });
-
-      server.listen(3000, () => {
-        console.log('Server is running on port 3000');
-      });`
-      // `const express = require('express');
-      // const app = express();
-
-      // app.get('/', (req, res) => {
-      //   res.send("Hello from express!");
-      // })
-
-      // app.listen(3000, () => {
-      //   console.log("Server is listening on port 3000!");
-      // })`
-    );
+    createFile("index.js", "javascript", project.id, serverCode);
   } else {
     createFile("index.html", "html", project.id, "");
     createFile("style.css", "css", project.id, "");
     createFile("index.js", "javascript", project.id, "");
   }
+
+  const watcher = chokidar.watch(projectPath, { persistent: true });
+
+  watcher.on("add", (filePath: string) => {
+    const fileName = path.basename(filePath);
+    if (fileName !== "index.js") {
+      fileModel.createFile(fileName, "json", filePath, project.id, false, 0);
+    }
+  });
+
+  // watcher.on("addDir", (dirPath: string) => {
+  //   const dirName = path.basename(dirPath);
+  //   fileModel.createFile(
+  //     dirName,
+  //     "json",
+  //     `${dirPath}/${dirName}`,
+  //     project.id,
+  //     true,
+  //     0
+  //   );
+  // });
+
+  watcher.on("unlink", (filePath) => {
+    fileModel.deleteFileByPath(filePath);
+  });
+
+  watcher.on("error", (error: Error) => {
+    throw new AppError(`Watcher error: ${error}`, 500);
+  });
 
   const { containerId, containerUrl } = await setUpContainer(
     project.id,

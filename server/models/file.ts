@@ -103,3 +103,13 @@ export const getFileByFileNameandProjectId = async (
   const file = z.array(FileSchema).parse(results[0]);
   return file[0];
 };
+
+export const deleteFileByPath = async (path: string) => {
+  await pool.query(
+    `
+    DELETE FROM file
+    WHERE location = ?
+    `,
+    [path]
+  );
+};

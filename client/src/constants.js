@@ -1,5 +1,6 @@
 import { faHtml5, faCss3, faJs } from "@fortawesome/free-brands-svg-icons";
-import { faFile, faFolder } from "@fortawesome/free-solid-svg-icons";
+import { faFolder } from "@fortawesome/free-solid-svg-icons";
+import { faFile } from "@fortawesome/free-regular-svg-icons";
 
 export const CODE_SNIPPETS = {
   javascript: `\nfunction greet(name) {\n\tconsole.log("Hello, " + name + "!");\n}\n\ngreet("Alex");\n`,
