@@ -113,3 +113,16 @@ export const deleteFileByPath = async (path: string) => {
     [path]
   );
 };
+
+export const getFileByPath = async (path: string) => {
+  const results = await pool.query(
+    `
+    SELECT * FROM file
+    WHERE location = ?
+    `,
+    [path]
+  );
+
+  const file = z.array(FileSchema).parse(results[0]);
+  return file[0];
+};

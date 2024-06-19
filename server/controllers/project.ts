@@ -66,23 +66,12 @@ export const createProject = async (req: Request, res: Response) => {
   const watcher = chokidar.watch(projectPath, { persistent: true });
 
   watcher.on("add", (filePath: string) => {
-    const fileName = path.basename(filePath);
-    if (fileName !== "index.js") {
-      fileModel.createFile(fileName, "json", filePath, project.id, false, 0);
-    }
+    addFile(filePath, project.id);
   });
 
-  // watcher.on("addDir", (dirPath: string) => {
-  //   const dirName = path.basename(dirPath);
-  //   fileModel.createFile(
-  //     dirName,
-  //     "json",
-  //     `${dirPath}/${dirName}`,
-  //     project.id,
-  //     true,
-  //     0
-  //   );
-  // });
+  watcher.on("addDir", (dirPath: string) => {
+    addDir(dirPath, project.id);
+  });
 
   watcher.on("unlink", (filePath) => {
     fileModel.deleteFileByPath(filePath);
@@ -140,4 +129,51 @@ const createFile = async (
       throw new AppError(err.message, 500);
     }
   });
+};
+
+const addFile = async (filePath: string, projectId: number) => {
+  const projectPath = `codeFiles/project${projectId}`;
+  const fileName = path.basename(filePath);
+
+  if (fileName !== "index.js") {
+    const parentPath = path.dirname(filePath);
+    const fullPath = path.join(projectPath);
+    if (parentPath === fullPath) {
+      fileModel.createFile(fileName, "json", filePath, projectId, false, 0);
+    } else {
+      const parentFolder = await fileModel.getFileByPath(parentPath);
+      // console.log(`${fileName}: location ${filePath}`);
+      fileModel.createFile(
+        fileName,
+        "json",
+        filePath,
+        projectId,
+        false,
+        parentFolder.id
+      );
+    }
+  }
+};
+
+const addDir = async (dirPath: string, projectId: number) => {
+  const projectPath = `codeFiles/project${projectId}`;
+  const dirName = path.basename(dirPath);
+
+  if (dirName !== `project${projectId}`) {
+    const parentPath = path.dirname(dirPath);
+    const fullPath = path.join(projectPath);
+    if (parentPath === fullPath) {
+      fileModel.createFile(dirName, "folder", dirPath, projectId, true, 0);
+    } else {
+      const parentFolder = await fileModel.getFileByPath(parentPath);
+      fileModel.createFile(
+        dirName,
+        "folder",
+        dirPath,
+        projectId,
+        true,
+        parentFolder.id
+      );
+    }
+  }
 };
