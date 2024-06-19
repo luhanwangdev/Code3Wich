@@ -6,6 +6,7 @@ import {
   getProjectsByUserId,
   createProject,
   connectProjectTerminal,
+  deleteProject,
 } from "../controllers/project.js";
 
 const router = Router();
@@ -13,7 +14,8 @@ const router = Router();
 router
   .route("/")
   .get(asyncWrapper(getProject))
-  .post(asyncWrapper(createProject));
+  .post(asyncWrapper(createProject))
+  .delete(asyncWrapper(deleteProject));
 
 router.route("/all").get(asyncWrapper(getAllProjects));
 

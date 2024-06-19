@@ -5,7 +5,12 @@ import chokidar from "chokidar";
 import * as projectModel from "../models/project.js";
 import * as fileModel from "../models/file.js";
 import AppError from "../utils/appError.js";
-import { setUpContainer, execContainer } from "../utils/container.js";
+import {
+  setUpContainer,
+  execContainer,
+  removeContainer,
+  removeImage,
+} from "../utils/container.js";
 
 export const getProject = async (req: Request, res: Response) => {
   const { id } = req.query as unknown as { id: number };
@@ -43,16 +48,16 @@ export const createProject = async (req: Request, res: Response) => {
   const project = await projectModel.createProject(name, userId, isDynamic);
   const projectPath = `codeFiles/project${project.id}`;
   const serverCode = `
-  const http = require('http');
+const http = require('http');
 
-  const server = http.createServer((req, res) => {
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end('Hello, Docker World!');
-  });
+const server = http.createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  res.end('Hello, Docker World!');
+});
 
-  server.listen(3000, () => {
-    console.log('Server is running on port 3000');
-  });
+server.listen(3000, () => {
+  console.log('Server is running on port 3000');
+});
   `;
 
   if (isDynamic) {
@@ -63,7 +68,10 @@ export const createProject = async (req: Request, res: Response) => {
     createFile("index.js", "javascript", project.id, "");
   }
 
-  const watcher = chokidar.watch(projectPath, { persistent: true });
+  const watcher = chokidar.watch(projectPath, {
+    persistent: true,
+    ignored: `${projectPath}/node_modules`,
+  });
 
   watcher.on("add", (filePath: string) => {
     addFile(filePath, project.id);
@@ -94,6 +102,18 @@ export const createProject = async (req: Request, res: Response) => {
   res
     .status(200)
     .json({ status: true, projectId: project.id, url: containerUrl });
+};
+
+export const deleteProject = async (req: Request, res: Response) => {
+  const { id } = req.query as unknown as { id: number };
+  const folderPath = `codeFiles/project${id}`;
+
+  projectModel.deleteProject(id);
+  await removeContainer(id);
+  await removeImage(id);
+  fs.rmSync(path.join(folderPath), { recursive: true });
+
+  res.status(200).json({ id, message: `Delete project${id} successfully` });
 };
 
 export const getAllProjects = async (req: Request, res: Response) => {

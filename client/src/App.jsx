@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import {
   Box,
   Button,
+  Flex,
   FormControl,
   FormLabel,
   Input,
@@ -46,6 +47,14 @@ function App() {
     fetchProjects();
   };
 
+  const deleteProject = async (id) => {
+    await fetch(`http://localhost:3000/api/project?id=${id}`, {
+      method: "DELETE",
+    });
+
+    fetchProjects();
+  };
+
   useEffect(() => {
     setUser({
       name: "Kyle",
@@ -64,11 +73,21 @@ function App() {
         {`${user.name}'s Projects:`}
       </Text>
       {projects.map((project) => (
-        <Link to={`project/${project.id}`}>
-          <Text my="1rem" color="orange" fontSize={20}>
-            {project.name}
-          </Text>
-        </Link>
+        <Flex alignItems="center">
+          <Link to={`project/${project.id}`}>
+            <Text my="1rem" color="orange" fontSize={20}>
+              {project.name}
+            </Text>
+          </Link>
+          <Button
+            ml="2rem"
+            onClick={() => {
+              deleteProject(project.id);
+            }}
+          >
+            Delete
+          </Button>
+        </Flex>
       ))}
       <FormControl mt="2rem">
         <FormLabel>Project Name:</FormLabel>

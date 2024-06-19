@@ -156,3 +156,90 @@ export const execContainer = async (
     });
   });
 };
+
+export const removeContainer = async (id: number) => {
+  const containerName = `project_${id}_container`;
+
+  const containers = await docker.listContainers({ all: true });
+
+  const container = containers.find((container) =>
+    container.Names.includes(`/${containerName}`)
+  );
+
+  if (!container) {
+    console.log(`Container '${containerName}' not found.`);
+    return;
+  }
+
+  const containerInstance = docker.getContainer(container.Id);
+
+  await containerInstance.remove({ force: true });
+
+  // docker.listContainers(
+  //   { all: true },
+  //   (err: Error, containers: ContainerInfo[]) => {
+  //     if (err) {
+  //       throw new AppError(`Error listing containers: ${err}`, 500);
+  //     }
+
+  //     const container = containers.find((container) =>
+  //       container.Names.includes(`/${containerName}`)
+  //     );
+
+  //     if (!container) {
+  //       console.log(`Container '${containerName}' not found.`);
+  //       return;
+  //     }
+
+  //     docker.getContainer(container.Id).remove({ force: true }, (err, data) => {
+  //       if (err) {
+  //         throw new AppError(`Error removing container: ${err}`, 500);
+  //       } else {
+  //         console.log("Container removed successfully:", data);
+  //       }
+  //     });
+  //   }
+  // );
+};
+
+export const removeImage = async (id: number) => {
+  const imageName = `project_${id}_image`;
+
+  const images = await docker.listImages();
+
+  const image = images.find(
+    (img) => img.RepoTags && img.RepoTags.includes(`${imageName}:latest`)
+  );
+
+  if (!image) {
+    console.log(`Image '${imageName}' not found.`);
+    return;
+  }
+
+  const imageInstance = docker.getImage(image.Id);
+
+  await imageInstance.remove({ force: true });
+
+  // docker.listImages((err: Error, images: ImageInfo[]) => {
+  //   if (err) {
+  //     throw new AppError(`Error listing images: ${err}`, 500);
+  //   }
+
+  //   const image = images.find((img) =>
+  //     img.RepoTags.includes(`${imageName}:latest`)
+  //   );
+
+  //   if (!image) {
+  //     console.log(`Image '${imageName}' not found.`);
+  //     return;
+  //   }
+
+  //   docker.getImage(image.Id).remove({ force: true }, (err, data) => {
+  //     if (err) {
+  //       throw new AppError(`Error removing image: ${err}`, 500);
+  //     } else {
+  //       console.log("Image removed successfully:", data);
+  //     }
+  //   });
+  // });
+};

@@ -126,3 +126,13 @@ export const getProjectsByUserId = async (userId: number) => {
 
   return projects[0];
 };
+
+export const deleteProject = async (id: number) => {
+  await pool.query(
+    `
+    DELETE FROM project
+    WHERE id = ?
+    `,
+    [id]
+  );
+};
