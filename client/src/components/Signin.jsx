@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -12,27 +13,31 @@ import {
 } from "@chakra-ui/react";
 import Header from "./Header";
 
-const Signup = () => {
+const Signin = () => {
   const navigate = useNavigate();
-  const userNameRef = useRef();
   const userEmailRef = useRef();
   const userPasswordRef = useRef();
 
-  const createUser = async (name, email, password) => {
-    const userResponse = await fetch("http://localhost:3000/api/user/signup", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name,
-        email,
-        password,
-      }),
-    });
-    const user = await userResponse.json();
+  const handleSignin = async (email, password) => {
+    const signinResponse = await fetch(
+      "http://localhost:3000/api/user/signin",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      }
+    );
+    const signinData = await signinResponse.json();
 
-    navigate(`/user/${user.id}`);
+    const { access_token, access_expired } = signinData;
+    Cookies.set("token", access_token, { expires: access_expired });
+
+    navigate(`/projects`);
   };
 
   return (
@@ -66,15 +71,6 @@ const Signup = () => {
         >
           <FormControl mb="4" p="0 2rem">
             <FormLabel color="lightblue" my="1rem">
-              Name
-            </FormLabel>
-            <Input
-              type="text"
-              bg="gray.700"
-              borderColor="gray.600"
-              ref={userNameRef}
-            />
-            <FormLabel color="lightblue" my="1rem">
               Email
             </FormLabel>
             <Input
@@ -93,19 +89,31 @@ const Signup = () => {
               ref={userPasswordRef}
             />
           </FormControl>
-          <Flex justifyContent="center" alignItems="center" h="20vh">
+          <Flex justifyContent="center" alignItems="center" h="15vh">
             <Button
               colorScheme="teal"
               width="80%"
               onClick={() =>
-                createUser(
-                  userNameRef.current.value,
+                handleSignin(
                   userEmailRef.current.value,
                   userPasswordRef.current.value
                 )
               }
             >
-              Sign up
+              Sign in
+            </Button>
+          </Flex>
+          <Flex flexDirection="column" alignItems="center" h="15vh">
+            <Box width="80%" height="3px" bg="gray.600" my="4" mb="3rem" />
+            <Button
+              colorScheme="teal"
+              variant="outline"
+              width="80%"
+              onClick={() => {
+                navigate("/user/signup");
+              }}
+            >
+              Register New Account
             </Button>
           </Flex>
         </Box>
@@ -114,4 +122,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default Signin;

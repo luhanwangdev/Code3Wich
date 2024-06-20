@@ -6,8 +6,9 @@ import "./index.css";
 import App from "./App.jsx";
 import User from "./components/User.jsx";
 import CodeEditor from "./components/CodeEditor.jsx";
-import Login from "./components/Login.jsx";
 import Signup from "./components/Signup.jsx";
+import Signin from "./components/Signin.jsx";
+import Project from "./components/Project.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <ChakraProvider>
@@ -16,8 +17,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/" element={<App />} />
         <Route path="/user/:id" element={<User />} />
         <Route path="/project/:id" element={<CodeEditor />} />
-        <Route path="/user/login" element={<Login />} />
+        <Route path="/user/signin" element={<Signin />} />
         <Route path="/user/signup" element={<Signup />} />
+        <Route path="/projects" element={<Project />} />
       </Routes>
     </BrowserRouter>
   </ChakraProvider>
