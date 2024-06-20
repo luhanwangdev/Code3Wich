@@ -11,51 +11,87 @@ const execAsync = promisify(exec);
 const docker = new Docker();
 dotenv.config();
 
-export const setUpContainer = async (id: number, isDynamic: boolean) => {
+export const setUpContainer = async (id: number, type: string) => {
   const projectDir = `codeFiles/project${id}`;
   const absolutePath = process.env.SERVER_PATH + projectDir;
   const dockerfilePath = "Dockerfile";
 
   const imageName = `project_${id}_image`;
   const containerName = `project_${id}_container`;
-  const port = isDynamic ? 3000 : 80;
-  const containerPath = isDynamic ? "/app" : "/usr/share/nginx/html";
 
-  let dockerfileContent;
+  const port = (() => {
+    switch (type) {
+      case "vanilla":
+        return 80;
+      case "node":
+        return 3000;
+      case "react":
+        return 5173;
+      default:
+        throw new AppError("Unknown Type for port", 500);
+    }
+  })();
 
-  if (isDynamic) {
-    // dockerfileContent = `
-    // FROM node:22-alpine
-    // WORKDIR /app
-    // COPY ${projectDir} .
-    // EXPOSE ${port}
-    // CMD ["node", "index.js"]
-    // `;
+  const containerPath = (() => {
+    switch (type) {
+      case "vanilla":
+        return "/usr/share/nginx/html";
+      case "node":
+        return "/app";
+      case "react":
+        return "/react";
+      default:
+        throw new AppError("Unknown Type for containerPath", 500);
+    }
+  })();
 
-    dockerfileContent = `
-    FROM node:22-alpine
-    WORKDIR /app
-    COPY ${projectDir} .
-    RUN npm init -y && npm install -g nodemon
-    EXPOSE ${port}
-    CMD ["nodemon", "-L", "index.js"]
-    `;
-  } else {
-    dockerfileContent = `
-    FROM nginx:1.27.0-alpine
-    COPY ${projectDir} ${containerPath}
-    EXPOSE ${port}
-    CMD ["nginx", "-g", "daemon off;"]
-    `;
-  }
+  const dockerfileContent = (() => {
+    switch (type) {
+      case "vanilla":
+        return `
+        FROM nginx:1.27.0-alpine
+        COPY ${projectDir} ${containerPath}
+        EXPOSE ${port}
+        CMD ["nginx", "-g", "daemon off;"]
+        `;
+      case "node":
+        return `
+        FROM node:22-alpine
+        WORKDIR /app
+        COPY ${projectDir} .
+        RUN npm init -y && npm install -g nodemon
+        EXPOSE ${port}
+        CMD ["nodemon", "-L", "index.js"]
+        `;
+      case "react":
+        return `
+        FROM node:22-alpine
+        WORKDIR /react
+        COPY ${projectDir} .
+        RUN npm init -y && npm install -g nodemon
+        RUN npx create-vite@5.2.3 react-app --template react -y
+        EXPOSE ${port}
+        CMD ["nodemon", "-L", "index.js"]
+        `;
+      default:
+        throw new AppError("Unknown Type for dockerfileContent", 500);
+    }
+  })();
 
   fs.writeFileSync(dockerfilePath, dockerfileContent);
 
   await execAsync(`docker image build -t ${imageName} .`);
 
-  if (isDynamic) {
+  if (type === "node") {
     await execAsync(`docker run -d --name temp-container ${imageName}`);
     await execAsync(`docker cp temp-container:/app/. ${projectDir}`);
+    await execAsync(`docker stop temp-container`);
+    await execAsync(`docker rm temp-container`);
+  }
+
+  if (type === "react") {
+    await execAsync(`docker run -d --name temp-container ${imageName}`);
+    await execAsync(`docker cp temp-container:/react/. ${projectDir}`);
     await execAsync(`docker stop temp-container`);
     await execAsync(`docker rm temp-container`);
   }
@@ -174,32 +210,6 @@ export const removeContainer = async (id: number) => {
   const containerInstance = docker.getContainer(container.Id);
 
   await containerInstance.remove({ force: true });
-
-  // docker.listContainers(
-  //   { all: true },
-  //   (err: Error, containers: ContainerInfo[]) => {
-  //     if (err) {
-  //       throw new AppError(`Error listing containers: ${err}`, 500);
-  //     }
-
-  //     const container = containers.find((container) =>
-  //       container.Names.includes(`/${containerName}`)
-  //     );
-
-  //     if (!container) {
-  //       console.log(`Container '${containerName}' not found.`);
-  //       return;
-  //     }
-
-  //     docker.getContainer(container.Id).remove({ force: true }, (err, data) => {
-  //       if (err) {
-  //         throw new AppError(`Error removing container: ${err}`, 500);
-  //       } else {
-  //         console.log("Container removed successfully:", data);
-  //       }
-  //     });
-  //   }
-  // );
 };
 
 export const removeImage = async (id: number) => {
@@ -219,27 +229,4 @@ export const removeImage = async (id: number) => {
   const imageInstance = docker.getImage(image.Id);
 
   await imageInstance.remove({ force: true });
-
-  // docker.listImages((err: Error, images: ImageInfo[]) => {
-  //   if (err) {
-  //     throw new AppError(`Error listing images: ${err}`, 500);
-  //   }
-
-  //   const image = images.find((img) =>
-  //     img.RepoTags.includes(`${imageName}:latest`)
-  //   );
-
-  //   if (!image) {
-  //     console.log(`Image '${imageName}' not found.`);
-  //     return;
-  //   }
-
-  //   docker.getImage(image.Id).remove({ force: true }, (err, data) => {
-  //     if (err) {
-  //       throw new AppError(`Error removing image: ${err}`, 500);
-  //     } else {
-  //       console.log("Image removed successfully:", data);
-  //     }
-  //   });
-  // });
 };

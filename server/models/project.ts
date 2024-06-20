@@ -7,14 +7,14 @@ import AppError from "../utils/appError.js";
 export const createProject = async (
   name: string,
   userId: number,
-  isDynamic: boolean
+  type: string
 ) => {
   const results = await pool.query(
     `
-    INSERT INTO project(name, user_id, isDynamic)
+    INSERT INTO project(name, user_id, type)
     VALUES (?, ?, ?)
     `,
-    [name, userId, isDynamic]
+    [name, userId, type]
   );
 
   if (Array.isArray(results) && instanceOfSetHeader(results[0])) {
@@ -59,7 +59,7 @@ const PorjectSchema = z.object({
   user_id: z.number(),
   url: z.string(),
   container_id: z.string(),
-  isDynamic: z.number(),
+  type: z.string(),
 });
 
 interface ProjectRow extends RowDataPacket {
@@ -69,7 +69,7 @@ interface ProjectRow extends RowDataPacket {
   user_id: number;
   url: string;
   container_id: string;
-  isDynamic: number;
+  type: string;
 }
 
 export const getProject = async (id: number) => {

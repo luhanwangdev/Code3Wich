@@ -26,11 +26,17 @@ function App() {
     setProjects(projects);
   };
 
-  const createProject = async (name, type) => {
-    let isDynamic = false;
-    if (type === "Dynamic") {
-      isDynamic = true;
-    }
+  const createProject = async (name, typeSeletor) => {
+    const type = (() => {
+      switch (typeSeletor) {
+        case "Vanilla JS":
+          return "vanilla";
+        case "Node":
+          return "node";
+        case "React":
+          return "react";
+      }
+    })();
 
     await fetch("http://localhost:3000/api/project", {
       method: "POST",
@@ -40,7 +46,7 @@ function App() {
       body: JSON.stringify({
         name,
         userId: user.id,
-        isDynamic,
+        type,
       }),
     });
 
@@ -98,8 +104,9 @@ function App() {
           ref={projectTypeRef}
           width="200px"
         >
-          <option>Static</option>
-          <option>Dynamic</option>
+          <option>Vanilla JS</option>
+          <option>Node</option>
+          {/* <option>React</option> */}
         </Select>
         <Button
           m="1rem"
