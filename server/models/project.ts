@@ -4,6 +4,38 @@ import { RowDataPacket } from "mysql2/promise";
 import instanceOfSetHeader from "../utils/instanceOfSetHeader.js";
 import AppError from "../utils/appError.js";
 
+const PorjectSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  location: z.string(),
+  user_id: z.number(),
+  url: z.string(),
+  container_id: z.string(),
+  type: z.string(),
+});
+
+interface ProjectRow extends RowDataPacket {
+  id: number;
+  name: string;
+  location: string;
+  user_id: number;
+  url: string;
+  container_id: string;
+  type: string;
+}
+
+export const getProject = async (id: number) => {
+  const results = await pool.query(
+    `
+    SELECT * FROM project
+    WHERE id = ?
+    `,
+    [id]
+  );
+
+  const project = z.array(PorjectSchema).parse(results[0]);
+  return project[0];
+};
 export const createProject = async (
   name: string,
   userId: number,
@@ -50,39 +82,6 @@ export const updateProjectAboutContainer = async (
     [containerId, url, id]
   );
   return result;
-};
-
-const PorjectSchema = z.object({
-  id: z.number(),
-  name: z.string(),
-  location: z.string(),
-  user_id: z.number(),
-  url: z.string(),
-  container_id: z.string(),
-  type: z.string(),
-});
-
-interface ProjectRow extends RowDataPacket {
-  id: number;
-  name: string;
-  location: string;
-  user_id: number;
-  url: string;
-  container_id: string;
-  type: string;
-}
-
-export const getProject = async (id: number) => {
-  const results = await pool.query(
-    `
-    SELECT * FROM project
-    WHERE id = ?
-    `,
-    [id]
-  );
-
-  const project = z.array(PorjectSchema).parse(results[0]);
-  return project[0];
 };
 
 export const getProjectContainerId = async (id: number): Promise<string> => {

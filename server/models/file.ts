@@ -4,29 +4,6 @@ import instanceOfSetHeader from "../utils/instanceOfSetHeader.js";
 import AppError from "../utils/appError.js";
 import { RowDataPacket } from "mysql2";
 
-export const createFile = async (
-  name: string,
-  type: string,
-  location: string,
-  projectId: number,
-  isFolder: boolean,
-  parentId: number
-) => {
-  const results = await pool.query(
-    `
-    INSERT INTO file(name, type, location, project_id, isFolder, parent_file_id)
-    VALUES (?, ?, ?, ?, ?, ?)
-    `,
-    [name, type, location, projectId, isFolder, parentId]
-  );
-
-  if (Array.isArray(results) && instanceOfSetHeader(results[0])) {
-    return results[0].insertId;
-  }
-
-  throw new AppError("create file failed", 400);
-};
-
 const FileSchema = z.object({
   id: z.number(),
   name: z.string(),
@@ -58,6 +35,29 @@ export const getFile = async (id: number) => {
 
   const file = z.array(FileSchema).parse(results[0]);
   return file[0];
+};
+
+export const createFile = async (
+  name: string,
+  type: string,
+  location: string,
+  projectId: number,
+  isFolder: boolean,
+  parentId: number
+) => {
+  const results = await pool.query(
+    `
+    INSERT INTO file(name, type, location, project_id, isFolder, parent_file_id)
+    VALUES (?, ?, ?, ?, ?, ?)
+    `,
+    [name, type, location, projectId, isFolder, parentId]
+  );
+
+  if (Array.isArray(results) && instanceOfSetHeader(results[0])) {
+    return results[0].insertId;
+  }
+
+  throw new AppError("create file failed", 400);
 };
 
 export const getFilePath = async (id: number): Promise<string> => {
