@@ -25,6 +25,7 @@ function Project() {
   const navigate = useNavigate();
   const [user, setUser] = useState({});
   const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(false);
   const projectNameRef = useRef();
   const projectTypeRef = useRef();
 
@@ -77,6 +78,11 @@ function Project() {
   };
 
   const createProject = async (name, typeSeletor) => {
+    if (loading) {
+      return;
+    }
+    setLoading(true);
+
     const type = (() => {
       switch (typeSeletor) {
         case "Vanilla JS":
@@ -97,8 +103,11 @@ function Project() {
       body: JSON.stringify({
         name,
         type,
+        userId: user.id,
       }),
     });
+
+    setLoading(false);
 
     fetchProjects();
   };

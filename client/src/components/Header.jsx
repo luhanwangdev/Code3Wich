@@ -1,17 +1,8 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Box, Flex, Image } from "@chakra-ui/react";
-import Cookies from "js-cookie";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFolderOpen } from "@fortawesome/free-regular-svg-icons";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
-
-// const [token, setToken] = useState();
-
-// const checkToken = async () => {
-//   const tokenCookie = Cookies.get("token");
-//   setToken(tokenCookie);
-// };
 
 const Header = () => {
   return (
