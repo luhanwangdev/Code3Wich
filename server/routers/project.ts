@@ -3,7 +3,6 @@ import asyncWrapper from "../middlewares/asyncWrapper.js";
 import {
   getProject,
   getAllProjects,
-  getProjectsByUserId,
   createProject,
   connectProjectTerminal,
   deleteProject,
@@ -18,8 +17,6 @@ router
   .delete(asyncWrapper(deleteProject));
 
 router.route("/all").get(asyncWrapper(getAllProjects));
-
-router.route("/user").get(asyncWrapper(getProjectsByUserId));
 
 router.route("/terminal").get(asyncWrapper(connectProjectTerminal));
 

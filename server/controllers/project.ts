@@ -125,14 +125,6 @@ export const getAllProjects = async (req: Request, res: Response) => {
   res.status(200).send(projects);
 };
 
-export const getProjectsByUserId = async (req: Request, res: Response) => {
-  const { id } = req.query as unknown as { id: number };
-
-  const projects = await projectModel.getProjectsByUserId(id);
-
-  res.status(200).send(projects);
-};
-
 const createFile = async (
   name: string,
   type: string,
@@ -197,18 +189,18 @@ const addDir = async (dirPath: string, projectId: number) => {
       fileModel.createFile(dirName, "folder", dirPath, projectId, true, 0);
     } else {
       const parentFolder = await fileModel.getFileByPath(parentPath);
-      // if (!parentFolder) {
-      //   throw new AppError(`${dirPath}'s folder doesn't exist`, 500);
-      // }
+      if (!parentFolder) {
+        throw new AppError(`${dirPath}'s folder doesn't exist`, 500);
+      }
 
-      // fileModel.createFile(
-      //   dirName,
-      //   "folder",
-      //   dirPath,
-      //   projectId,
-      //   true,
-      //   parentFolder.id
-      // );
+      fileModel.createFile(
+        dirName,
+        "folder",
+        dirPath,
+        projectId,
+        true,
+        parentFolder.id
+      );
     }
   }
 };

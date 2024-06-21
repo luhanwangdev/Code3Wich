@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import { Server } from "socket.io";
 import { createServer } from "http";
+import { createProxyMiddleware } from "http-proxy-middleware";
 import projectRoutes from "./routers/project.js";
 import fileRoutes from "./routers/file.js";
 import userRoutes from "./routers/user.js";
@@ -31,6 +32,14 @@ app.use(
     credentials: true,
   })
 );
+
+app.use("/container/:port", (req, res, next) => {
+  const { port } = req.params;
+  createProxyMiddleware({
+    target: `http://localhost:${port}`,
+    changeOrigin: true,
+  })(req, res, next);
+});
 
 app.use("/api/project", projectRoutes);
 app.use("/api/file", fileRoutes);

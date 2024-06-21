@@ -109,7 +109,7 @@ export const setUpContainer = async (id: number, type: string) => {
   );
 
   const containerPort = urlStdout.trim();
-  const containerUrl = `http://localhost:${containerPort}`;
+  const containerUrl = `http://localhost:3000/container/${containerPort}`;
   const containerId = idStdout.trim();
 
   return { containerId, containerUrl };
