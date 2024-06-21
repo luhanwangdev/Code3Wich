@@ -18,7 +18,21 @@ const Signin = () => {
   const userEmailRef = useRef();
   const userPasswordRef = useRef();
 
+  const isValidEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
   const handleSignin = async (email, password) => {
+    if (!email || !isValidEmail(email)) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+
+    if (!password) {
+      alert("Please enter your password.");
+      return;
+    }
+
     const signinResponse = await fetch(
       "http://localhost:3000/api/user/signin",
       {

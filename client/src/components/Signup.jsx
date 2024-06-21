@@ -19,7 +19,26 @@ const Signup = () => {
   const userEmailRef = useRef();
   const userPasswordRef = useRef();
 
+  const isValidEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
   const createUser = async (name, email, password) => {
+    if (!name) {
+      alert("Please enter your name.");
+      return;
+    }
+
+    if (!email || !isValidEmail(email)) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+
+    if (!password) {
+      alert("Please enter your password.");
+      return;
+    }
+
     const signupResponse = await fetch(
       "http://localhost:3000/api/user/signup",
       {

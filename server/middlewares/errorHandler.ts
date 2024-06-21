@@ -7,7 +7,7 @@ const sendError = (err: AppError, req: Request, res: Response) => {
   res.json({ error: { statusCode, message } });
 };
 
-const globalErrorHandlerMiddleware = async (
+const globalErrorHandlerMiddleware = (
   err: AppError,
   req: Request,
   res: Response,
@@ -16,6 +16,9 @@ const globalErrorHandlerMiddleware = async (
   err.statusCode = err.statusCode || 500;
   sendError(err, req, res);
   console.log(err);
+  console.log(
+    "--------------------------------------------------------------------------------------"
+  );
 };
 
 export default globalErrorHandlerMiddleware;

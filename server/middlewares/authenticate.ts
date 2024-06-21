@@ -12,11 +12,7 @@ interface JwtPayload {
   email: string;
 }
 
-const jwtAuthMiddleware = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const jwtAuthMiddleware = (req: Request, res: Response, next: NextFunction) => {
   const { token } = req.cookies;
 
   if (!token) {
