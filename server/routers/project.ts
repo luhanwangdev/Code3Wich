@@ -2,10 +2,10 @@ import { Router } from "express";
 import asyncWrapper from "../middlewares/asyncWrapper.js";
 import {
   getProject,
-  getAllProjects,
   createProject,
   connectProjectTerminal,
   deleteProject,
+  getFilesByProject,
 } from "../controllers/project.js";
 
 const router = Router();
@@ -16,7 +16,7 @@ router
   .post(asyncWrapper(createProject))
   .delete(asyncWrapper(deleteProject));
 
-router.route("/all").get(asyncWrapper(getAllProjects));
+router.route("/file").get(asyncWrapper(getFilesByProject));
 
 router.route("/terminal").get(asyncWrapper(connectProjectTerminal));
 

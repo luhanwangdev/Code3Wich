@@ -96,20 +96,6 @@ export const getProjectContainerId = async (id: number): Promise<string> => {
   return results[0].container_id;
 };
 
-export const getAllProjects = async () => {
-  const results = await pool.query(
-    `
-    SELECT * FROM project
-    `
-  );
-
-  const projects = results
-    .slice(0, -1)
-    .map((result) => z.array(PorjectSchema).parse(result));
-
-  return projects[0];
-};
-
 export const getProjectsByUserId = async (userId: number) => {
   const results = await pool.query(
     `

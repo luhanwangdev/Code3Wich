@@ -45,6 +45,7 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
     );
     const files = await filesResponse.json();
 
+    console.log("in updateFiles");
     setFiles(files);
   };
 
@@ -77,6 +78,11 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
     }
   };
 
+  const handleContextMenu = (e) => {
+    e.preventDefault();
+    console.log("right-click");
+  };
+
   useEffect(() => {
     setShowFiles(files.filter((file) => file.parent_file_id === 0));
   }, [files]);
@@ -84,6 +90,7 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
   return (
     <>
       <Box
+        onContextMenu={(e) => handleContextMenu(e)}
         as="nav"
         width="200px"
         padding="5"
@@ -93,11 +100,12 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
       >
         <List spacing={3}>
           {showFiles.map((file) => (
-            <ListItem>
+            <Box>
               <Link
                 display="flex"
                 alignItems="center"
                 onClick={() => clickFile(file)}
+                _hover={{ color: "cyan.200", textDecoration: "none" }}
               >
                 <FontAwesomeIcon
                   icon={ICON[file.type].icon}
@@ -105,7 +113,7 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
                 />
                 <Text mx="0.5rem">{file.name}</Text>
               </Link>
-            </ListItem>
+            </Box>
           ))}
         </List>
 

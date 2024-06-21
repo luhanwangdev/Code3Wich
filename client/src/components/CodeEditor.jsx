@@ -44,7 +44,7 @@ const CodeEditor = () => {
 
   const fetchFiles = async () => {
     const filesResponse = await fetch(
-      `http://localhost:3000/api/file/project?projectId=${id}`
+      `http://localhost:3000/api/project/file?id=${id}`
     );
     const files = await filesResponse.json();
 
@@ -81,6 +81,8 @@ const CodeEditor = () => {
     console.log(project);
     if (project.id) {
       socketRef.current = io(URL);
+
+      console.log(socketRef.current);
 
       socketRef.current.on("connect", () => {
         console.log("Connected to server");
@@ -136,7 +138,7 @@ const CodeEditor = () => {
               fontSize: 20,
             }}
           />
-          {socketRef.current && project.id && (
+          {socketRef.current && (
             <Terminal socket={socketRef.current} project={project} />
           )}
           <Flex alignItems="center">

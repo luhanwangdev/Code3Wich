@@ -12,6 +12,14 @@ import {
   removeImage,
 } from "../utils/container.js";
 
+export const getFilesByProject = async (req: Request, res: Response) => {
+  const { id } = req.query as unknown as { id: number };
+
+  const files = await fileModel.getFilesByProjectId(id);
+
+  res.status(200).send(files);
+};
+
 export const getProject = async (req: Request, res: Response) => {
   const { id } = req.query as unknown as { id: number };
 
@@ -117,12 +125,6 @@ export const deleteProject = async (req: Request, res: Response) => {
   fs.rmSync(path.join(folderPath), { recursive: true });
 
   res.status(200).json({ id, message: `Delete project${id} successfully` });
-};
-
-export const getAllProjects = async (req: Request, res: Response) => {
-  const projects = await projectModel.getAllProjects();
-
-  res.status(200).send(projects);
 };
 
 const createFile = async (
