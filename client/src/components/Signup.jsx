@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 import {
   Box,
   Button,
@@ -19,26 +20,33 @@ const Signup = () => {
   const userPasswordRef = useRef();
 
   const createUser = async (name, email, password) => {
-    const userResponse = await fetch("http://localhost:3000/api/user/signup", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name,
-        email,
-        password,
-      }),
-    });
-    const user = await userResponse.json();
+    const signupResponse = await fetch(
+      "http://localhost:3000/api/user/signup",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+        }),
+      }
+    );
 
-    navigate(`/user/${user.id}`);
+    const signupData = await signupResponse.json();
+
+    const { access_token, access_expired } = signupData;
+    Cookies.set("token", access_token, { expires: access_expired });
+
+    navigate(`/projects`);
   };
 
   return (
-    <Box minH="100vh" bg="#2C2C32" color="gray.500" px={6} py={8}>
+    <Box minH="100vh" bg="#2C2C32" color="gray.500">
       <Header />
-      <Flex justifyContent="space-evenly" alignItems="center" h="80vh">
+      <Flex justifyContent="space-evenly" alignItems="center" h="87vh">
         <Flex justifyContent="center" alignItems="center" direction="column">
           <Image
             w="15rem"
@@ -47,7 +55,7 @@ const Signup = () => {
             borderRadius="50%"
           ></Image>
           <Box>
-            <Text my="2rem" color="lightblue" fontSize={28}>
+            <Text my="2rem" color="lightblue" fontSize={28} fontWeight="bold">
               Code3Wich, <br />
               Coding like eating a sandwich.
             </Text>
@@ -95,7 +103,7 @@ const Signup = () => {
           </FormControl>
           <Flex justifyContent="center" alignItems="center" h="20vh">
             <Button
-              colorScheme="teal"
+              colorScheme="cyan"
               width="80%"
               onClick={() =>
                 createUser(

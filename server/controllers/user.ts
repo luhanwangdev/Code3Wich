@@ -34,9 +34,11 @@ export const handleSignup = async (req: Request, res: Response) => {
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  const user = await userModel.createUser(name, email, hashedPassword);
+  const payload = await userModel.createUser(name, email, hashedPassword);
 
-  res.status(200).json(user);
+  const jwtResult = jwtTokenGenerator(payload);
+
+  res.status(200).send(jwtResult);
 };
 
 export const handleSignin = async (req: Request, res: Response) => {
@@ -81,9 +83,13 @@ export const getUserProjects = async (req: Request, res: Response) => {
 };
 
 export const getUserInfo = async (req: Request, res: Response) => {
-  const { id, name } = req.user as unknown as { id: number; name: string };
+  const { id, name, email } = req.user as unknown as {
+    id: number;
+    name: string;
+    email: string;
+  };
 
-  res.status(200).json({ id, name });
+  res.status(200).json({ id, name, email });
 };
 
 const JWTExpired = 3600;

@@ -1,18 +1,50 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Box, Flex, Image } from "@chakra-ui/react";
+import Cookies from "js-cookie";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFolderOpen } from "@fortawesome/free-regular-svg-icons";
+import { faUser } from "@fortawesome/free-solid-svg-icons";
+
+// const [token, setToken] = useState();
+
+// const checkToken = async () => {
+//   const tokenCookie = Cookies.get("token");
+//   setToken(tokenCookie);
+// };
 
 const Header = () => {
   return (
-    <Box w="90vw" h="10vh">
-      <Flex align="center" w="90%" h="100%" ml="0.5rem">
+    <Box maxW="100vw" h="13vh" background="cyan.100" px="2rem">
+      <Flex
+        align="center"
+        justifyContent="space-between"
+        w="100%"
+        h="100%"
+        ml="0.5rem"
+      >
         <Link to="/">
           <Image
             w="15rem"
             src="/src/assets/logo.png"
             border="2px solid gray"
-            borderRadius="md"
+            borderRadius="lg"
           ></Image>
         </Link>
+        <Flex w="8vw" justifyContent="space-between" mr="2rem">
+          <Link to="/projects">
+            <FontAwesomeIcon
+              icon={faFolderOpen}
+              style={{ fontSize: "2rem", color: "#086F83" }}
+            />
+          </Link>
+          <Link to="/profile">
+            <FontAwesomeIcon
+              icon={faUser}
+              style={{ fontSize: "2rem", color: "#086F83" }}
+            />
+          </Link>
+        </Flex>
       </Flex>
     </Box>
   );

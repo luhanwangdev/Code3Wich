@@ -107,9 +107,9 @@ const CodeEditor = () => {
   }, [activeFile]);
 
   return (
-    <Box minH="100vh" bg="#2C2C32" color="gray.500" px={6} py={8}>
+    <Box minH="100vh" bg="#2C2C32" color="gray.500">
       <Header />
-      <Flex>
+      <Flex px={6} py={6}>
         <Box flex="1">
           <SideBar
             files={files}

@@ -41,9 +41,9 @@ const Signin = () => {
   };
 
   return (
-    <Box minH="100vh" bg="#2C2C32" color="gray.500" px={6} py={8}>
+    <Box minH="100vh" bg="#2C2C32" color="gray.500">
       <Header />
-      <Flex justifyContent="space-evenly" alignItems="center" h="80vh">
+      <Flex justifyContent="space-evenly" alignItems="center" h="87vh">
         <Flex justifyContent="center" alignItems="center" direction="column">
           <Image
             w="15rem"
@@ -52,7 +52,7 @@ const Signin = () => {
             borderRadius="50%"
           ></Image>
           <Box>
-            <Text my="2rem" color="lightblue" fontSize={28}>
+            <Text my="2rem" color="lightblue" fontSize={28} fontWeight="bold">
               Code3Wich, <br />
               Coding like eating a sandwich.
             </Text>
@@ -91,7 +91,7 @@ const Signin = () => {
           </FormControl>
           <Flex justifyContent="center" alignItems="center" h="15vh">
             <Button
-              colorScheme="teal"
+              colorScheme="cyan"
               width="80%"
               onClick={() =>
                 handleSignin(
@@ -106,7 +106,7 @@ const Signin = () => {
           <Flex flexDirection="column" alignItems="center" h="15vh">
             <Box width="80%" height="3px" bg="gray.600" my="4" mb="3rem" />
             <Button
-              colorScheme="teal"
+              colorScheme="cyan"
               variant="outline"
               width="80%"
               onClick={() => {
