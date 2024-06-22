@@ -19,6 +19,7 @@ const CodeEditor = () => {
   const [files, setFiles] = useState([]);
   const [project, setProject] = useState({});
   const [render, setRender] = useState(false);
+  const [isSocketConnected, setIsSocketConnected] = useState(false);
 
   const onMount = (editor) => {
     editorRef.current = editor;
@@ -82,6 +83,7 @@ const CodeEditor = () => {
 
       socketRef.current.on("connect", () => {
         console.log("Connected to server");
+        setIsSocketConnected(true);
 
         socketRef.current.emit("register", `project${project.id}`);
 
@@ -135,7 +137,7 @@ const CodeEditor = () => {
                 fontSize: 20,
               }}
             />
-            {socketRef.current && (
+            {isSocketConnected && (
               <Terminal socket={socketRef.current} project={project} />
             )}
             <Flex alignItems="center">

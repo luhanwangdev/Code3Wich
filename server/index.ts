@@ -44,6 +44,9 @@ app.use("/container/:port", (req, res, next) => {
   createProxyMiddleware({
     target: `http://localhost:${port}`,
     changeOrigin: true,
+    pathRewrite: {
+      "^/container/\\d+": "",
+    },
   })(req, res, next);
 });
 
