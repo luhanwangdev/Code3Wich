@@ -3,7 +3,7 @@ import { Box, DarkMode } from "@chakra-ui/react";
 const WebView = ({ url }) => {
   return (
     <DarkMode>
-      <Box mt="2.5rem" height="92vh">
+      <Box mt="2.5rem" height="92vh" background="white">
         <iframe
           src={url}
           style={{ width: "100%", height: "100%", border: "none" }}
