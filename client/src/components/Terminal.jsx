@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import * as xterm from "@xterm/xterm";
 import "@xterm/xterm/css/xterm.css";
 import { WebLinksAddon } from "@xterm/addon-web-links";
-import { Box } from "@chakra-ui/react";
+import { Box, DarkMode } from "@chakra-ui/react";
 
 const Terminal = ({ socket, project }) => {
   const terminalRef = useRef(null);
@@ -79,9 +79,11 @@ const Terminal = ({ socket, project }) => {
   }, [project]);
 
   return (
-    <Box>
-      <div ref={terminalRef} style={{ width: "100%" }} />
-    </Box>
+    <DarkMode>
+      <Box>
+        <div ref={terminalRef} style={{ width: "100%" }} />
+      </Box>
+    </DarkMode>
   );
 };
 

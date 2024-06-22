@@ -15,3 +15,6 @@ export const ICON = {
   json: { icon: faFile, style: { color: "#a6a6a6" } },
   folder: { icon: faFolder, style: { color: "#a6a6a6" } },
 };
+
+export const url = "http://localhost:3000";
+// export const url = "";

@@ -28,7 +28,7 @@ const App = () => {
         <Flex justifyContent="center" alignItems="center" direction="column">
           <Image
             w="15rem"
-            src="/src/assets/big-icon.png"
+            src="./assets/big-icon.png"
             border="2px solid gray"
             borderRadius="50%"
           ></Image>

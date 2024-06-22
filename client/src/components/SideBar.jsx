@@ -10,9 +10,11 @@ import {
   FormLabel,
   Input,
   Select,
+  DarkMode,
 } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ICON } from "../constants";
+import { url } from "../constants";
 
 const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
   const fileNameRef = useRef();
@@ -22,7 +24,7 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
   const [showFiles, setShowFiles] = useState([]);
 
   const createFile = async (name, type, parentId) => {
-    await fetch(`http://localhost:3000/api/file/edit`, {
+    await fetch(`${url}/api/file/edit`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -41,7 +43,7 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
 
   const updateFiles = async () => {
     const filesResponse = await fetch(
-      `http://localhost:3000/api/file/project?projectId=${projectId}`
+      `${url}/api/file/project?projectId=${projectId}`
     );
     const files = await filesResponse.json();
 
@@ -88,7 +90,7 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
   }, [files]);
 
   return (
-    <>
+    <DarkMode>
       <Box
         onContextMenu={(e) => handleContextMenu(e)}
         as="nav"
@@ -143,7 +145,7 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
           </Button>
         </FormControl>
       </Box>
-    </>
+    </DarkMode>
   );
 };
 
