@@ -1,5 +1,7 @@
 node_modules
-# /dist
+/dist/*
+!/dist/public
+!/dist/public/**
 .env
 database
 codeFiles
