@@ -19,9 +19,12 @@ import {
   Select,
   Text,
   useDisclosure,
+  Link as ChakraLink,
 } from "@chakra-ui/react";
+import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import Header from "./Header";
 import { url } from "../constants";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function Project() {
   const navigate = useNavigate();
@@ -50,6 +53,7 @@ function Project() {
   };
 
   const fetchProjects = async () => {
+    console.log("fetchProfile");
     const projectReponse = await fetch(`${url}/api/user/projects`, {
       method: "GET",
       headers: {
@@ -150,53 +154,126 @@ function Project() {
         </Modal>
         <Box px={6}>
           {user.name && (
-            <Text my="2rem" color="white" fontSize={32}>
+            <Text
+              m="2rem"
+              ml="7rem"
+              color="teal.300"
+              fontSize={32}
+              fontWeight="bold"
+            >
               {`${user.name}'s Projects:`}
             </Text>
           )}
 
-          {projects.map((project) => (
-            <Flex alignItems="center">
-              <Link to={{ pathname: `/project/${project.id}` }}>
-                <Text my="1rem" color="orange" fontSize={20}>
-                  {project.name}
-                </Text>
-              </Link>
-              <Button
-                ml="2rem"
-                onClick={() => {
-                  deleteProject(project.id);
-                }}
+          <Flex wrap="wrap" w="75vw" mx="auto">
+            {projects.map((project) => (
+              <Box
+                w="20vw"
+                h="40vh"
+                maxW="800px"
+                p="20px"
+                bg="gray.700"
+                boxShadow="lg"
+                borderRadius="10%"
+                border="2px"
+                borderColor="gray.600"
+                m="2rem"
               >
-                Delete
-              </Button>
-            </Flex>
-          ))}
-          <FormControl mt="2rem">
-            <FormLabel>Project Name:</FormLabel>
-            <Input type="text" ref={projectNameRef} width="200px" />
-            <FormLabel>Project Type:</FormLabel>
-            <Select
-              placeholder="Select project type"
-              ref={projectTypeRef}
-              width="200px"
+                <Box p="0 1rem">
+                  <Text color="lightblue" my="0.5rem">
+                    Project Name
+                  </Text>
+                  <Text
+                    my="0.5rem"
+                    color="teal.200"
+                    fontSize={28}
+                    fontWeight="bold"
+                  >
+                    {project.name}
+                  </Text>
+
+                  <Text color="lightblue" my="0.5rem">
+                    Project URL
+                  </Text>
+                  <Box
+                    my="0.5rem"
+                    color="gray.300"
+                    fontSize="14px"
+                    fontWeight="bold"
+                  >
+                    <ChakraLink href={project.url} isExternal>
+                      {project.url}
+                    </ChakraLink>
+                  </Box>
+                </Box>
+                <Flex
+                  justifyContent="space-between"
+                  alignItems="center"
+                  h="13vh"
+                >
+                  <Link to={{ pathname: `/project/${project.id}` }}>
+                    <Button colorScheme="cyan" width="13vw">
+                      Edit
+                    </Button>
+                  </Link>
+                  <Button
+                    colorScheme="gray"
+                    width="3vw"
+                    onClick={() => deleteProject(project.id)}
+                  >
+                    <FontAwesomeIcon
+                      icon={faTrashCan}
+                      style={{ fontSize: "1rem", color: "#9DECF9" }}
+                    />
+                  </Button>
+                </Flex>
+              </Box>
+            ))}
+            <Box
+              w="20vw"
+              h="40vh"
+              maxW="800px"
+              p="20px"
+              bg="gray.700"
+              boxShadow="lg"
+              borderRadius="10%"
+              border="2px"
+              borderColor="gray.600"
+              m="2rem"
             >
-              <option>Vanilla JS</option>
-              <option>Node</option>
-              {/* <option>React</option> */}
-            </Select>
-            <Button
-              m="1rem"
-              onClick={() => {
-                createProject(
-                  projectNameRef.current.value,
-                  projectTypeRef.current.value
-                );
-              }}
-            >
-              +
-            </Button>
-          </FormControl>
+              <FormControl>
+                <Text color="lightblue" my="0.5rem">
+                  Project Name:
+                </Text>
+                <Input type="text" ref={projectNameRef} width="200px" />
+                <Text color="lightblue" my="0.5rem">
+                  Project Type:
+                </Text>
+                <Select
+                  placeholder="Select project type"
+                  ref={projectTypeRef}
+                  width="200px"
+                >
+                  <option>Vanilla JS</option>
+                  <option>Node</option>
+                  {/* <option>React</option> */}
+                </Select>
+                <Button
+                  mt="2rem"
+                  colorScheme="cyan"
+                  width="13vw"
+                  onClick={() => {
+                    createProject(
+                      projectNameRef.current.value,
+                      projectTypeRef.current.value
+                    );
+                  }}
+                >
+                  Create
+                </Button>
+              </FormControl>
+            </Box>
+          </Flex>
         </Box>
       </Box>
     </DarkMode>
