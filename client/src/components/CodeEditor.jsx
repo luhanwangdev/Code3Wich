@@ -27,7 +27,7 @@ const CodeEditor = () => {
 
   const saveFile = async () => {
     const { name, type, project_id, parentId } = activeFile;
-    await fetch(`http://localhost:3000/api/file/edit`, {
+    await fetch(`${url}/api/file/edit`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
