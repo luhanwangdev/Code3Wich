@@ -109,7 +109,7 @@ export const setUpContainer = async (id: number, type: string) => {
   );
 
   const containerPort = urlStdout.trim();
-  const containerUrl = `http://localhost:3000/container/${containerPort}`;
+  const containerUrl = `${process.env.HOST_PATH}/container/${containerPort}`;
   const containerId = idStdout.trim();
 
   return { containerId, containerUrl };

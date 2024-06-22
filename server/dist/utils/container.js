@@ -87,7 +87,7 @@ export const setUpContainer = async (id, type) => {
     const { stdout: urlStdout } = await execAsync(`docker inspect --format="{{(index (index .NetworkSettings.Ports \\"${port}/tcp\\") 0).HostPort}}" ${containerName}`);
     const { stdout: idStdout } = await execAsync(`docker ps -aqf "name=${containerName}"`);
     const containerPort = urlStdout.trim();
-    const containerUrl = `http://localhost:3000/container/${containerPort}`;
+    const containerUrl = `${process.env.HOST_PATH}/container/${containerPort}`;
     const containerId = idStdout.trim();
     return { containerId, containerUrl };
 };
