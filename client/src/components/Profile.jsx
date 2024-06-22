@@ -1,7 +1,22 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
-import { Box, Button, DarkMode, Flex, Image, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  DarkMode,
+  Flex,
+  Image,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Text,
+  useDisclosure,
+} from "@chakra-ui/react";
 import Header from "./Header";
 import { url } from "../constants";
 import bigIcon from "/src/assets/big-icon.png";
@@ -10,6 +25,13 @@ const Profile = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState({});
   const [projects, setProjects] = useState([]);
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const handleNavigate = () => {
+    navigate("/user/signin");
+    onClose();
+  };
 
   const checkToken = () => {
     const tokenCookie = Cookies.get("token");
@@ -31,10 +53,12 @@ const Profile = () => {
       credentials: "include",
     });
 
-    const user = await infoReponse.json();
-    console.log(user);
-
-    setUser(user);
+    if (infoReponse.status === 200) {
+      const user = await infoReponse.json();
+      setUser(user);
+    } else {
+      onOpen();
+    }
   };
 
   const fetchProjects = async () => {
@@ -47,8 +71,12 @@ const Profile = () => {
       credentials: "include",
     });
 
-    const projects = await projectReponse.json();
-    setProjects(projects);
+    if (projectReponse.status === 200) {
+      const projects = await projectReponse.json();
+      setProjects(projects);
+    } else {
+      onOpen();
+    }
   };
 
   const handleLogout = async () => {
@@ -65,6 +93,22 @@ const Profile = () => {
     <DarkMode>
       <Box minH="100vh" bg="#2C2C32" color="gray.500">
         <Header />
+        <Modal isOpen={isOpen} onClose={handleNavigate}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader color="white">Alert</ModalHeader>
+            <ModalCloseButton onClick={handleNavigate} color="gray.500" />
+            <ModalBody color="white">
+              Your token is expired. Please Sign in again.
+            </ModalBody>
+
+            <ModalFooter>
+              <Button colorScheme="blue" mr={3} onClick={handleNavigate}>
+                Sign In Now!
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
         <Flex justifyContent="space-evenly" alignItems="center" h="87vh">
           <Flex justifyContent="center" alignItems="center" direction="column">
             <Image

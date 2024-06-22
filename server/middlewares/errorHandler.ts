@@ -4,7 +4,7 @@ import AppError from "../utils/appError.js";
 const sendError = (err: AppError, req: Request, res: Response) => {
   const { message, statusCode } = err;
 
-  res.json({ error: { statusCode, message } });
+  res.status(statusCode).json({ error: { statusCode, message } });
 };
 
 const globalErrorHandlerMiddleware = (

@@ -58,8 +58,12 @@ function Project() {
       credentials: "include",
     });
 
-    const projects = await projectReponse.json();
-    setProjects(projects);
+    if (projectReponse.status === 200) {
+      const projects = await projectReponse.json();
+      setProjects(projects);
+    } else {
+      onOpen();
+    }
   };
 
   const fetchInfo = async () => {
@@ -71,9 +75,12 @@ function Project() {
       credentials: "include",
     });
 
-    const user = await infoReponse.json();
-
-    setUser(user);
+    if (infoReponse.status === 200) {
+      const user = await infoReponse.json();
+      setUser(user);
+    } else {
+      onOpen();
+    }
   };
 
   const createProject = async (name, typeSeletor) => {
