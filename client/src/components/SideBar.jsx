@@ -39,7 +39,6 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
   const menuRef = useRef(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [fileName, setFileName] = useState("");
-  const [fileType, setFileType] = useState("");
 
   const handleContextMenu = (event) => {
     event.preventDefault();
@@ -58,7 +57,7 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
     onOpen();
   };
 
-  const handleCreateFile = async (name, type, parentId) => {
+  const handleCreateFile = async (name, isFolder, parentId) => {
     await fetch(`${url}/api/file/edit`, {
       method: "POST",
       headers: {
@@ -66,7 +65,7 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
       },
       body: JSON.stringify({
         name,
-        type,
+        isFolder,
         projectId,
         parentId,
         code: "",
@@ -75,9 +74,8 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
 
     updateFiles();
 
-    alert(`File created: ${fileName}`);
+    // alert(`File created: ${fileName}`);
     setFileName("");
-    setFileType("");
     onClose();
   };
 
@@ -201,25 +199,12 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
                   onChange={(e) => setFileName(e.target.value)}
                 />
               </FormControl>
-              <FormControl id="file-type" isRequired mt={4}>
-                <FormLabel>File Type</FormLabel>
-                <Select
-                  placeholder="Select file type"
-                  value={fileType}
-                  onChange={(e) => setFileType(e.target.value)}
-                >
-                  <option value="javascript">JavaScript File (.js)</option>
-                  <option value="css">CSS File (.css)</option>
-                  <option value="html">HTML File (.html)</option>
-                  <option value="json">JSON File (.json)</option>
-                </Select>
-              </FormControl>
             </ModalBody>
             <ModalFooter>
               <Button
                 colorScheme="blue"
                 mr={3}
-                onClick={() => handleCreateFile(fileName, fileType, 0)}
+                onClick={() => handleCreateFile(fileName, false, 0)}
               >
                 Create
               </Button>

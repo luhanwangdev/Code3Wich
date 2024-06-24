@@ -5,9 +5,9 @@ import AppError from '../utils/appError.js';
 import * as fileModel from '../models/file.js';
 
 export const updateFile = async (req: Request, res: Response) => {
-  const { name, type, projectId, parentId, code } = req.body as unknown as {
+  const { name, isFolder, projectId, parentId, code } = req.body as unknown as {
     name: string;
-    type: string;
+    isFolder: boolean;
     projectId: number;
     parentId: number;
     code: string;
@@ -18,8 +18,6 @@ export const updateFile = async (req: Request, res: Response) => {
   let filePath;
 
   if (!file) {
-    const isFolder = type === 'folder' ? true : false;
-
     if (parentId === 0) {
       filePath = `codeFiles/project${projectId}/${name}`;
     } else {

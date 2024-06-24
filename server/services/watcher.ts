@@ -1,11 +1,7 @@
 import chokidar from 'chokidar';
-import path, { dirname } from 'path';
-import { fileURLToPath } from 'url';
+import path from 'path';
 import AppError from '../utils/appError.js';
 import * as fileModel from '../models/file.js';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(dirname(dirname(__filename)));
 
 const watchDirectory = 'codeFiles';
 
@@ -40,47 +36,54 @@ const getProjectIdFromPath = (filePath: string): number => {
 const addFile = async (filePath: string, projectId: number) => {
   const projectPath = `codeFiles/project${projectId}`;
   const fileName = path.basename(filePath);
-  const parentPath = path.dirname(filePath);
-  const fullPath = path.join(projectPath);
 
-  if (parentPath === fullPath) {
-    const ext = fileName.split('.').pop();
-    // console.log(`extention: ${ext}`);
-    switch (ext) {
-      case 'js':
-        fileModel.createFile(
-          fileName,
-          'javascript',
-          filePath,
-          projectId,
-          false,
-          0
-        );
-        break;
-      case 'html':
-        fileModel.createFile(fileName, 'html', filePath, projectId, false, 0);
-        break;
-      case 'css':
-        fileModel.createFile(fileName, 'css', filePath, projectId, false, 0);
-        break;
-      default:
-        fileModel.createFile(fileName, 'json', filePath, projectId, false, 0);
+  if (
+    fileName !== 'index.js' &&
+    fileName !== 'index.html' &&
+    fileName !== 'style.css'
+  ) {
+    const parentPath = path.dirname(filePath);
+    const fullPath = path.join(projectPath);
+    if (parentPath === fullPath) {
+      const ext = fileName.split('.').pop();
+      // console.log(`extention: ${ext}`);
+      switch (ext) {
+        case 'js':
+          fileModel.createFile(
+            fileName,
+            'javascript',
+            filePath,
+            projectId,
+            false,
+            0
+          );
+          break;
+        case 'html':
+          fileModel.createFile(fileName, 'html', filePath, projectId, false, 0);
+          break;
+        case 'css':
+          fileModel.createFile(fileName, 'css', filePath, projectId, false, 0);
+          break;
+        default:
+          fileModel.createFile(fileName, 'json', filePath, projectId, false, 0);
+      }
+      // fileModel.createFile(fileName, 'json', filePath, projectId, false, 0);
+    } else {
+      const parentFolder = await fileModel.getFileByPath(parentPath);
+
+      if (!parentFolder) {
+        throw new AppError(`${filePath}'s folder doesn't exist`, 500);
+      }
+
+      fileModel.createFile(
+        fileName,
+        'json',
+        filePath,
+        projectId,
+        false,
+        parentFolder.id
+      );
     }
-  } else {
-    const parentFolder = await fileModel.getFileByPath(parentPath);
-
-    if (!parentFolder) {
-      throw new AppError(`${filePath}'s folder doesn't exist`, 500);
-    }
-
-    fileModel.createFile(
-      fileName,
-      'json',
-      filePath,
-      projectId,
-      false,
-      parentFolder.id
-    );
   }
 };
 
