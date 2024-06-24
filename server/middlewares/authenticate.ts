@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt, { VerifyErrors, JwtPayload } from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 
 import dotenv from 'dotenv';
 import AppError from '../utils/appError.js';
@@ -22,7 +22,7 @@ const jwtAuthMiddleware = (req: Request, res: Response, next: NextFunction) => {
   jwt.verify(
     token,
     process.env.JWT_SECRET_KEY as string,
-    (err: VerifyErrors, decoded: JwtPayload) => {
+    (err: any, decoded: any) => {
       if (err) {
         throw new AppError('Wrong token!', 403);
       }

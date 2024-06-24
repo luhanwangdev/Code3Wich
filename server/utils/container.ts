@@ -1,7 +1,6 @@
 import dotenv from 'dotenv';
 import fs from 'fs';
 import { promisify } from 'util';
-import { Duplex } from 'stream';
 import { Socket } from 'socket.io';
 import { exec } from 'child_process';
 import Docker from 'dockerode';
@@ -124,7 +123,7 @@ export const setUpContainer = async (id: number, type: string) => {
     const containerId = idStdout.trim();
 
     return { containerId, containerUrl, err: null };
-  } catch (err) {
+  } catch (err: any) {
     return { containerId: null, containerUrl: null, err: err.message };
   }
 };
@@ -142,7 +141,7 @@ export const execContainer = async (
     Cmd: ['ash'],
   });
 
-  exec.start({ hijack: true, stdin: true }, (err: Error, stream: Duplex) => {
+  exec.start({ hijack: true, stdin: true }, (err: Error, stream: any) => {
     if (err) {
       socket.emit('execError', err.message);
       throw new AppError(err.message, 500);
@@ -151,7 +150,7 @@ export const execContainer = async (
     console.log('Container exec session started');
     let dataOutput = '';
 
-    stream.on('data', (data) => {
+    stream.on('data', (data: any) => {
       const dataStr = data
         .toString('utf8')
         .replace(
@@ -184,7 +183,7 @@ export const execContainer = async (
       console.log('End of stream');
     });
 
-    stream.on('error', (error) => {
+    stream.on('error', (error: any) => {
       socket.emit('execError', error.message);
       throw new AppError(`Error during stream: ${error.message}`, 500);
     });

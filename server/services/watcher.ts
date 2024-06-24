@@ -33,7 +33,7 @@ watcher
   .on('error', (error: Error) => console.log(`Watcher error: ${error}`))
   .on('ready', () => console.log('Initial scan complete. Ready for changes'));
 
-const getProjectIdFromPath = (filePath: string): number => {
+const getProjectIdFromPath = (filePath: string): any => {
   const relativePath = path.relative(watchDirectory, filePath);
   const match = relativePath.match(/^project(\d+)/);
   return match ? match[1] : 'unknown';
