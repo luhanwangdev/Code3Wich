@@ -36,6 +36,7 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
   const [showFiles, setShowFiles] = useState([]);
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
   const [isMenuVisible, setMenuVisible] = useState(false);
+  const [isCreatingFolder, setIsCreatingFolder] = useState(false);
   const menuRef = useRef(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [fileName, setFileName] = useState("");
@@ -54,6 +55,13 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
 
   const handleNewFile = () => {
     setMenuVisible(false);
+    setIsCreatingFolder(false);
+    onOpen();
+  };
+
+  const handleNewFolder = () => {
+    setMenuVisible(false);
+    setIsCreatingFolder(true);
     onOpen();
   };
 
@@ -177,9 +185,7 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
               left={`${menuPosition.x}px`}
             >
               <MenuItem onClick={handleNewFile}>New File</MenuItem>
-              <MenuItem onClick={() => alert("New Folder")}>
-                New Folder
-              </MenuItem>
+              <MenuItem onClick={handleNewFolder}>New Folder</MenuItem>
               <MenuItem onClick={() => alert("Delete")}>Delete</MenuItem>
             </MenuList>
           </Menu>
@@ -188,13 +194,19 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
         <Modal isOpen={isOpen} onClose={onClose}>
           <ModalOverlay />
           <ModalContent>
-            <ModalHeader>Create New File</ModalHeader>
+            <ModalHeader>
+              {isCreatingFolder ? "Create New Folder" : "Create New File"}
+            </ModalHeader>
             <ModalCloseButton />
             <ModalBody>
               <FormControl id="file-name" isRequired>
-                <FormLabel>File Name</FormLabel>
+                <FormLabel>
+                  {isCreatingFolder ? "Folder Name" : "File name"}
+                </FormLabel>
                 <Input
-                  placeholder="Enter file name"
+                  placeholder={
+                    isCreatingFolder ? "Enter Folder Name" : "Enter File name"
+                  }
                   value={fileName}
                   onChange={(e) => setFileName(e.target.value)}
                 />
@@ -204,7 +216,11 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
               <Button
                 colorScheme="blue"
                 mr={3}
-                onClick={() => handleCreateFile(fileName, false, 0)}
+                onClick={() =>
+                  isCreatingFolder
+                    ? handleCreateFile(fileName, true, 0)
+                    : handleCreateFile(fileName, false, 0)
+                }
               >
                 Create
               </Button>
@@ -231,7 +247,7 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
           ))}
         </List>
 
-        <FormControl mt="2rem">
+        {/* <FormControl mt="2rem">
           <FormLabel>file name:</FormLabel>
           <Input type="text" ref={fileNameRef} />
           <FormLabel>file type</FormLabel>
@@ -255,7 +271,7 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
           >
             +
           </Button>
-        </FormControl>
+        </FormControl> */}
       </Box>
     </DarkMode>
   );

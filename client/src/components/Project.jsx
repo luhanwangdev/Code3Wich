@@ -250,37 +250,41 @@ function Project() {
               borderColor="gray.600"
               m="2rem"
             >
-              <FormControl>
-                <Text color="lightblue" my="0.5rem">
-                  Project Name:
-                </Text>
-                <Input type="text" ref={projectNameRef} width="200px" />
-                <Text color="lightblue" my="0.5rem">
-                  Project Type:
-                </Text>
-                <Select
-                  placeholder="Select project type"
-                  ref={projectTypeRef}
-                  width="200px"
-                >
-                  <option>Vanilla JS</option>
-                  <option>Node</option>
-                  {/* <option>React</option> */}
-                </Select>
-                <Button
-                  mt="2rem"
-                  colorScheme="cyan"
-                  width="13vw"
-                  onClick={() => {
-                    createProject(
-                      projectNameRef.current.value,
-                      projectTypeRef.current.value
-                    );
-                  }}
-                >
-                  Create
-                </Button>
-              </FormControl>
+              <Flex justifyContent="center">
+                <Box w="200px">
+                  <FormControl>
+                    <Text color="lightblue" my="0.5rem">
+                      Project Name:
+                    </Text>
+                    <Input type="text" ref={projectNameRef} width="200px" />
+                    <Text color="lightblue" my="0.5rem">
+                      Project Type:
+                    </Text>
+                    <Select
+                      placeholder="Select project type"
+                      ref={projectTypeRef}
+                      width="200px"
+                    >
+                      <option>Vanilla JS</option>
+                      <option>Node</option>
+                      {/* <option>React</option> */}
+                    </Select>
+                    <Button
+                      mt="2rem"
+                      colorScheme="cyan"
+                      width="13vw"
+                      onClick={() => {
+                        createProject(
+                          projectNameRef.current.value,
+                          projectTypeRef.current.value
+                        );
+                      }}
+                    >
+                      Create
+                    </Button>
+                  </FormControl>
+                </Box>
+              </Flex>
             </Box>
           </Flex>
         </Box>
