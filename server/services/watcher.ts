@@ -20,10 +20,16 @@ watcher
     const projectId = getProjectIdFromPath(dirPath);
     addDir(dirPath, projectId);
   })
+  .on('unlinkDir', (filePath: string) => {
+    if (filePath.charAt(0) === 'c') {
+      fileModel.deleteFileByPath(filePath);
+    } else {
+      fileModel.deleteFileByPath(filePath.split('server\\')[1]);
+    }
+  })
   .on('unlink', (filePath: string) => {
     fileModel.deleteFileByPath(filePath);
   })
-
   .on('error', (error: Error) => console.log(`Watcher error: ${error}`))
   .on('ready', () => console.log('Initial scan complete. Ready for changes'));
 
@@ -46,7 +52,7 @@ const addFile = async (filePath: string, projectId: number) => {
     const fullPath = path.join(projectPath);
     if (parentPath === fullPath) {
       const ext = fileName.split('.').pop();
-      // console.log(`extention: ${ext}`);
+
       switch (ext) {
         case 'js':
           fileModel.createFile(
@@ -67,7 +73,6 @@ const addFile = async (filePath: string, projectId: number) => {
         default:
           fileModel.createFile(fileName, 'json', filePath, projectId, false, 0);
       }
-      // fileModel.createFile(fileName, 'json', filePath, projectId, false, 0);
     } else {
       const parentFolder = await fileModel.getFileByPath(parentPath);
 
@@ -75,14 +80,49 @@ const addFile = async (filePath: string, projectId: number) => {
         throw new AppError(`${filePath}'s folder doesn't exist`, 500);
       }
 
-      fileModel.createFile(
-        fileName,
-        'json',
-        filePath,
-        projectId,
-        false,
-        parentFolder.id
-      );
+      const ext = fileName.split('.').pop();
+
+      switch (ext) {
+        case 'js':
+          fileModel.createFile(
+            fileName,
+            'javascript',
+            filePath,
+            projectId,
+            false,
+            parentFolder.id
+          );
+          break;
+        case 'html':
+          fileModel.createFile(
+            fileName,
+            'html',
+            filePath,
+            projectId,
+            false,
+            parentFolder.id
+          );
+          break;
+        case 'css':
+          fileModel.createFile(
+            fileName,
+            'css',
+            filePath,
+            projectId,
+            false,
+            parentFolder.id
+          );
+          break;
+        default:
+          fileModel.createFile(
+            fileName,
+            'json',
+            filePath,
+            projectId,
+            false,
+            parentFolder.id
+          );
+      }
     }
   }
 };

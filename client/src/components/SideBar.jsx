@@ -40,11 +40,22 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
   const menuRef = useRef(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [fileName, setFileName] = useState("");
+  const [mouseFile, setMouseFile] = useState("");
+  const [menuFile, setMenuFile] = useState("");
 
   const handleContextMenu = (event) => {
     event.preventDefault();
+    setMenuFile(mouseFile);
     setMenuPosition({ x: event.clientX, y: event.clientY });
     setMenuVisible(true);
+  };
+
+  const handleMouseEnter = (file) => {
+    setMouseFile(file);
+  };
+
+  const handleMouseLeave = () => {
+    setMouseFile(null);
   };
 
   const handleClick = (event) => {
@@ -65,7 +76,17 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
     onOpen();
   };
 
-  const handleCreateFile = async (name, isFolder, parentId) => {
+  const handleDeleteFile = async (id) => {
+    await fetch(`${url}/api/file/${id}`, {
+      method: "DELETE",
+    });
+
+    updateFiles();
+  };
+
+  const handleCreateFile = async (name, isFolder) => {
+    const parentId = menuFile ? menuFile.id : 0;
+
     await fetch(`${url}/api/file/edit`, {
       method: "POST",
       headers: {
@@ -145,11 +166,11 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
   };
   useEffect(() => {
     document.addEventListener("click", handleClick);
-    document.addEventListener("contextmenu", handleContextMenu);
+    // document.addEventListener("contextmenu", handleContextMenu);
 
     return () => {
       document.removeEventListener("click", handleClick);
-      document.removeEventListener("contextmenu", handleContextMenu);
+      // document.removeEventListener("contextmenu", handleContextMenu);
     };
   }, []);
 
@@ -184,9 +205,17 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
               top={`${menuPosition.y}px`}
               left={`${menuPosition.x}px`}
             >
-              <MenuItem onClick={handleNewFile}>New File</MenuItem>
-              <MenuItem onClick={handleNewFolder}>New Folder</MenuItem>
-              <MenuItem onClick={() => alert("Delete")}>Delete</MenuItem>
+              {((menuFile && menuFile.type === "folder") || !menuFile) && (
+                <MenuItem onClick={handleNewFile}>New File</MenuItem>
+              )}
+              {((menuFile && menuFile.type === "folder") || !menuFile) && (
+                <MenuItem onClick={handleNewFolder}>New Folder</MenuItem>
+              )}
+              {menuFile && (
+                <MenuItem onClick={() => handleDeleteFile(menuFile.id)}>
+                  Delete
+                </MenuItem>
+              )}
             </MenuList>
           </Menu>
         )}
@@ -218,8 +247,8 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
                 mr={3}
                 onClick={() =>
                   isCreatingFolder
-                    ? handleCreateFile(fileName, true, 0)
-                    : handleCreateFile(fileName, false, 0)
+                    ? handleCreateFile(fileName, true)
+                    : handleCreateFile(fileName, false)
                 }
               >
                 Create
@@ -236,6 +265,8 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
                 alignItems="center"
                 onClick={() => clickFile(file)}
                 _hover={{ color: "cyan.200", textDecoration: "none" }}
+                onMouseEnter={() => handleMouseEnter(file)}
+                onMouseLeave={handleMouseLeave}
               >
                 <FontAwesomeIcon
                   icon={ICON[file.type].icon}

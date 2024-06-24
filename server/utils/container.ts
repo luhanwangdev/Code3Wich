@@ -83,23 +83,33 @@ export const setUpContainer = async (id: number, type: string) => {
 
     await execAsync(`docker image build -t ${imageName} .`);
 
-    if (type === 'node') {
-      await execAsync(`docker run -d --name temp-container ${imageName}`);
-      await execAsync(`docker cp temp-container:/app/. ${projectDir}`);
-      await execAsync(`docker stop temp-container`);
-      await execAsync(`docker rm temp-container`);
+    switch (type) {
+      case 'vanilla':
+        await execAsync(
+          `docker container run -d -p 0:${port} --name ${containerName} -v "${absolutePath}:${containerPath}" -m 50m ${imageName}`
+        );
+        break;
+      case 'node':
+        await execAsync(`docker run -d --name temp-container ${imageName}`);
+        await execAsync(`docker cp temp-container:/app/. ${projectDir}`);
+        await execAsync('docker stop temp-container');
+        await execAsync('docker rm temp-container');
+        await execAsync(
+          `docker container run -d -p 0:${port} --name ${containerName} -v "${absolutePath}:${containerPath}" -m 100m ${imageName}`
+        );
+        break;
+      case 'react':
+        await execAsync(`docker run -d --name temp-container ${imageName}`);
+        await execAsync(`docker cp temp-container:/react/. ${projectDir}`);
+        await execAsync('docker stop temp-container');
+        await execAsync('docker rm temp-container');
+        await execAsync(
+          `docker container run -d -p 0:${port} --name ${containerName} -v "${absolutePath}:${containerPath}" -m 100m ${imageName}`
+        );
+        break;
+      default:
+        throw new AppError('No project type', 500);
     }
-
-    if (type === 'react') {
-      await execAsync(`docker run -d --name temp-container ${imageName}`);
-      await execAsync(`docker cp temp-container:/react/. ${projectDir}`);
-      await execAsync(`docker stop temp-container`);
-      await execAsync(`docker rm temp-container`);
-    }
-
-    await execAsync(
-      `docker container run -d -p 0:${port} --name ${containerName} -v "${absolutePath}:${containerPath}" ${imageName}`
-    );
 
     const { stdout: urlStdout } = await execAsync(
       `docker inspect --format="{{(index (index .NetworkSettings.Ports \\"${port}/tcp\\") 0).HostPort}}" ${containerName}`

@@ -124,7 +124,7 @@ const createFile = async (
   code: string
 ) => {
   const file = await fileModel.getFileByFileNameandProjectId(name, projectId);
-  const filePath = `codeFiles/project${projectId}/${name}`;
+  const filePath = path.join(`codeFiles/project${projectId}/${name}`);
 
   if (!file) {
     fileModel.createFile(name, type, filePath, projectId, false, 0);

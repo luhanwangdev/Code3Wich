@@ -104,7 +104,7 @@ export const getUserInfo = async (req: Request, res: Response) => {
   res.status(200).json({ id, name, email });
 };
 
-const JWTExpired = 3600;
+const JWTExpired = 86400;
 
 interface Payload {
   id: number;

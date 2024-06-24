@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import fs from 'fs';
+import fsExtra from 'fs-extra';
 import path from 'path';
 import AppError from '../utils/appError.js';
 import * as fileModel from '../models/file.js';
@@ -59,4 +60,18 @@ export const loadFile = async (req: Request, res: Response) => {
     }
     res.status(200).json({ status: true, code: data });
   });
+};
+
+export const deleteFile = async (req: Request, res: Response) => {
+  const { id } = req.params as unknown as {
+    id: number;
+  };
+
+  const filePath = await fileModel.getFilePath(id);
+
+  await fsExtra.remove(filePath);
+
+  res
+    .status(200)
+    .json({ status: true, message: 'Folder deleted successfully' });
 };
