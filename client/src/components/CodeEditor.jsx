@@ -159,7 +159,9 @@ const CodeEditor = () => {
             </Flex>
           </Box>
           <Box flex="3">
-            {project.id && <WebView url={project.url} key={render} />}
+            {project.id && (
+              <WebView url={project.url} type={project.type} key={render} />
+            )}
           </Box>
         </Flex>
       </Box>

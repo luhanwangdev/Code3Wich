@@ -110,7 +110,7 @@ export const setUpContainer = async (id: number, type: string) => {
     );
 
     const containerPort = urlStdout.trim();
-    const containerUrl = `${process.env.HOST_PATH}/container/${containerPort}`;
+    const containerUrl = `${process.env.HOST_PATH}/container/${containerPort}/`;
     const containerId = idStdout.trim();
 
     return { containerId, containerUrl, err: null };

@@ -42,7 +42,7 @@ export const connectProjectTerminal = async (req: Request, res: Response) => {
   }
 
   const containerId = await projectModel.getProjectContainerId(id);
-  execContainer(userSocket, containerId);
+  await execContainer(userSocket, containerId);
 };
 
 export const createProject = async (req: Request, res: Response) => {
