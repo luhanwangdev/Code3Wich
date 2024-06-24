@@ -1,16 +1,16 @@
-import { Request, Response } from "express";
-import fs from "fs";
-import path from "path";
-import chokidar from "chokidar";
-import * as projectModel from "../models/project.js";
-import * as fileModel from "../models/file.js";
-import AppError from "../utils/appError.js";
+import { Request, Response } from 'express';
+import fs from 'fs';
+import path from 'path';
+import chokidar from 'chokidar';
+import * as projectModel from '../models/project.js';
+import * as fileModel from '../models/file.js';
+import AppError from '../utils/appError.js';
 import {
   setUpContainer,
   execContainer,
   removeContainer,
   removeImage,
-} from "../utils/container.js";
+} from '../utils/container.js';
 
 export const getFilesByProject = async (req: Request, res: Response) => {
   const { id } = req.query as unknown as { id: number };
@@ -31,15 +31,15 @@ export const getProject = async (req: Request, res: Response) => {
 export const connectProjectTerminal = async (req: Request, res: Response) => {
   const { id } = req.query as unknown as { id: number };
 
-  const io = req.app.get("socketio");
-  const userSocketMap = req.app.get("userSocketMap");
+  const io = req.app.get('socketio');
+  const userSocketMap = req.app.get('userSocketMap');
   const userSocketId = userSocketMap[`project${id}`];
   const userSocket = io.sockets.sockets.get(userSocketId);
 
   console.log(`project${id}: ${userSocketId}`);
 
   if (!userSocket) {
-    throw new AppError("User socket not found", 500);
+    throw new AppError('User socket not found', 500);
   }
 
   const containerId = await projectModel.getProjectContainerId(id);
@@ -52,7 +52,7 @@ export const createProject = async (req: Request, res: Response) => {
     userId: number;
     type: string;
   };
-  console.log("create Project!");
+  console.log('create Project!');
 
   const project = await projectModel.createProject(name, userId, type);
   const projectPath = `codeFiles/project${project.id}`;
@@ -69,44 +69,56 @@ server.listen(3000, () => {
   `;
 
   switch (type) {
-    case "vanilla":
-      createFile("index.html", "html", project.id, "");
-      createFile("style.css", "css", project.id, "");
-      createFile("index.js", "javascript", project.id, "");
+    case 'vanilla':
+      createFile('index.html', 'html', project.id, '');
+      createFile('style.css', 'css', project.id, '');
+      createFile('index.js', 'javascript', project.id, '');
       break;
-    case "node":
-      createFile("index.js", "javascript", project.id, serverCode);
+    case 'node':
+      createFile('index.js', 'javascript', project.id, serverCode);
       break;
-    case "react":
-      createFile("index.js", "javascript", project.id, serverCode);
+    case 'react':
+      createFile('index.js', 'javascript', project.id, serverCode);
       break;
   }
 
   const watcher = chokidar.watch(projectPath, {
     persistent: true,
+    ignoreInitial: true,
     ignored: `${projectPath}/node_modules`,
   });
 
-  watcher.on("add", (filePath: string) => {
-    addFile(filePath, project.id);
-  });
+  watcher
+    .on('add', (filePath: string) => {
+      addFile(filePath, project.id);
+    })
+    .on('addDir', (dirPath: string) => {
+      addDir(dirPath, project.id);
+    })
+    .on('unlink', (filePath) => {
+      fileModel.deleteFileByPath(filePath);
+    })
+    .on('error', (error: Error) => {
+      throw new AppError(`Watcher error: ${error}`, 500);
+    });
 
-  watcher.on("addDir", (dirPath: string) => {
-    addDir(dirPath, project.id);
-  });
+  const { containerId, containerUrl, err } = await setUpContainer(
+    project.id,
+    type
+  );
 
-  watcher.on("unlink", (filePath) => {
-    fileModel.deleteFileByPath(filePath);
-  });
+  if (err) {
+    const folderPath = `codeFiles/project${project.id}`;
 
-  watcher.on("error", (error: Error) => {
-    throw new AppError(`Watcher error: ${error}`, 500);
-  });
+    await projectModel.deleteProject(project.id);
+    fs.rmSync(path.join(folderPath), { recursive: true });
 
-  const { containerId, containerUrl } = await setUpContainer(project.id, type);
+    throw new AppError(err, 500);
+  }
+
   await projectModel.updateProjectAboutContainer(
-    containerId,
-    containerUrl,
+    containerId as string,
+    containerUrl as string,
     project.id
   );
 
@@ -152,33 +164,55 @@ const addFile = async (filePath: string, projectId: number) => {
   const projectPath = `codeFiles/project${projectId}`;
   const fileName = path.basename(filePath);
 
-  if (
-    fileName !== "index.js" &&
-    fileName !== "index.html" &&
-    fileName !== "style.css"
-  ) {
-    const parentPath = path.dirname(filePath);
-    const fullPath = path.join(projectPath);
-    if (parentPath === fullPath) {
-      fileModel.createFile(fileName, "json", filePath, projectId, false, 0);
-    } else {
-      const parentFolder = await fileModel.getFileByPath(parentPath);
-
-      if (!parentFolder) {
-        throw new AppError(`${filePath}'s folder doesn't exist`, 500);
-      }
-
-      fileModel.createFile(
-        fileName,
-        "json",
-        filePath,
-        projectId,
-        false,
-        parentFolder.id
-      );
+  // if (
+  // fileName !== 'index.js' &&
+  //   fileName !== 'index.html' &&
+  //   fileName !== 'style.css'
+  // ) {
+  const parentPath = path.dirname(filePath);
+  const fullPath = path.join(projectPath);
+  if (parentPath === fullPath) {
+    const ext = fileName.split('.').pop();
+    console.log(`extention: ${ext}`);
+    switch (ext) {
+      case 'js':
+        fileModel.createFile(
+          fileName,
+          'javascript',
+          filePath,
+          projectId,
+          false,
+          0
+        );
+        break;
+      case 'html':
+        fileModel.createFile(fileName, 'html', filePath, projectId, false, 0);
+        break;
+      case 'css':
+        fileModel.createFile(fileName, 'css', filePath, projectId, false, 0);
+        break;
+      default:
+        fileModel.createFile(fileName, 'json', filePath, projectId, false, 0);
     }
+    // fileModel.createFile(fileName, 'json', filePath, projectId, false, 0);
+  } else {
+    const parentFolder = await fileModel.getFileByPath(parentPath);
+
+    if (!parentFolder) {
+      throw new AppError(`${filePath}'s folder doesn't exist`, 500);
+    }
+
+    fileModel.createFile(
+      fileName,
+      'json',
+      filePath,
+      projectId,
+      false,
+      parentFolder.id
+    );
   }
 };
+// };
 
 const addDir = async (dirPath: string, projectId: number) => {
   const projectPath = `codeFiles/project${projectId}`;
@@ -188,7 +222,7 @@ const addDir = async (dirPath: string, projectId: number) => {
     const parentPath = path.dirname(dirPath);
     const fullPath = path.join(projectPath);
     if (parentPath === fullPath) {
-      fileModel.createFile(dirName, "folder", dirPath, projectId, true, 0);
+      fileModel.createFile(dirName, 'folder', dirPath, projectId, true, 0);
     } else {
       const parentFolder = await fileModel.getFileByPath(parentPath);
       if (!parentFolder) {
@@ -197,7 +231,7 @@ const addDir = async (dirPath: string, projectId: number) => {
 
       fileModel.createFile(
         dirName,
-        "folder",
+        'folder',
         dirPath,
         projectId,
         true,

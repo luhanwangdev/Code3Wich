@@ -88,6 +88,11 @@ function Project() {
   };
 
   const createProject = async (name, typeSeletor) => {
+    if (!(name && typeSeletor)) {
+      alert("Project name and Project rype are both required!");
+      return;
+    }
+
     if (loading) {
       return;
     }
@@ -104,7 +109,7 @@ function Project() {
       }
     })();
 
-    await fetch(`${url}/api/project`, {
+    const createResponse = await fetch(`${url}/api/project`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -119,7 +124,11 @@ function Project() {
 
     setLoading(false);
 
-    fetchProjects();
+    if (createResponse.status === 200) {
+      fetchProjects();
+    } else {
+      alert("Project creation failed. Please try again.");
+    }
   };
 
   const deleteProject = async (id) => {

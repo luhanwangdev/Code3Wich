@@ -1,8 +1,8 @@
-import { Request, Response } from "express";
-import fs from "fs";
-import path from "path";
-import AppError from "../utils/appError.js";
-import * as fileModel from "../models/file.js";
+import { Request, Response } from 'express';
+import fs from 'fs';
+import path from 'path';
+import AppError from '../utils/appError.js';
+import * as fileModel from '../models/file.js';
 
 export const updateFile = async (req: Request, res: Response) => {
   const { name, type, projectId, parentId, code } = req.body as unknown as {
@@ -18,10 +18,7 @@ export const updateFile = async (req: Request, res: Response) => {
   let filePath;
 
   if (!file) {
-    let isFolder = false;
-    if (type === "folder") {
-      isFolder = true;
-    }
+    const isFolder = type === 'folder' ? true : false;
 
     if (parentId === 0) {
       filePath = `codeFiles/project${projectId}/${name}`;
@@ -30,7 +27,7 @@ export const updateFile = async (req: Request, res: Response) => {
       filePath = `${parentPath}/${name}`;
     }
 
-    fileModel.createFile(name, type, filePath, projectId, isFolder, parentId);
+    // fileModel.createFile(name, type, filePath, projectId, isFolder, parentId);
 
     if (isFolder) {
       fs.mkdirSync(filePath, { recursive: true });
@@ -58,7 +55,7 @@ export const loadFile = async (req: Request, res: Response) => {
 
   const filePath = await fileModel.getFilePath(id);
 
-  fs.readFile(filePath, "utf8", (err, data) => {
+  fs.readFile(filePath, 'utf8', (err, data) => {
     if (err) {
       throw new AppError(err.message, 500);
     }

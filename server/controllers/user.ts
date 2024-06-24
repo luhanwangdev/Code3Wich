@@ -1,12 +1,24 @@
-import { Request, Response } from "express";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
-import AppError from "../utils/appError.js";
-import * as userModel from "../models/user.js";
-import * as projectModel from "../models/project.js";
+import { Request, Response } from 'express';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+import AppError from '../utils/appError.js';
+import * as userModel from '../models/user.js';
+import * as projectModel from '../models/project.js';
 
 dotenv.config();
+
+interface User {
+  id: number;
+  name: string;
+  email: string;
+}
+
+declare module 'express' {
+  export interface Request {
+    user?: User;
+  }
+}
 
 export const getUser = async (req: Request, res: Response) => {
   const { id } = req.query as unknown as { id: number };
@@ -24,12 +36,12 @@ export const handleSignup = async (req: Request, res: Response) => {
   };
 
   if (!(name && email && password)) {
-    throw new AppError("Name, email and password are required!", 400);
+    throw new AppError('Name, email and password are required!', 400);
   }
 
   const existUser = await userModel.checkUserByEmail(email);
   if (existUser) {
-    throw new AppError("The email is already signed up!", 400);
+    throw new AppError('The email is already signed up!', 400);
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -48,7 +60,7 @@ export const handleSignin = async (req: Request, res: Response) => {
   };
 
   if (!(email && password)) {
-    throw new AppError("Email and password are required!", 400);
+    throw new AppError('Email and password are required!', 400);
   }
 
   const hashedPassword = await userModel.getUserPasswordByEmail(email);
@@ -69,7 +81,7 @@ export const handleSignin = async (req: Request, res: Response) => {
       const jwtResult = jwtTokenGenerator(payload);
       res.status(200).send(jwtResult);
     } else {
-      throw new AppError("Incorrect email or password", 403);
+      throw new AppError('Incorrect email or password', 403);
     }
   });
 };

@@ -1,8 +1,8 @@
-import { z } from "zod";
-import pool from "./databasePool.js";
-import instanceOfSetHeader from "../utils/instanceOfSetHeader.js";
-import AppError from "../utils/appError.js";
-import { RowDataPacket } from "mysql2";
+import { z } from 'zod';
+import pool from './databasePool.js';
+import instanceOfSetHeader from '../utils/instanceOfSetHeader.js';
+import AppError from '../utils/appError.js';
+import { RowDataPacket } from 'mysql2';
 
 const UserSchema = z.object({
   id: z.number(),
@@ -16,7 +16,7 @@ interface UserRow extends RowDataPacket {
   id: number;
   name: string;
   email: string;
-  password: number;
+  password: string;
   picture: any;
 }
 
@@ -50,7 +50,7 @@ export const createUser = async (
     return { id: results[0].insertId, name, email };
   }
 
-  throw new AppError("create user failed", 400);
+  throw new AppError('create user failed', 400);
 };
 
 export const checkUserByEmail = async (email: string) => {

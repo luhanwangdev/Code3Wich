@@ -1,61 +1,62 @@
-import dotenv from "dotenv";
-import fs from "fs";
-import { promisify } from "util";
-import { Duplex } from "stream";
-import { Socket } from "socket.io";
-import { exec } from "child_process";
-import Docker from "dockerode";
-import AppError from "./appError.js";
+import dotenv from 'dotenv';
+import fs from 'fs';
+import { promisify } from 'util';
+import { Duplex } from 'stream';
+import { Socket } from 'socket.io';
+import { exec } from 'child_process';
+import Docker from 'dockerode';
+import AppError from './appError.js';
 
 const execAsync = promisify(exec);
 const docker = new Docker();
 dotenv.config();
 
 export const setUpContainer = async (id: number, type: string) => {
-  const projectDir = `codeFiles/project${id}`;
-  const absolutePath = process.env.SERVER_PATH + projectDir;
-  const dockerfilePath = "Dockerfile";
+  try {
+    const projectDir = `codeFiles/project${id}`;
+    const absolutePath = process.env.SERVER_PATH + projectDir;
+    const dockerfilePath = 'Dockerfile';
 
-  const imageName = `project_${id}_image`;
-  const containerName = `project_${id}_container`;
+    const imageName = `project_${id}_image`;
+    const containerName = `project_${id}_container`;
 
-  const port = (() => {
-    switch (type) {
-      case "vanilla":
-        return 80;
-      case "node":
-        return 3000;
-      case "react":
-        return 5173;
-      default:
-        throw new AppError("Unknown Type for port", 500);
-    }
-  })();
+    const port = (() => {
+      switch (type) {
+        case 'vanilla':
+          return 80;
+        case 'node':
+          return 3000;
+        case 'react':
+          return 5173;
+        default:
+          throw new AppError('Unknown Type for port', 500);
+      }
+    })();
 
-  const containerPath = (() => {
-    switch (type) {
-      case "vanilla":
-        return "/usr/share/nginx/html";
-      case "node":
-        return "/app";
-      case "react":
-        return "/react";
-      default:
-        throw new AppError("Unknown Type for containerPath", 500);
-    }
-  })();
+    const containerPath = (() => {
+      switch (type) {
+        case 'vanilla':
+          return '/usr/share/nginx/html';
+        case 'node':
+          return '/app';
+        case 'react':
+          return '/react';
+        default:
+          throw new AppError('Unknown Type for containerPath', 500);
+      }
+    })();
 
-  const dockerfileContent = (() => {
-    switch (type) {
-      case "vanilla":
-        return `
+    const dockerfileContent = (() => {
+      switch (type) {
+        case 'vanilla':
+          return `
         FROM nginx:1.27.0-alpine
         COPY ${projectDir} ${containerPath}
         EXPOSE ${port}
         CMD ["nginx", "-g", "daemon off;"]
         `;
-      case "node":
-        return `
+        case 'node':
+          return `
         FROM node:22-alpine
         WORKDIR /app
         COPY ${projectDir} .
@@ -63,8 +64,8 @@ export const setUpContainer = async (id: number, type: string) => {
         EXPOSE ${port}
         CMD ["nodemon", "-L", "index.js"]
         `;
-      case "react":
-        return `
+        case 'react':
+          return `
         FROM node:22-alpine
         WORKDIR /react
         COPY ${projectDir} .
@@ -73,46 +74,49 @@ export const setUpContainer = async (id: number, type: string) => {
         EXPOSE ${port}
         CMD ["nodemon", "-L", "index.js"]
         `;
-      default:
-        throw new AppError("Unknown Type for dockerfileContent", 500);
+        default:
+          throw new AppError('Unknown Type for dockerfileContent', 500);
+      }
+    })();
+
+    fs.writeFileSync(dockerfilePath, dockerfileContent);
+
+    await execAsync(`docker image build -t ${imageName} .`);
+
+    if (type === 'node') {
+      await execAsync(`docker run -d --name temp-container ${imageName}`);
+      await execAsync(`docker cp temp-container:/app/. ${projectDir}`);
+      await execAsync(`docker stop temp-container`);
+      await execAsync(`docker rm temp-container`);
     }
-  })();
 
-  fs.writeFileSync(dockerfilePath, dockerfileContent);
+    if (type === 'react') {
+      await execAsync(`docker run -d --name temp-container ${imageName}`);
+      await execAsync(`docker cp temp-container:/react/. ${projectDir}`);
+      await execAsync(`docker stop temp-container`);
+      await execAsync(`docker rm temp-container`);
+    }
 
-  await execAsync(`docker image build -t ${imageName} .`);
+    await execAsync(
+      `docker container run -d -p 0:${port} --name ${containerName} -v "${absolutePath}:${containerPath}" ${imageName}`
+    );
 
-  if (type === "node") {
-    await execAsync(`docker run -d --name temp-container ${imageName}`);
-    await execAsync(`docker cp temp-container:/app/. ${projectDir}`);
-    await execAsync(`docker stop temp-container`);
-    await execAsync(`docker rm temp-container`);
+    const { stdout: urlStdout } = await execAsync(
+      `docker inspect --format="{{(index (index .NetworkSettings.Ports \\"${port}/tcp\\") 0).HostPort}}" ${containerName}`
+    );
+
+    const { stdout: idStdout } = await execAsync(
+      `docker ps -aqf "name=${containerName}"`
+    );
+
+    const containerPort = urlStdout.trim();
+    const containerUrl = `${process.env.HOST_PATH}/container/${containerPort}`;
+    const containerId = idStdout.trim();
+
+    return { containerId, containerUrl, err: null };
+  } catch (err) {
+    return { containerId: null, containerUrl: null, err: err.message };
   }
-
-  if (type === "react") {
-    await execAsync(`docker run -d --name temp-container ${imageName}`);
-    await execAsync(`docker cp temp-container:/react/. ${projectDir}`);
-    await execAsync(`docker stop temp-container`);
-    await execAsync(`docker rm temp-container`);
-  }
-
-  await execAsync(
-    `docker container run -d -p 0:${port} --name ${containerName} -v "${absolutePath}:${containerPath}" ${imageName}`
-  );
-
-  const { stdout: urlStdout } = await execAsync(
-    `docker inspect --format="{{(index (index .NetworkSettings.Ports \\"${port}/tcp\\") 0).HostPort}}" ${containerName}`
-  );
-
-  const { stdout: idStdout } = await execAsync(
-    `docker ps -aqf "name=${containerName}"`
-  );
-
-  const containerPort = urlStdout.trim();
-  const containerUrl = `${process.env.HOST_PATH}/container/${containerPort}`;
-  const containerId = idStdout.trim();
-
-  return { containerId, containerUrl };
 };
 
 export const execContainer = async (
@@ -125,70 +129,70 @@ export const execContainer = async (
     AttachStdin: true,
     AttachStderr: true,
     Tty: true,
-    Cmd: ["ash"],
+    Cmd: ['ash'],
   });
 
   exec.start({ hijack: true, stdin: true }, (err: Error, stream: Duplex) => {
     if (err) {
-      socket.emit("execError", err.message);
+      socket.emit('execError', err.message);
       throw new AppError(err.message, 500);
     }
 
-    console.log("Container exec session started");
-    let dataOutput = "";
+    console.log('Container exec session started');
+    let dataOutput = '';
 
-    stream.on("data", (data) => {
+    stream.on('data', (data) => {
       const dataStr = data
-        .toString("utf8")
+        .toString('utf8')
         .replace(
           /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,
-          ""
+          ''
         );
 
-      const lines = dataStr.split("\n");
+      const lines = dataStr.split('\n');
 
-      if (lines[lines.length - 1].slice(-2) === "# ") {
+      if (lines[lines.length - 1].slice(-2) === '# ') {
         lines.splice(-2, 1);
 
-        dataOutput += lines.join("\n");
+        dataOutput += lines.join('\n');
 
-        const contentList = dataOutput.split("\n");
+        const contentList = dataOutput.split('\n');
         contentList.shift();
-        const output = contentList.join("\n");
+        const output = contentList.join('\n');
         const finalOutput = output.trim();
 
         // console.log("Received data from container:", finalOutput);
-        socket.emit("execOutput", finalOutput);
+        socket.emit('execOutput', finalOutput);
 
-        dataOutput = "";
+        dataOutput = '';
       } else {
         dataOutput += dataStr;
       }
     });
 
-    stream.on("end", () => {
-      console.log("End of stream");
+    stream.on('end', () => {
+      console.log('End of stream');
     });
 
-    stream.on("error", (error) => {
-      socket.emit("execError", error.message);
+    stream.on('error', (error) => {
+      socket.emit('execError', error.message);
       throw new AppError(`Error during stream: ${error.message}`, 500);
     });
 
-    socket.on("execCommand", (command) => {
+    socket.on('execCommand', (command) => {
       // console.log("Received command from client:", command);
       if (stream.writable) {
-        stream.write(command + "\n");
+        stream.write(command + '\n');
       } else {
-        socket.emit("execError", "Stream is not writable");
+        socket.emit('execError', 'Stream is not writable');
       }
     });
 
-    socket.on("disconnect", () => {
+    socket.on('disconnect', () => {
       // userSocketMap[user] = socket.id;
       stream.end();
-      console.log("client disconnect");
-      socket.emit("execEnd", "Socket disconnected and stream ended");
+      console.log('client disconnect');
+      socket.emit('execEnd', 'Socket disconnected and stream ended');
     });
   });
 };
