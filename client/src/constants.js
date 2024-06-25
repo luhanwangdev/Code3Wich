@@ -10,6 +10,7 @@ export const CODE_SNIPPETS = {
 
 export const ICON = {
   javascript: { icon: faJs, style: { color: "#ffce47" } },
+  typescript: { icon: faJs, style: { color: "#3178C6" } },
   html: { icon: faHtml5, style: { color: "#ff6e3d" } },
   css: { icon: faCss3, style: { color: "#1899fb" } },
   json: { icon: faFile, style: { color: "#a6a6a6" } },

@@ -29,10 +29,6 @@ import { ICON } from "../constants";
 import { url } from "../constants";
 
 const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
-  const fileNameRef = useRef();
-  const fileTypeRef = useRef();
-  const fileParentRef = useRef();
-
   const [showFiles, setShowFiles] = useState([]);
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
   const [isMenuVisible, setMenuVisible] = useState(false);
@@ -109,17 +105,36 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
   };
 
   const updateFiles = async () => {
+    const notTabFiles = files.filter((file) => !file.isTab);
+
+    console.log(notTabFiles);
+
     const filesResponse = await fetch(
       `${url}/api/project/file?id=${projectId}`
     );
-    const files = await filesResponse.json();
+    const updatedFiles = await filesResponse.json();
 
-    setFiles(files);
+    const readyFiles = updatedFiles.map((file) => {
+      const notTab = notTabFiles.find(
+        (notTabFile) => notTabFile.id === file.id
+      );
+
+      return notTab ? { ...file, isTab: false } : { ...file, isTab: true };
+    });
+
+    setFiles(readyFiles);
   };
 
   const clickFile = async (file) => {
     if (!file.isFolder) {
+      setFiles((prevFiles) =>
+        prevFiles.map((prevFile) =>
+          prevFile.id === file.id ? { ...prevFile, isTab: true } : prevFile
+        )
+      );
+
       setActiveFile({
+        id: file.id,
         name: file.name,
         type: file.type,
         location: file.location,

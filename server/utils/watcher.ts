@@ -66,12 +66,23 @@ const addFile = async (filePath: string, projectId: number) => {
             0
           );
           break;
+        case 'ts':
+          fileModel.createFile(
+            fileName,
+            'typescript',
+            filePath,
+            projectId,
+            false,
+            0
+          );
+          break;
         case 'html':
           fileModel.createFile(fileName, 'html', filePath, projectId, false, 0);
           break;
         case 'css':
           fileModel.createFile(fileName, 'css', filePath, projectId, false, 0);
           break;
+
         default:
           fileModel.createFile(fileName, 'json', filePath, projectId, false, 0);
       }
@@ -89,6 +100,16 @@ const addFile = async (filePath: string, projectId: number) => {
           fileModel.createFile(
             fileName,
             'javascript',
+            filePath,
+            projectId,
+            false,
+            parentFolder.id
+          );
+          break;
+        case 'ts':
+          fileModel.createFile(
+            fileName,
+            'typescript',
             filePath,
             projectId,
             false,
