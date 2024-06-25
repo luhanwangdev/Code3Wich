@@ -94,6 +94,15 @@ server.listen(3000, () => {
     throw new AppError(err, 500);
   }
 
+  if (!(containerId && containerUrl)) {
+    const folderPath = `codeFiles/project${project.id}`;
+
+    await projectModel.deleteProject(project.id);
+    fs.rmSync(path.join(folderPath), { recursive: true });
+
+    throw new AppError('Container id is null', 500);
+  }
+
   await projectModel.updateProjectAboutContainer(
     containerId as string,
     containerUrl as string,

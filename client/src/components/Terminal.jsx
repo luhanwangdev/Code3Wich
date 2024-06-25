@@ -3,15 +3,33 @@ import * as xterm from "@xterm/xterm";
 import "@xterm/xterm/css/xterm.css";
 import { WebLinksAddon } from "@xterm/addon-web-links";
 import { Box, DarkMode } from "@chakra-ui/react";
+import { url } from "../constants";
 
-const Terminal = ({ socket, project }) => {
+const Terminal = ({ setFiles, socket, project }) => {
   const terminalRef = useRef(null);
   const termRef = useRef(null);
 
   let command = "";
 
-  const runCommand = async (socket, command) => {
+  const handleRunCommand = async (socket, command) => {
     socket.emit("execCommand", command);
+
+    if (
+      command.startsWith("touch ") ||
+      command.startsWith("mkdir ") ||
+      command.startsWith("rm ")
+    ) {
+      setTimeout(() => updateFiles(), 300);
+    }
+  };
+
+  const updateFiles = async () => {
+    const filesResponse = await fetch(
+      `${url}/api/project/file?id=${project.id}`
+    );
+    const files = await filesResponse.json();
+
+    setFiles(files);
   };
 
   useEffect(() => {
@@ -52,7 +70,7 @@ const Terminal = ({ socket, project }) => {
       }
 
       if (e.key === "\r") {
-        runCommand(socket, command);
+        handleRunCommand(socket, command);
         command = "";
       }
     });

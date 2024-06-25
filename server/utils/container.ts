@@ -50,7 +50,8 @@ export const setUpContainer = async (id: number, type: string) => {
         case 'vanilla':
           return `
         FROM nginx:1.27.0-alpine
-        COPY ${projectDir} ${containerPath}
+        WORKDIR ${containerPath}
+        COPY ${projectDir} .
         EXPOSE ${port}
         CMD ["nginx", "-g", "daemon off;"]
         `;

@@ -1,6 +1,19 @@
 import { useState, useRef, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import { Box, Button, Flex, DarkMode } from "@chakra-ui/react";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  Box,
+  Button,
+  Flex,
+  DarkMode,
+  useDisclosure,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
+} from "@chakra-ui/react";
 import { Editor } from "@monaco-editor/react";
 import SideBar from "./SideBar.jsx";
 import TabNavigation from "./TabNavigator";
@@ -11,15 +24,18 @@ import { io } from "socket.io-client";
 import { url } from "../constants.js";
 
 const CodeEditor = () => {
+  const navigate = useNavigate();
   const { id } = useParams();
   const editorRef = useRef();
   const socketRef = useRef(null);
   const [value, setValue] = useState("");
+  const [auth, setAuth] = useState("");
   const [activeFile, setActiveFile] = useState({});
   const [files, setFiles] = useState([]);
   const [project, setProject] = useState({});
   const [render, setRender] = useState(false);
   const [isSocketConnected, setIsSocketConnected] = useState(false);
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const onMount = (editor) => {
     editorRef.current = editor;
@@ -65,6 +81,33 @@ const CodeEditor = () => {
     setProject(project);
   };
 
+  const checkAuth = async (project) => {
+    const infoReponse = await fetch(`${url}/api/user/info`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+
+    if (infoReponse.status !== 200) {
+      setAuth("TokenExpired");
+      onOpen();
+      return;
+    }
+
+    const user = await infoReponse.json();
+    if (user.id !== project.userId) {
+      setAuth("NotUser");
+      onOpen();
+      return;
+    }
+  };
+
+  const handleNavigate = () => {
+    navigate("/user/signin");
+  };
+
   const renderView = () => {
     setRender(!render);
   };
@@ -77,6 +120,7 @@ const CodeEditor = () => {
   useEffect(() => {
     console.log(project);
     if (project.id) {
+      checkAuth(project);
       socketRef.current = io(url);
 
       console.log(socketRef.current);
@@ -110,6 +154,24 @@ const CodeEditor = () => {
     <DarkMode>
       <Box minH="100vh" bg="#2C2C32" color="gray.500">
         <Header />
+        <Modal isOpen={isOpen} onClose={handleNavigate}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader color="white">Alert</ModalHeader>
+            <ModalCloseButton onClick={handleNavigate} color="gray.500" />
+            <ModalBody color="white">
+              {auth === "TokenExpired"
+                ? "Your token is expired, please sign in again!"
+                : "Your account have no authentication to edit this project, please sign in with right account!"}
+            </ModalBody>
+
+            <ModalFooter>
+              <Button colorScheme="blue" mr={3} onClick={handleNavigate}>
+                Sign In Now!
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
         <Flex px={6} py={6}>
           <Box flex="1">
             <SideBar
@@ -138,7 +200,11 @@ const CodeEditor = () => {
               }}
             />
             {isSocketConnected && (
-              <Terminal socket={socketRef.current} project={project} />
+              <Terminal
+                socket={socketRef.current}
+                project={project}
+                setFiles={setFiles}
+              />
             )}
             <Flex alignItems="center">
               <Button
