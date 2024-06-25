@@ -35,7 +35,7 @@ export const connectProjectTerminal = async (req: Request, res: Response) => {
   const userSocketId = userSocketMap[`project${id}`];
   const userSocket = io.sockets.sockets.get(userSocketId);
 
-  console.log(`project${id}: ${userSocketId}`);
+  // console.log(`project${id}: ${userSocketId}`);
 
   if (!userSocket) {
     throw new AppError('User socket not found', 500);

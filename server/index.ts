@@ -62,11 +62,11 @@ app.get('*', (req, res) => {
 app.use(globalErrorHandlerMiddleware);
 
 io.on('connection', (socket) => {
-  console.log('client is connected');
+  // console.log('client is connected');
 
   socket.on('register', (user: string) => {
     userSocketMap[user] = socket.id;
-    console.log(userSocketMap);
+    // console.log(userSocketMap);
 
     socket.emit('registered', 'success');
   });

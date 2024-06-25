@@ -97,7 +97,7 @@ const CodeEditor = () => {
     }
 
     const user = await infoReponse.json();
-    if (user.id !== project.userId) {
+    if (user.id !== project.user_id) {
       setAuth("NotUser");
       onOpen();
       return;

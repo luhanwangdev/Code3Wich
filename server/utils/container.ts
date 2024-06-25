@@ -148,7 +148,7 @@ export const execContainer = async (
       throw new AppError(err.message, 500);
     }
 
-    console.log('Container exec session started');
+    // console.log('Container exec session started');
     let dataOutput = '';
 
     stream.on('data', (data: any) => {
@@ -181,7 +181,7 @@ export const execContainer = async (
     });
 
     stream.on('end', () => {
-      console.log('End of stream');
+      // console.log('End of stream');
     });
 
     stream.on('error', (error: any) => {
@@ -201,7 +201,7 @@ export const execContainer = async (
     socket.on('disconnect', () => {
       // userSocketMap[user] = socket.id;
       stream.end();
-      console.log('client disconnect');
+      // console.log('client disconnect');
       socket.emit('execEnd', 'Socket disconnected and stream ended');
     });
   });
