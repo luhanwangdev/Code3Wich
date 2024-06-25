@@ -213,6 +213,7 @@ const CodeEditor = () => {
             />
             {isSocketConnected && (
               <Terminal
+                files={files}
                 socket={socketRef.current}
                 project={project}
                 setFiles={setFiles}

@@ -5,7 +5,7 @@ import { WebLinksAddon } from "@xterm/addon-web-links";
 import { Box, DarkMode } from "@chakra-ui/react";
 import { url } from "../constants";
 
-const Terminal = ({ setFiles, socket, project }) => {
+const Terminal = ({ files, setFiles, socket, project }) => {
   const terminalRef = useRef(null);
   const termRef = useRef(null);
 
@@ -24,12 +24,24 @@ const Terminal = ({ setFiles, socket, project }) => {
   };
 
   const updateFiles = async () => {
+    const notTabFiles = files.filter((file) => !file.isTab);
+
+    console.log(notTabFiles);
+
     const filesResponse = await fetch(
       `${url}/api/project/file?id=${project.id}`
     );
-    const files = await filesResponse.json();
+    const updatedFiles = await filesResponse.json();
 
-    setFiles(files);
+    const readyFiles = updatedFiles.map((file) => {
+      const notTab = notTabFiles.find(
+        (notTabFile) => notTabFile.id === file.id
+      );
+
+      return notTab ? { ...file, isTab: false } : { ...file, isTab: true };
+    });
+
+    setFiles(readyFiles);
   };
 
   useEffect(() => {
