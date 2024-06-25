@@ -63,8 +63,19 @@ const CodeEditor = () => {
     const filesResponse = await fetch(`${url}/api/project/file?id=${id}`);
     const files = await filesResponse.json();
 
-    setFiles(files);
-    setActiveFile(files[0]);
+    if (files.length > 0) {
+      const updatedFiles = files.map((file, index) => ({
+        ...file,
+        isTab: index === 0 ? true : file.isTab || false,
+      }));
+      console.log(updatedFiles);
+
+      setFiles(updatedFiles);
+      setActiveFile(updatedFiles[0]);
+    }
+
+    // setFiles(files);
+    // setActiveFile(files[0]);
   };
 
   const fetchCode = async () => {
@@ -184,7 +195,8 @@ const CodeEditor = () => {
           </Box>
           <Box flex="3">
             <TabNavigation
-              files={files.filter((file) => !file.isFolder)}
+              files={files.filter((file) => !file.isFolder && file.isTab)}
+              setFiles={setFiles}
               activeFile={activeFile}
               setActiveFile={setActiveFile}
             />
