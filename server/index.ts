@@ -12,6 +12,7 @@ import fileRoutes from './routers/file.js';
 import userRoutes from './routers/user.js';
 import globalErrorHandlerMiddleware from './middlewares/errorHandler.js';
 import { watcher, monitorCodeFiles } from './utils/watcher.js';
+import setUpLogLogic from './utils/cloudClient.js';
 
 const app = express();
 const server = createServer(app);
@@ -19,6 +20,7 @@ const userSocketMap: Record<string, string> = {};
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+setUpLogLogic();
 monitorCodeFiles(watcher);
 
 const io = new Server(server, {

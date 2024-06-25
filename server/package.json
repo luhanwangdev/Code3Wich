@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@aws-sdk/client-cloudwatch-logs": "^3.600.0",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
     "chokidar": "^3.6.0",
