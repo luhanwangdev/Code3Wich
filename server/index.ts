@@ -7,18 +7,19 @@ import { Server } from 'socket.io';
 import { createServer } from 'http';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { fileURLToPath } from 'url';
-import { spawn } from 'child_process';
 import projectRoutes from './routers/project.js';
 import fileRoutes from './routers/file.js';
 import userRoutes from './routers/user.js';
 import globalErrorHandlerMiddleware from './middlewares/errorHandler.js';
+import { watcher, monitorCodeFiles } from './utils/watcher.js';
 
 const app = express();
 const server = createServer(app);
 const userSocketMap: Record<string, string> = {};
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-spawn('node', [path.join(__dirname, 'services', 'watcher.js')]);
+
+monitorCodeFiles(watcher);
 
 const io = new Server(server, {
   cors: {

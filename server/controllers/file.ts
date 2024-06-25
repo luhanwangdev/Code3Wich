@@ -38,11 +38,7 @@ export const updateFile = async (req: Request, res: Response) => {
   }
 
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
-  fs.writeFile(filePath, code, (err) => {
-    if (err) {
-      throw new AppError(err.message, 500);
-    }
-  });
+  fs.writeFileSync(filePath, code);
 
   res.status(200).json({ success: true, path: filePath, code });
 };

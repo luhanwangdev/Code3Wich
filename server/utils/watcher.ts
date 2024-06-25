@@ -1,37 +1,39 @@
-import chokidar from 'chokidar';
+import chokidar, { FSWatcher } from 'chokidar';
 import path from 'path';
-import AppError from '../utils/appError.js';
+import AppError from './appError.js';
 import * as fileModel from '../models/file.js';
 
 const watchDirectory = 'codeFiles';
 
-const watcher = chokidar.watch(watchDirectory, {
+export const watcher: FSWatcher = chokidar.watch(watchDirectory, {
   persistent: true,
   ignoreInitial: true,
   ignored: path.join(watchDirectory, 'project*/node_modules'),
 });
 
-watcher
-  .on('add', (filePath: string) => {
-    const projectId = getProjectIdFromPath(filePath);
-    addFile(filePath, projectId);
-  })
-  .on('addDir', (dirPath: string) => {
-    const projectId = getProjectIdFromPath(dirPath);
-    addDir(dirPath, projectId);
-  })
-  .on('unlinkDir', (filePath: string) => {
-    if (filePath.charAt(0) === 'c') {
+export const monitorCodeFiles = (watcher: FSWatcher) => {
+  watcher
+    .on('add', (filePath: string) => {
+      const projectId = getProjectIdFromPath(filePath);
+      addFile(filePath, projectId);
+    })
+    .on('addDir', (dirPath: string) => {
+      const projectId = getProjectIdFromPath(dirPath);
+      addDir(dirPath, projectId);
+    })
+    .on('unlinkDir', (filePath: string) => {
+      if (filePath.charAt(0) === 'c') {
+        fileModel.deleteFileByPath(filePath);
+      } else {
+        fileModel.deleteFileByPath(filePath.split('server\\')[1]);
+      }
+    })
+    .on('unlink', (filePath: string) => {
       fileModel.deleteFileByPath(filePath);
-    } else {
-      fileModel.deleteFileByPath(filePath.split('server\\')[1]);
-    }
-  })
-  .on('unlink', (filePath: string) => {
-    fileModel.deleteFileByPath(filePath);
-  })
-  .on('error', (error: Error) => console.log(`Watcher error: ${error}`))
-  .on('ready', () => console.log('Initial scan complete. Ready for changes'));
+    })
+    .on('error', (error: Error) => console.log(`Watcher error: ${error}`))
+    .on('ready', () => console.log('Initial scan complete. Ready for changes'));
+};
 
 const getProjectIdFromPath = (filePath: string): any => {
   const relativePath = path.relative(watchDirectory, filePath);
@@ -104,7 +106,7 @@ const addFile = async (filePath: string, projectId: number) => {
           );
           break;
         case 'css':
-          fileModel.createFile(
+          await fileModel.createFile(
             fileName,
             'css',
             filePath,
@@ -114,7 +116,7 @@ const addFile = async (filePath: string, projectId: number) => {
           );
           break;
         default:
-          fileModel.createFile(
+          await fileModel.createFile(
             fileName,
             'json',
             filePath,
@@ -135,14 +137,21 @@ const addDir = async (dirPath: string, projectId: number) => {
     const parentPath = path.dirname(dirPath);
     const fullPath = path.join(projectPath);
     if (parentPath === fullPath) {
-      fileModel.createFile(dirName, 'folder', dirPath, projectId, true, 0);
+      await fileModel.createFile(
+        dirName,
+        'folder',
+        dirPath,
+        projectId,
+        true,
+        0
+      );
     } else {
       const parentFolder = await fileModel.getFileByPath(parentPath);
       if (!parentFolder) {
         throw new AppError(`${dirPath}'s folder doesn't exist`, 500);
       }
 
-      fileModel.createFile(
+      await fileModel.createFile(
         dirName,
         'folder',
         dirPath,

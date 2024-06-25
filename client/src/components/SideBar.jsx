@@ -81,7 +81,7 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
       method: "DELETE",
     });
 
-    updateFiles();
+    setTimeout(() => updateFiles(), 300);
   };
 
   const handleCreateFile = async (name, isFolder) => {
@@ -101,38 +101,19 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
       }),
     });
 
-    updateFiles();
+    setTimeout(() => updateFiles(), 100);
 
     // alert(`File created: ${fileName}`);
     setFileName("");
     onClose();
   };
 
-  const createFile = async (name, type, parentId) => {
-    await fetch(`${url}/api/file/edit`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name,
-        type,
-        projectId,
-        parentId,
-        code: "",
-      }),
-    });
-
-    updateFiles();
-  };
-
   const updateFiles = async () => {
     const filesResponse = await fetch(
-      `${url}/api/file/project?projectId=${projectId}`
+      `${url}/api/project/file?id=${projectId}`
     );
     const files = await filesResponse.json();
 
-    console.log("in updateFiles");
     setFiles(files);
   };
 
@@ -166,11 +147,9 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
   };
   useEffect(() => {
     document.addEventListener("click", handleClick);
-    // document.addEventListener("contextmenu", handleContextMenu);
 
     return () => {
       document.removeEventListener("click", handleClick);
-      // document.removeEventListener("contextmenu", handleContextMenu);
     };
   }, []);
 
