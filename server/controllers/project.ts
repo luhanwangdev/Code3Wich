@@ -95,6 +95,7 @@ server.listen(3000, () => {
   }
 
   if (!(containerId && containerUrl)) {
+    console.log('inside !(containerId && containerUrl)');
     const folderPath = `codeFiles/project${project.id}`;
 
     await projectModel.deleteProject(project.id);

@@ -217,16 +217,17 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
         <Modal isOpen={isOpen} onClose={onClose}>
           <ModalOverlay />
           <ModalContent>
-            <ModalHeader>
+            <ModalHeader color="white">
               {isCreatingFolder ? "Create New Folder" : "Create New File"}
             </ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
+            <ModalCloseButton color="white" />
+            <ModalBody color="white">
               <FormControl id="file-name" isRequired>
                 <FormLabel>
                   {isCreatingFolder ? "Folder Name" : "File name"}
                 </FormLabel>
                 <Input
+                  color="white"
                   placeholder={
                     isCreatingFolder ? "Enter Folder Name" : "Enter File name"
                   }

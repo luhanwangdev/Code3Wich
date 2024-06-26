@@ -102,7 +102,7 @@ const Terminal = ({ files, setFiles, socket, project }) => {
   useEffect(() => {
     if (termRef.current && project.url) {
       termRef.current.write(
-        `Code3Wich $ Your website is host on \x1B[38;5;208m${project.url}\x1B[0m`
+        `Code3Wich $ Your website is host on\r\n\x1B[38;5;208m${project.url}\x1B[0m`
       );
       termRef.current.write("\r\n" + `Code3Wich/${project.name} $ `);
     }
