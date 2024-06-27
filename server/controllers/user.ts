@@ -20,6 +20,25 @@ declare module 'express' {
   }
 }
 
+const JWTExpired = 86400000;
+
+interface Payload {
+  id: number;
+  name: string;
+  email: string;
+}
+
+const jwtTokenGenerator = (payload: Payload) => {
+  const token = jwt.sign(payload, process.env.JWT_SECRET_KEY as string, {
+    expiresIn: JWTExpired,
+  });
+
+  return {
+    accessToken: token,
+    user: payload,
+  };
+};
+
 export const getUser = async (req: Request, res: Response) => {
   const { id } = req.query as unknown as { id: number };
 
@@ -48,9 +67,14 @@ export const handleSignup = async (req: Request, res: Response) => {
 
   const payload = await userModel.createUser(name, email, hashedPassword);
 
-  const jwtResult = jwtTokenGenerator(payload);
+  const { accessToken, user } = jwtTokenGenerator(payload);
 
-  res.status(200).send(jwtResult);
+  res.cookie('token', accessToken, {
+    maxAge: JWTExpired,
+    secure: true,
+  });
+
+  res.status(200).send(user);
 };
 
 export const handleSignin = async (req: Request, res: Response) => {
@@ -78,8 +102,14 @@ export const handleSignin = async (req: Request, res: Response) => {
         email: existUser.email,
       };
 
-      const jwtResult = jwtTokenGenerator(payload);
-      res.status(200).send(jwtResult);
+      const { accessToken, user } = jwtTokenGenerator(payload);
+
+      res.cookie('token', accessToken, {
+        maxAge: JWTExpired,
+        secure: true,
+      });
+
+      res.status(200).send(user);
     } else {
       throw new AppError('Incorrect email or password', 403);
     }
@@ -102,24 +132,4 @@ export const getUserInfo = async (req: Request, res: Response) => {
   };
 
   res.status(200).json({ id, name, email });
-};
-
-const JWTExpired = 86400;
-
-interface Payload {
-  id: number;
-  name: string;
-  email: string;
-}
-
-const jwtTokenGenerator = (payload: Payload) => {
-  const token = jwt.sign(payload, process.env.JWT_SECRET_KEY as string, {
-    expiresIn: JWTExpired,
-  });
-
-  return {
-    access_token: token,
-    access_expired: JWTExpired,
-    user: payload,
-  };
 };

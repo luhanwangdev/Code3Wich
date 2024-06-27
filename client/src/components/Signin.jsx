@@ -1,5 +1,4 @@
 import { useRef } from "react";
-import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -36,20 +35,17 @@ const Signin = () => {
       return;
     }
 
-    const signinResponse = await fetch(`${url}/api/user/signin`, {
+    await fetch(`${url}/api/user/signin`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include",
       body: JSON.stringify({
         email,
         password,
       }),
     });
-    const signinData = await signinResponse.json();
-
-    const { access_token, access_expired } = signinData;
-    Cookies.set("token", access_token, { expires: access_expired });
 
     navigate(`/projects`);
   };
