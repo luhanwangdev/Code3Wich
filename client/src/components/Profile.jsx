@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Cookies from "js-cookie";
 import {
   Box,
   Button,
@@ -31,17 +30,6 @@ const Profile = () => {
   const handleNavigate = () => {
     navigate("/user/signin");
     onClose();
-  };
-
-  const checkToken = () => {
-    const tokenCookie = Cookies.get("token");
-
-    if (!tokenCookie) {
-      navigate("/user/signin");
-    } else {
-      fetchInfo();
-      fetchProjects();
-    }
   };
 
   const fetchInfo = async () => {
@@ -79,13 +67,20 @@ const Profile = () => {
   };
 
   const handleLogout = async () => {
-    Cookies.remove("token");
+    await fetch(`${url}/api/user/logout`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
 
     navigate("/user/signin");
   };
 
   useEffect(() => {
-    checkToken();
+    fetchInfo();
+    fetchProjects();
   }, []);
 
   return (
@@ -97,9 +92,7 @@ const Profile = () => {
           <ModalContent>
             <ModalHeader color="white">Alert</ModalHeader>
             <ModalCloseButton onClick={handleNavigate} color="gray.500" />
-            <ModalBody color="white">
-              Your token is expired. Please Sign in again.
-            </ModalBody>
+            <ModalBody color="white">Please Sign in first.</ModalBody>
 
             <ModalFooter>
               <Button colorScheme="blue" mr={3} onClick={handleNavigate}>

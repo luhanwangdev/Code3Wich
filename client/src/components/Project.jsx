@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import Cookies from "js-cookie";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Box,
@@ -34,17 +33,6 @@ function Project() {
   const projectTypeRef = useRef();
 
   const { isOpen, onOpen, onClose } = useDisclosure();
-
-  const checkToken = () => {
-    const tokenCookie = Cookies.get("token");
-
-    if (!tokenCookie) {
-      onOpen();
-    } else {
-      fetchInfo();
-      fetchProjects();
-    }
-  };
 
   const handleNavigate = () => {
     navigate("/user/signin");
@@ -139,7 +127,8 @@ function Project() {
   };
 
   useEffect(() => {
-    checkToken();
+    fetchInfo();
+    fetchProjects();
   }, []);
 
   return (
