@@ -72,6 +72,7 @@ export const handleSignup = async (req: Request, res: Response) => {
   res.cookie('token', accessToken, {
     maxAge: JWTExpired,
     secure: true,
+    sameSite: 'none',
   });
 
   res.status(200).send(user);
@@ -107,6 +108,7 @@ export const handleSignin = async (req: Request, res: Response) => {
       res.cookie('token', accessToken, {
         maxAge: JWTExpired,
         secure: true,
+        sameSite: 'none',
       });
 
       res.status(200).send(user);
@@ -114,6 +116,12 @@ export const handleSignin = async (req: Request, res: Response) => {
       throw new AppError('Incorrect email or password', 403);
     }
   });
+};
+
+export const handleLogout = async (req: Request, res: Response) => {
+  res.clearCookie('token');
+
+  res.status(200).send({ message: 'Logout' });
 };
 
 export const getUserProjects = async (req: Request, res: Response) => {
