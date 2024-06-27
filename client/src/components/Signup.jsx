@@ -1,6 +1,5 @@
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import Cookies from "js-cookie";
 import {
   Box,
   Button,
@@ -42,22 +41,18 @@ const Signup = () => {
       return;
     }
 
-    const signupResponse = await fetch(`${url}/api/user/signup`, {
+    await fetch(`${url}/api/user/signup`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include",
       body: JSON.stringify({
         name,
         email,
         password,
       }),
     });
-
-    const signupData = await signupResponse.json();
-
-    const { access_token, access_expired } = signupData;
-    Cookies.set("token", access_token, { expires: access_expired });
 
     navigate(`/projects`);
   };
