@@ -11,6 +11,27 @@ import {
   removeImage,
 } from '../utils/container.js';
 
+const createFile = async (
+  name: string,
+  type: string,
+  projectId: number,
+  code: string
+) => {
+  const file = await fileModel.getFileByFileNameandProjectId(name, projectId);
+  const filePath = path.join(`codeFiles/project${projectId}/${name}`);
+
+  if (!file) {
+    await fileModel.createFile(name, type, filePath, projectId, false, 0);
+  }
+
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  fs.writeFile(filePath, code, (err) => {
+    if (err) {
+      throw new AppError(err.message, 500);
+    }
+  });
+};
+
 export const getFilesByProject = async (req: Request, res: Response) => {
   const { id } = req.query as unknown as { id: number };
 
@@ -54,6 +75,28 @@ export const createProject = async (req: Request, res: Response) => {
   console.log('create Project!');
 
   const project = await projectModel.createProject(name, userId, type);
+  const initialHTML = `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./style.css" />
+    <script defer src="./index.js"></script>
+    <title>Project</title>
+  </head>
+  <body>
+    <h1 class="hello"></h1>
+  </body>
+</html>
+  `;
+  const initialCSS = `h1{
+  color: orangered;
+};`;
+  const initialJS = `const helloArea = document.querySelector("h1");
+const helloText = "Hello from Code3Wich";
+
+helloArea.innerText = helloText;`;
+
   const serverCode = `const http = require('http');
 
 const server = http.createServer((req, res) => {
@@ -68,16 +111,20 @@ server.listen(3000, () => {
 
   switch (type) {
     case 'vanilla':
-      createFile('index.html', 'html', project.id, '');
-      createFile('style.css', 'css', project.id, '');
-      createFile('index.js', 'javascript', project.id, '');
+      await Promise.all([
+        createFile('index.html', 'html', project.id, initialHTML),
+        createFile('style.css', 'css', project.id, initialCSS),
+        createFile('index.js', 'javascript', project.id, initialJS),
+      ]);
       break;
     case 'node':
-      createFile('index.js', 'javascript', project.id, serverCode);
+      await createFile('index.js', 'javascript', project.id, serverCode);
       break;
     case 'react':
-      createFile('index.js', 'javascript', project.id, serverCode);
+      await createFile('index.js', 'javascript', project.id, serverCode);
       break;
+    default:
+      throw new AppError('The project type is invalid', 500);
   }
 
   const { containerId, containerUrl, err } = await setUpContainer(
@@ -93,6 +140,9 @@ server.listen(3000, () => {
 
     throw new AppError(err, 500);
   }
+
+  console.log(`containerId: ${containerId}`);
+  console.log(`containerUrl: ${containerUrl}`);
 
   if (!(containerId && containerUrl)) {
     console.log('inside !(containerId && containerUrl)');
@@ -125,25 +175,4 @@ export const deleteProject = async (req: Request, res: Response) => {
   fs.rmSync(path.join(folderPath), { recursive: true });
 
   res.status(200).json({ id, message: `Delete project${id} successfully` });
-};
-
-const createFile = async (
-  name: string,
-  type: string,
-  projectId: number,
-  code: string
-) => {
-  const file = await fileModel.getFileByFileNameandProjectId(name, projectId);
-  const filePath = path.join(`codeFiles/project${projectId}/${name}`);
-
-  if (!file) {
-    fileModel.createFile(name, type, filePath, projectId, false, 0);
-  }
-
-  fs.mkdirSync(path.dirname(filePath), { recursive: true });
-  fs.writeFile(filePath, code, (err) => {
-    if (err) {
-      throw new AppError(err.message, 500);
-    }
-  });
 };

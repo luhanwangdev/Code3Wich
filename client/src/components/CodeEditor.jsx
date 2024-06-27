@@ -35,7 +35,7 @@ const CodeEditor = () => {
   const [project, setProject] = useState({});
   const [render, setRender] = useState(false);
   const [isSocketConnected, setIsSocketConnected] = useState(false);
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen, onOpen } = useDisclosure();
 
   const onMount = (editor) => {
     editorRef.current = editor;
@@ -73,9 +73,6 @@ const CodeEditor = () => {
       setFiles(updatedFiles);
       setActiveFile(updatedFiles[0]);
     }
-
-    // setFiles(files);
-    // setActiveFile(files[0]);
   };
 
   const fetchCode = async () => {
@@ -229,12 +226,6 @@ const CodeEditor = () => {
               >
                 Save
               </Button>
-
-              {/* <Button mt="0.5rem" ml="2rem" bg="orange">
-            <Link href={url} color="white" isExternal>
-              {url}
-            </Link>
-          </Button> */}
             </Flex>
           </Box>
           <Box flex="3">
