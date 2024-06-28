@@ -90,7 +90,7 @@ export const createProject = async (req: Request, res: Response) => {
 </html>
   `;
   const initialCSS = `h1{
-  color: orangered;
+  color: lightseagreen;
 };`;
   const initialJS = `const helloArea = document.querySelector("h1");
 const helloText = "Hello from Code3Wich";

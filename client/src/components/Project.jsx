@@ -40,7 +40,6 @@ function Project() {
   };
 
   const fetchProjects = async () => {
-    console.log("fetchProfile");
     const projectReponse = await fetch(`${url}/api/user/projects`, {
       method: "GET",
       headers: {
