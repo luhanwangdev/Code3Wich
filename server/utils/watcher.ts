@@ -5,35 +5,11 @@ import * as fileModel from '../models/file.js';
 
 const watchDirectory = 'codeFiles';
 
-export const watcher: FSWatcher = chokidar.watch(watchDirectory, {
+const watcher: FSWatcher = chokidar.watch(watchDirectory, {
   persistent: true,
   ignoreInitial: true,
   ignored: path.join(watchDirectory, 'project*/node_modules'),
 });
-
-export const monitorCodeFiles = (watcher: FSWatcher) => {
-  watcher
-    .on('add', (filePath: string) => {
-      const projectId = getProjectIdFromPath(filePath);
-      addFile(filePath, projectId);
-    })
-    .on('addDir', (dirPath: string) => {
-      const projectId = getProjectIdFromPath(dirPath);
-      addDir(dirPath, projectId);
-    })
-    .on('unlinkDir', (filePath: string) => {
-      if (filePath.charAt(0) === 'c') {
-        fileModel.deleteFileByPath(filePath);
-      } else {
-        fileModel.deleteFileByPath(filePath.split('server\\')[1]);
-      }
-    })
-    .on('unlink', (filePath: string) => {
-      fileModel.deleteFileByPath(filePath);
-    })
-    .on('error', (error: Error) => console.log(`Watcher error: ${error}`))
-    .on('ready', () => console.log('Initial scan complete. Ready for changes'));
-};
 
 const getProjectIdFromPath = (filePath: string): any => {
   const relativePath = path.relative(watchDirectory, filePath);
@@ -183,3 +159,33 @@ const addDir = async (dirPath: string, projectId: number) => {
     }
   }
 };
+
+export const startWatcher = () => {
+  watcher
+    .on('add', (filePath: string) => {
+      const projectId = getProjectIdFromPath(filePath);
+      addFile(filePath, projectId);
+    })
+    .on('addDir', (dirPath: string) => {
+      const projectId = getProjectIdFromPath(dirPath);
+      addDir(dirPath, projectId);
+    })
+    .on('unlinkDir', (filePath: string) => {
+      if (filePath.charAt(0) === 'c') {
+        fileModel.deleteFileByPath(filePath);
+      } else {
+        fileModel.deleteFileByPath(filePath.split('server\\')[1]);
+      }
+    })
+    .on('unlink', (filePath: string) => {
+      fileModel.deleteFileByPath(filePath);
+    })
+    .on('error', (error: Error) => console.log(`Watcher error: ${error}`))
+    .on('ready', () => console.log('Initial scan complete. Ready for changes'));
+};
+
+export async function stopWatcher() {
+  if (watcher) {
+    await watcher.close();
+  }
+}

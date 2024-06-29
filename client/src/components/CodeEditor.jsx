@@ -137,11 +137,20 @@ const CodeEditor = () => {
         console.log("Connected to server");
         setIsSocketConnected(true);
 
-        socketRef.current.emit("register", `project${project.id}`);
+        socketRef.current.emit(
+          "register",
+          `project${project.id}`,
+          (response) => {
+            if (response === "success") {
+              console.log("success");
+              fetch(`${url}/api/project/terminal?id=${project.id}`);
+            }
+          }
+        );
 
-        socketRef.current.on("registered", () => {
-          fetch(`${url}/api/project/terminal?id=${project.id}`);
-        });
+        // socketRef.current.on("registered", () => {
+        //   fetch(`${url}/api/project/terminal?id=${project.id}`);
+        // });
       });
 
       return () => {

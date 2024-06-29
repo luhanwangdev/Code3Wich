@@ -90,19 +90,25 @@ export const setUpContainer = async (id: number, type: string) => {
         );
         break;
       case 'node':
-        await execAsync(`docker run -d --name temp-container ${imageName}`);
-        await execAsync(`docker cp temp-container:/app/. ${projectDir}`);
-        await execAsync('docker stop temp-container');
-        await execAsync('docker rm temp-container');
+        await execAsync(
+          `docker run -d --name temp-container-${id} ${imageName}`
+        );
+        await execAsync(`docker cp temp-container-${id}:/app/. ${projectDir}`);
+        await execAsync(`docker stop temp-container-${id}`);
+        await execAsync(`docker rm temp-container-${id}`);
         await execAsync(
           `docker container run -d -p 0:${port} --name ${containerName} -v "${absolutePath}:${containerPath}" -m 100m ${imageName}`
         );
         break;
       case 'react':
-        await execAsync(`docker run -d --name temp-container ${imageName}`);
-        await execAsync(`docker cp temp-container:/react/. ${projectDir}`);
-        await execAsync('docker stop temp-container');
-        await execAsync('docker rm temp-container');
+        await execAsync(
+          `docker run -d --name temp-container-${id} ${imageName}`
+        );
+        await execAsync(
+          `docker cp temp-container-${id}:/react/. ${projectDir}`
+        );
+        await execAsync(`docker stop temp-container-${id}`);
+        await execAsync(`docker rm temp-container-${id}`);
         await execAsync(
           `docker container run -d -p 0:${port} --name ${containerName} -v "${absolutePath}:${containerPath}" -m 100m ${imageName}`
         );

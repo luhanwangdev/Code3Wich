@@ -10,6 +10,7 @@ import {
   removeContainer,
   removeImage,
 } from '../utils/container.js';
+import { getRabbitMQChannel } from '../utils/rabbitmq.js';
 
 const createFile = async (
   name: string,
@@ -58,9 +59,9 @@ export const connectProjectTerminal = async (req: Request, res: Response) => {
 
   // console.log(`project${id}: ${userSocketId}`);
 
-  if (!userSocket) {
-    throw new AppError('User socket not found', 500);
-  }
+  // if (!userSocket) {
+  //   throw new AppError('User socket not found', 500);
+  // }
 
   const containerId = await projectModel.getProjectContainerId(id);
   await execContainer(userSocket, containerId);
@@ -76,38 +77,38 @@ export const createProject = async (req: Request, res: Response) => {
 
   const project = await projectModel.createProject(name, userId, type);
   const initialHTML = `<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="./style.css" />
-    <script defer src="./index.js"></script>
-    <title>Project</title>
-  </head>
-  <body>
-    <h1 class="hello"></h1>
-  </body>
-</html>
-  `;
+  <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="stylesheet" href="./style.css" />
+      <script defer src="./index.js"></script>
+      <title>Project</title>
+    </head>
+    <body>
+      <h1 class="hello"></h1>
+    </body>
+  </html>
+    `;
   const initialCSS = `h1{
-  color: lightseagreen;
-};`;
+    color: lightseagreen;
+  };`;
   const initialJS = `const helloArea = document.querySelector("h1");
-const helloText = "Hello from Code3Wich";
+  const helloText = "Hello from Code3Wich";
 
-helloArea.innerText = helloText;`;
+  helloArea.innerText = helloText;`;
 
   const serverCode = `const http = require('http');
 
-const server = http.createServer((req, res) => {
-  res.writeHead(200, { 'Content-Type': 'text/plain' });
-  res.end('Hello, Docker World!');
-});
+  const server = http.createServer((req, res) => {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('Hello, Docker World!');
+  });
 
-server.listen(3000, () => {
-  console.log('Server is running on port 3000');
-});
-  `;
+  server.listen(3000, () => {
+    console.log('Server is running on port 3000');
+  });
+    `;
 
   switch (type) {
     case 'vanilla':
@@ -127,42 +128,23 @@ server.listen(3000, () => {
       throw new AppError('The project type is invalid', 500);
   }
 
-  const { containerId, containerUrl, err } = await setUpContainer(
-    project.id,
-    type
-  );
+  const channel = await getRabbitMQChannel();
+  const queue = 'createProjectQueue';
 
-  if (err) {
-    const folderPath = `codeFiles/project${project.id}`;
+  await channel.assertQueue(queue, {
+    durable: false,
+  });
 
-    await projectModel.deleteProject(project.id);
-    fs.rmSync(path.join(folderPath), { recursive: true });
+  const message = { projectId: project.id, type };
+  channel.sendToQueue(queue, Buffer.from(JSON.stringify(message)));
+  console.log(`Sent: ${JSON.stringify(message)}`);
 
-    throw new AppError(err, 500);
-  }
+  await projectModel.updateProjectStatus('loading', project.id);
 
-  console.log(`containerId: ${containerId}`);
-  console.log(`containerUrl: ${containerUrl}`);
-
-  if (!(containerId && containerUrl)) {
-    console.log('inside !(containerId && containerUrl)');
-    const folderPath = `codeFiles/project${project.id}`;
-
-    await projectModel.deleteProject(project.id);
-    fs.rmSync(path.join(folderPath), { recursive: true });
-
-    throw new AppError('Container id is null', 500);
-  }
-
-  await projectModel.updateProjectAboutContainer(
-    containerId as string,
-    containerUrl as string,
-    project.id
-  );
-
-  res
-    .status(200)
-    .json({ status: true, projectId: project.id, url: containerUrl });
+  res.status(200).json({
+    status: true,
+    message: 'The project is passed to worker successfuly',
+  });
 };
 
 export const deleteProject = async (req: Request, res: Response) => {

@@ -11,7 +11,8 @@ import projectRoutes from './routers/project.js';
 import fileRoutes from './routers/file.js';
 import userRoutes from './routers/user.js';
 import globalErrorHandlerMiddleware from './middlewares/errorHandler.js';
-import { watcher, monitorCodeFiles } from './utils/watcher.js';
+import { startWatcher, stopWatcher } from './utils/watcher.js';
+import { closeRabbitMQConnection } from './utils/rabbitmq.js';
 import setUpLogLogic from './utils/cloudClient.js';
 
 const app = express();
@@ -21,7 +22,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 setUpLogLogic();
-monitorCodeFiles(watcher);
+startWatcher();
 
 const io = new Server(server, {
   cors: {
@@ -64,13 +65,17 @@ app.use('/', express.static('codeFiles'));
 app.use(globalErrorHandlerMiddleware);
 
 io.on('connection', (socket) => {
-  // console.log('client is connected');
+  console.log('client is connected');
 
-  socket.on('register', (user: string) => {
+  socket.on('register', (user, callback) => {
     userSocketMap[user] = socket.id;
     // console.log(userSocketMap);
 
-    socket.emit('registered', 'success');
+    callback('success');
+  });
+
+  socket.on('projectStatus', (data) => {
+    socket.broadcast.emit('projectStatus', data);
   });
 });
 // app.listen(3000, () => {
@@ -79,4 +84,20 @@ io.on('connection', (socket) => {
 
 server.listen(3000, () => {
   console.log('Express app is running on port 3000');
+});
+
+process.on('SIGINT', async () => {
+  await closeRabbitMQConnection();
+  await stopWatcher();
+  server.close(() => {
+    process.exit(0);
+  });
+});
+
+process.on('SIGTERM', async () => {
+  await closeRabbitMQConnection();
+  await stopWatcher();
+  server.close(() => {
+    process.exit(0);
+  });
 });
