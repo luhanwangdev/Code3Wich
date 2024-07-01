@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "npm run build && aws s3 --region ap-southeast-2 sync ./dist 's3://public4code3wich/' && aws cloudfront create-invalidation --distribution-id EWKWH5C26EMJQ --paths '/*'"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",

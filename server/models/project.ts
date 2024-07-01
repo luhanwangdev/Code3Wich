@@ -1,17 +1,18 @@
-import { z } from "zod";
-import pool from "./databasePool.js";
-import { RowDataPacket } from "mysql2/promise";
-import instanceOfSetHeader from "../utils/instanceOfSetHeader.js";
-import AppError from "../utils/appError.js";
+import { z } from 'zod';
+import pool from './databasePool.js';
+import { RowDataPacket } from 'mysql2/promise';
+import instanceOfSetHeader from '../utils/instanceOfSetHeader.js';
+import AppError from '../utils/appError.js';
 
 const PorjectSchema = z.object({
   id: z.number(),
   name: z.string(),
   location: z.string(),
   user_id: z.number(),
-  url: z.string(),
-  container_id: z.string(),
+  url: z.any(),
+  container_id: z.any(),
   type: z.string(),
+  status: z.string(),
 });
 
 interface ProjectRow extends RowDataPacket {
@@ -19,9 +20,10 @@ interface ProjectRow extends RowDataPacket {
   name: string;
   location: string;
   user_id: number;
-  url: string;
-  container_id: string;
+  url: any;
+  container_id: any;
   type: string;
+  status: string;
 }
 
 export const getProject = async (id: number) => {
@@ -65,7 +67,7 @@ export const createProject = async (
     return { id, name, location, user_id: userId };
   }
 
-  throw new AppError("create file failed", 400);
+  throw new AppError('create file failed', 400);
 };
 
 export const updateProjectAboutContainer = async (
@@ -120,4 +122,16 @@ export const deleteProject = async (id: number) => {
     `,
     [id]
   );
+};
+
+export const updateProjectStatus = async (status: string, id: number) => {
+  const result = await pool.query(
+    `
+    UPDATE project
+    SET status = ?
+    WHERE id = ?
+    `,
+    [status, id]
+  );
+  return result;
 };
