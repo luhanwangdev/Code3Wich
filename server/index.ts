@@ -11,7 +11,7 @@ import projectRoutes from './routers/project.js';
 import fileRoutes from './routers/file.js';
 import userRoutes from './routers/user.js';
 import globalErrorHandlerMiddleware from './middlewares/errorHandler.js';
-import { startWatcher, stopWatcher } from './utils/watcher.js';
+import { watcher, startWatcher, stopWatcher } from './utils/watcher.js';
 import { closeRabbitMQConnection } from './utils/rabbitmq.js';
 import setUpLogLogic from './utils/cloudClient.js';
 
@@ -22,7 +22,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 setUpLogLogic();
-startWatcher();
+startWatcher(watcher);
 
 const io = new Server(server, {
   cors: {
@@ -65,7 +65,7 @@ app.use('/', express.static('codeFiles'));
 app.use(globalErrorHandlerMiddleware);
 
 io.on('connection', (socket) => {
-  console.log('client is connected');
+  // console.log('client is connected');
 
   socket.on('register', (user, callback) => {
     userSocketMap[user] = socket.id;
@@ -88,7 +88,7 @@ server.listen(3000, () => {
 
 process.on('SIGINT', async () => {
   await closeRabbitMQConnection();
-  await stopWatcher();
+  await stopWatcher(watcher);
   server.close(() => {
     process.exit(0);
   });
@@ -96,7 +96,7 @@ process.on('SIGINT', async () => {
 
 process.on('SIGTERM', async () => {
   await closeRabbitMQConnection();
-  await stopWatcher();
+  await stopWatcher(watcher);
   server.close(() => {
     process.exit(0);
   });

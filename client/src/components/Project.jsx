@@ -95,6 +95,8 @@ function Project() {
           return "node";
         case "React":
           return "react";
+        case "Bun":
+          return "bun";
       }
     })();
 
@@ -289,6 +291,7 @@ function Project() {
                     >
                       <option>Vanilla JS</option>
                       <option>Node</option>
+                      {/* <option>Bun</option> */}
                       {/* <option>React</option> */}
                     </Select>
                     <Button

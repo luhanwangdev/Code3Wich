@@ -131,8 +131,6 @@ const CodeEditor = () => {
       checkAuth(project);
       socketRef.current = io(url);
 
-      console.log(socketRef.current);
-
       socketRef.current.on("connect", () => {
         console.log("Connected to server");
         setIsSocketConnected(true);

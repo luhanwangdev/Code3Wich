@@ -5,7 +5,7 @@ import * as fileModel from '../models/file.js';
 
 const watchDirectory = 'codeFiles';
 
-const watcher: FSWatcher = chokidar.watch(watchDirectory, {
+export const watcher: FSWatcher = chokidar.watch(watchDirectory, {
   persistent: true,
   ignoreInitial: true,
   ignored: path.join(watchDirectory, 'project*/node_modules'),
@@ -160,7 +160,7 @@ const addDir = async (dirPath: string, projectId: number) => {
   }
 };
 
-export const startWatcher = () => {
+export const startWatcher = (watcher: FSWatcher) => {
   watcher
     .on('add', (filePath: string) => {
       const projectId = getProjectIdFromPath(filePath);
@@ -184,7 +184,7 @@ export const startWatcher = () => {
     .on('ready', () => console.log('Initial scan complete. Ready for changes'));
 };
 
-export async function stopWatcher() {
+export async function stopWatcher(watcher: FSWatcher) {
   if (watcher) {
     await watcher.close();
   }

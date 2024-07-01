@@ -23,8 +23,8 @@ const createProjectContainer = async (projectId: number, type: string) => {
     throw new AppError(err, 500);
   }
 
-  console.log(`containerId: ${containerId}`);
-  console.log(`containerUrl: ${containerUrl}`);
+  // console.log(`containerId: ${containerId}`);
+  // console.log(`containerUrl: ${containerUrl}`);
 
   if (!(containerId && containerUrl)) {
     console.log('inside !(containerId && containerUrl)');
@@ -68,15 +68,13 @@ async function receiveMessages() {
           const messageObject = JSON.parse(messageContent);
           const { projectId, type } = messageObject;
 
-          // console.log(`Received: ${JSON.stringify(messageObject, null, 2)}`);
-
           try {
             await createProjectContainer(projectId, type);
             await projectModel.updateProjectStatus('done', projectId);
 
-            // console.log(
-            //   `Project${projectId}'s container is created successfully`
-            // );
+            console.log(
+              `Project${projectId}'s container is created successfully`
+            );
 
             socket.emit('projectStatus', { id: projectId, status: 'success' });
           } catch (error) {

@@ -5,7 +5,6 @@ import * as projectModel from '../models/project.js';
 import * as fileModel from '../models/file.js';
 import AppError from '../utils/appError.js';
 import {
-  setUpContainer,
   execContainer,
   removeContainer,
   removeImage,
@@ -50,6 +49,7 @@ export const getProject = async (req: Request, res: Response) => {
 };
 
 export const connectProjectTerminal = async (req: Request, res: Response) => {
+  // console.log('connecting to terminal...');
   const { id } = req.query as unknown as { id: number };
 
   const io = req.app.get('socketio');
@@ -65,6 +65,7 @@ export const connectProjectTerminal = async (req: Request, res: Response) => {
 
   const containerId = await projectModel.getProjectContainerId(id);
   await execContainer(userSocket, containerId);
+  res.status(200).send('ok');
 };
 
 export const createProject = async (req: Request, res: Response) => {
@@ -119,6 +120,9 @@ export const createProject = async (req: Request, res: Response) => {
       ]);
       break;
     case 'node':
+      await createFile('index.js', 'javascript', project.id, serverCode);
+      break;
+    case 'bun':
       await createFile('index.js', 'javascript', project.id, serverCode);
       break;
     case 'react':
