@@ -21,6 +21,7 @@ jobs:
             echo "Hello from github action, start deploy main to ec2"
             cd /home/ubuntu/mySandBox
             git pull
+            cd server
             npm install
             npm run build
             npx pm2 restart all
