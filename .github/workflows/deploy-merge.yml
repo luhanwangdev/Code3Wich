@@ -1,0 +1,57 @@
+name: Deploy EC2 on merge
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy_server:
+    runs_on: ubuntu_latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: "${{ secrets.HOST_DNS }}"
+          username: "${{ secrets.EC2_USERNAME }}"
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            echo "Hello from github action, start deploy main to ec2"
+            cd /home/ubuntu/mySandBox
+            git pull
+            npm install
+            npm run build
+            npx pm2 restart all
+
+  deploy_vite:
+    runs_on: ubuntu_latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Build project
+        run: |
+          cd client
+          npm install
+          npm run build
+
+      - name: Sync S3
+        run: aws s3 sync ./client/dist 's3://public4code3wich/' --region ${{ secrets.AWS_REGION }}
+
+      - name: Invalidate CDN
+        run: aws cloudfront create-invalidation --distribution-id EWKWH5C26EMJQ --paths '/*'
