@@ -5,7 +5,7 @@ on:
       - main
 jobs:
   deploy_server:
-    runs_on: ubuntu_latest
+    runs-on: ubuntu_latest
 
     steps:
       - name: Checkout Repository
@@ -26,7 +26,7 @@ jobs:
             npx pm2 restart all
 
   deploy_vite:
-    runs_on: ubuntu_latest
+    runs-on: ubuntu_latest
 
     steps:
       - name: Checkout Repository
