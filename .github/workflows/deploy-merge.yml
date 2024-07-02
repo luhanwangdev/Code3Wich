@@ -5,7 +5,7 @@ on:
       - main
 jobs:
   deploy_server:
-    runs_on: ubuntu_latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
@@ -21,12 +21,13 @@ jobs:
             echo "Hello from github action, start deploy main to ec2"
             cd /home/ubuntu/mySandBox
             git pull
+            cd server
             npm install
             npm run build
             npx pm2 restart all
 
   deploy_vite:
-    runs_on: ubuntu_latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
