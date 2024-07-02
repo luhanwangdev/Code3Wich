@@ -61,7 +61,7 @@ async function receiveMessages() {
 
     channel.consume(
       queue,
-      async (msg) => {
+      async (msg: any) => {
         if (msg !== null) {
           const messageContent = msg.content.toString();
 
