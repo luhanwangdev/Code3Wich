@@ -193,7 +193,8 @@ function Project() {
               <Box
                 w="20vw"
                 h="40vh"
-                maxW="800px"
+                maxH="300px"
+                maxW="400px"
                 p="20px"
                 bg="gray.700"
                 boxShadow="lg"
@@ -265,7 +266,8 @@ function Project() {
             <Box
               w="20vw"
               h="40vh"
-              maxW="800px"
+              maxH="300px"
+              maxW="400px"
               p="20px"
               bg="gray.700"
               boxShadow="lg"
@@ -297,7 +299,7 @@ function Project() {
                     <Button
                       mt="2rem"
                       colorScheme="cyan"
-                      width="13vw"
+                      width="100%"
                       onClick={() => {
                         createProject(
                           projectNameRef.current.value,
