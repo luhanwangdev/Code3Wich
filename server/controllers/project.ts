@@ -156,9 +156,9 @@ export const deleteProject = async (req: Request, res: Response) => {
   const folderPath = `codeFiles/project${id}`;
 
   projectModel.deleteProject(id);
+  fs.rmSync(path.join(folderPath), { recursive: true });
   await removeContainer(id);
   await removeImage(id);
-  fs.rmSync(path.join(folderPath), { recursive: true });
 
   res.status(200).json({ id, message: `Delete project${id} successfully` });
 };
