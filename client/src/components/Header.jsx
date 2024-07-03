@@ -20,7 +20,7 @@ const Header = () => {
             <Image
               w="15rem"
               src={logo}
-              border="2px solid gray"
+              border="3px solid white"
               borderRadius="lg"
             ></Image>
           </Link>
