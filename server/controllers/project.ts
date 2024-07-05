@@ -1,15 +1,7 @@
 import { Request, Response } from 'express';
-import fs from 'fs';
-import path from 'path';
 import * as projectModel from '../models/project.js';
 import * as fileModel from '../models/file.js';
 import * as serviceInstanceModel from '../models/serviceInstance.js';
-import AppError from '../utils/appError.js';
-import {
-  execContainer,
-  removeContainer,
-  removeImage,
-} from '../utils/container.js';
 import { getRabbitMQChannel } from '../utils/rabbitmq.js';
 
 export const getFilesByProject = async (req: Request, res: Response) => {
@@ -48,16 +40,7 @@ export const connectProjectTerminal = async (req: Request, res: Response) => {
 
   const clientSocket = io.sockets.sockets.get(clientSocketId);
   const instanceSocket = io.sockets.sockets.get(instanceSocketId);
-  // console.log(instanceSocket);
 
-  // console.log(`project${id}: ${userSocketId}`);
-
-  // if (!userSocket) {
-  //   throw new AppError('User socket not found', 500);
-  // }
-
-  // const containerId = await projectModel.getProjectContainerId(id);
-  // await execContainer(userSocket, containerId);
   clientSocket.on('execCommand', (command: any) => {
     instanceSocket.emit('execCommand', command);
   });
@@ -84,7 +67,6 @@ export const createProject = async (req: Request, res: Response) => {
     userId: number;
     type: string;
   };
-  console.log('create Project!');
 
   const project = await projectModel.createProject(name, userId, type);
 
