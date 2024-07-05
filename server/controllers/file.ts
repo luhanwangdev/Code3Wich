@@ -1,9 +1,7 @@
 import { Request, Response } from 'express';
-import fs from 'fs';
-import fsExtra from 'fs-extra';
-import path from 'path';
-import AppError from '../utils/appError.js';
 import * as fileModel from '../models/file.js';
+import * as projectModel from '../models/project.js';
+import * as serviceInstanceModel from '../models/serviceInstance.js';
 
 export const updateFile = async (req: Request, res: Response) => {
   const { name, isFolder, projectId, parentId, code } = req.body as unknown as {
@@ -14,33 +12,35 @@ export const updateFile = async (req: Request, res: Response) => {
     code: string;
   };
 
-  const file = await fileModel.getFileByFileNameandProjectId(name, projectId);
+  const serviceInstanceId = await projectModel.getProjectServiceInstance(
+    projectId
+  );
+  const serviceInstanceUrl = await serviceInstanceModel.getServiceInstanceUrl(
+    serviceInstanceId
+  );
 
-  let filePath;
-
-  if (!file) {
-    if (parentId === 0) {
-      filePath = `codeFiles/project${projectId}/${name}`;
-    } else {
-      const parentPath = await fileModel.getFilePath(parentId);
-      filePath = `${parentPath}/${name}`;
+  const updateResponse = await fetch(
+    `http://${serviceInstanceUrl}:5000/api/file/edit`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name,
+        isFolder,
+        projectId,
+        parentId,
+        code,
+      }),
     }
+  );
 
-    // fileModel.createFile(name, type, filePath, projectId, isFolder, parentId);
+  const updateData = await updateResponse.json();
+  const updatePath = updateData.path;
+  const updateCode = updateData.code;
 
-    if (isFolder) {
-      fs.mkdirSync(filePath, { recursive: true });
-      res.status(200).json({ success: true, path: filePath });
-      return;
-    }
-  } else {
-    filePath = file.location;
-  }
-
-  fs.mkdirSync(path.dirname(filePath), { recursive: true });
-  fs.writeFileSync(filePath, code);
-
-  res.status(200).json({ success: true, path: filePath, code });
+  res.status(200).json({ success: true, path: updatePath, code: updateCode });
 };
 
 export const loadFile = async (req: Request, res: Response) => {
@@ -48,14 +48,18 @@ export const loadFile = async (req: Request, res: Response) => {
     id: number;
   };
 
-  const filePath = await fileModel.getFilePath(id);
+  const serviceInstanceId = await fileModel.getFileServiceInstance(id);
+  const serviceInstanceUrl = await serviceInstanceModel.getServiceInstanceUrl(
+    serviceInstanceId
+  );
 
-  fs.readFile(filePath, 'utf8', (err, data) => {
-    if (err) {
-      throw new AppError(err.message, 500);
-    }
-    res.status(200).json({ status: true, code: data });
-  });
+  const codeResponse = await fetch(
+    `http://${serviceInstanceUrl}:5000/api/file/edit?id=${id}`
+  );
+  const codeData = await codeResponse.json();
+  const data = codeData.code;
+
+  res.status(200).json({ status: true, code: data });
 };
 
 export const deleteFile = async (req: Request, res: Response) => {
@@ -63,9 +67,14 @@ export const deleteFile = async (req: Request, res: Response) => {
     id: number;
   };
 
-  const filePath = await fileModel.getFilePath(id);
+  const serviceInstanceId = await fileModel.getFileServiceInstance(id);
+  const serviceInstanceUrl = await serviceInstanceModel.getServiceInstanceUrl(
+    serviceInstanceId
+  );
 
-  await fsExtra.remove(filePath);
+  await fetch(`http://${serviceInstanceUrl}:5000/api/file/${id}`, {
+    method: 'DELETE',
+  });
 
   res
     .status(200)

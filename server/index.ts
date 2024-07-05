@@ -14,6 +14,7 @@ import globalErrorHandlerMiddleware from './middlewares/errorHandler.js';
 import { watcher, startWatcher, stopWatcher } from './utils/watcher.js';
 import { closeRabbitMQConnection } from './utils/rabbitmq.js';
 import setUpLogLogic from './utils/cloudClient.js';
+import { getServiceInstanceUrl } from './models/serviceInstance.js';
 
 const app = express();
 const server = createServer(app);
@@ -44,10 +45,15 @@ app.use(
   })
 );
 
-app.use('/container/:port/', (req, res, next) => {
-  const { port } = req.params;
+app.use('/container/:route/', async (req, res, next) => {
+  const { route } = req.params as unknown as { route: number };
+  const port = Math.floor(route / 100);
+  const serviceInstanceId = route % 100;
+
+  const serviceInstanceUrl = await getServiceInstanceUrl(serviceInstanceId);
+
   createProxyMiddleware({
-    target: `http://localhost:${port}/`,
+    target: `http://${serviceInstanceUrl}:${port}/`,
     changeOrigin: true,
   })(req, res, next);
 });

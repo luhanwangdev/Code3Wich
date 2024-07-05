@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import * as projectModel from '../models/project.js';
 import * as fileModel from '../models/file.js';
+import * as serviceInstanceModel from '../models/serviceInstance.js';
 import AppError from '../utils/appError.js';
 import {
   execContainer,
@@ -10,27 +11,6 @@ import {
   removeImage,
 } from '../utils/container.js';
 import { getRabbitMQChannel } from '../utils/rabbitmq.js';
-
-const createFile = async (
-  name: string,
-  type: string,
-  projectId: number,
-  code: string
-) => {
-  const file = await fileModel.getFileByFileNameandProjectId(name, projectId);
-  const filePath = path.join(`codeFiles/project${projectId}/${name}`);
-
-  if (!file) {
-    await fileModel.createFile(name, type, filePath, projectId, false, 0);
-  }
-
-  fs.mkdirSync(path.dirname(filePath), { recursive: true });
-  fs.writeFile(filePath, code, (err) => {
-    if (err) {
-      throw new AppError(err.message, 500);
-    }
-  });
-};
 
 export const getFilesByProject = async (req: Request, res: Response) => {
   const { id } = req.query as unknown as { id: number };
@@ -52,10 +32,23 @@ export const connectProjectTerminal = async (req: Request, res: Response) => {
   // console.log('connecting to terminal...');
   const { id } = req.query as unknown as { id: number };
 
+  const serviceInstanceId = await projectModel.getProjectServiceInstance(id);
+  const serviceInstanceUrl = await serviceInstanceModel.getServiceInstanceUrl(
+    serviceInstanceId
+  );
+
+  await fetch(
+    `http://${serviceInstanceUrl}:5000/api/project/terminal?id=${id}`
+  );
+
   const io = req.app.get('socketio');
   const userSocketMap = req.app.get('userSocketMap');
-  const userSocketId = userSocketMap[`project${id}`];
-  const userSocket = io.sockets.sockets.get(userSocketId);
+  const clientSocketId = userSocketMap[`project${id}`];
+  const instanceSocketId = userSocketMap[`instance${id}`];
+
+  const clientSocket = io.sockets.sockets.get(clientSocketId);
+  const instanceSocket = io.sockets.sockets.get(instanceSocketId);
+  // console.log(instanceSocket);
 
   // console.log(`project${id}: ${userSocketId}`);
 
@@ -63,8 +56,25 @@ export const connectProjectTerminal = async (req: Request, res: Response) => {
   //   throw new AppError('User socket not found', 500);
   // }
 
-  const containerId = await projectModel.getProjectContainerId(id);
-  await execContainer(userSocket, containerId);
+  // const containerId = await projectModel.getProjectContainerId(id);
+  // await execContainer(userSocket, containerId);
+  clientSocket.on('execCommand', (command: any) => {
+    instanceSocket.emit('execCommand', command);
+  });
+
+  clientSocket.on('disconnect', () => {
+    instanceSocket.emit('clientDisconnect');
+    clientSocket.emit('execEnd', 'Socket disconnected and stream ended');
+  });
+
+  instanceSocket.on('execError', (error: any) => {
+    clientSocket.emit('execError', error.message);
+  });
+
+  instanceSocket.on('execOutput', (finalOutput: any) => {
+    clientSocket.emit('execOutput', finalOutput);
+  });
+
   res.status(200).send('ok');
 };
 
@@ -77,60 +87,6 @@ export const createProject = async (req: Request, res: Response) => {
   console.log('create Project!');
 
   const project = await projectModel.createProject(name, userId, type);
-  const initialHTML = `<!DOCTYPE html>
-  <html lang="en">
-    <head>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <link rel="stylesheet" href="./style.css" />
-      <script defer src="./index.js"></script>
-      <title>Project</title>
-    </head>
-    <body>
-      <h1 class="hello"></h1>
-    </body>
-  </html>
-    `;
-  const initialCSS = `h1{
-    color: lightseagreen;
-  };`;
-  const initialJS = `const helloArea = document.querySelector("h1");
-  const helloText = "Hello from Code3Wich";
-
-  helloArea.innerText = helloText;`;
-
-  const serverCode = `const http = require('http');
-
-  const server = http.createServer((req, res) => {
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end('Hello, Docker World!');
-  });
-
-  server.listen(3000, () => {
-    console.log('Server is running on port 3000');
-  });
-    `;
-
-  switch (type) {
-    case 'vanilla':
-      await Promise.all([
-        createFile('index.html', 'html', project.id, initialHTML),
-        createFile('style.css', 'css', project.id, initialCSS),
-        createFile('index.js', 'javascript', project.id, initialJS),
-      ]);
-      break;
-    case 'node':
-      await createFile('index.js', 'javascript', project.id, serverCode);
-      break;
-    case 'bun':
-      await createFile('index.js', 'javascript', project.id, serverCode);
-      break;
-    case 'react':
-      await createFile('index.js', 'javascript', project.id, serverCode);
-      break;
-    default:
-      throw new AppError('The project type is invalid', 500);
-  }
 
   const channel = await getRabbitMQChannel();
   const queue = 'createProjectQueue';
@@ -140,6 +96,7 @@ export const createProject = async (req: Request, res: Response) => {
   });
 
   const message = { projectId: project.id, type };
+
   channel.sendToQueue(queue, Buffer.from(JSON.stringify(message)));
   console.log(`Sent: ${JSON.stringify(message)}`);
 
@@ -153,12 +110,15 @@ export const createProject = async (req: Request, res: Response) => {
 
 export const deleteProject = async (req: Request, res: Response) => {
   const { id } = req.query as unknown as { id: number };
-  const folderPath = `codeFiles/project${id}`;
 
-  projectModel.deleteProject(id);
-  fs.rmSync(path.join(folderPath), { recursive: true });
-  await removeContainer(id);
-  await removeImage(id);
+  const serviceInstanceId = await projectModel.getProjectServiceInstance(id);
+  const serviceInstanceUrl = await serviceInstanceModel.getServiceInstanceUrl(
+    serviceInstanceId
+  );
+
+  await fetch(`http://${serviceInstanceUrl}:5000/api/project?id=${id}`, {
+    method: 'DELETE',
+  });
 
   res.status(200).json({ id, message: `Delete project${id} successfully` });
 };

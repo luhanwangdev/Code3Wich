@@ -1,8 +1,16 @@
-import { z } from 'zod';
-import pool from './databasePool.js';
-import instanceOfSetHeader from '../utils/instanceOfSetHeader.js';
-import AppError from '../utils/appError.js';
-import { RowDataPacket } from 'mysql2';
+import { z } from "zod";
+import pool from "./databasePool.js";
+import instanceOfSetHeader from "../utils/instanceOfSetHeader.js";
+import AppError from "../utils/appError.js";
+import { RowDataPacket } from "mysql2";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const serviceInstanceId = parseInt(
+  process.env.SERVICE_INSTANCE_ID as string,
+  10
+);
 
 const FileSchema = z.object({
   id: z.number(),
@@ -49,17 +57,17 @@ export const createFile = async (
 ) => {
   const results = await pool.query(
     `
-    INSERT INTO file(name, type, location, project_id, isFolder, parent_file_id)
-    VALUES (?, ?, ?, ?, ?, ?)
+    INSERT INTO file(name, type, location, project_id, isFolder, parent_file_id, service_instance_id)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
     `,
-    [name, type, location, projectId, isFolder, parentId]
+    [name, type, location, projectId, isFolder, parentId, serviceInstanceId]
   );
 
   if (Array.isArray(results) && instanceOfSetHeader(results[0])) {
     return results[0].insertId;
   }
 
-  throw new AppError('create file failed', 400);
+  throw new AppError("create file failed", 400);
 };
 
 export const getFilePath = async (id: number): Promise<string> => {
@@ -127,16 +135,4 @@ export const getFileByPath = async (path: string) => {
 
   const file = z.array(FileSchema).parse(results[0]);
   return file[0];
-};
-
-export const getFileServiceInstance = async (id: number): Promise<number> => {
-  const results = await pool.query<FileRow[]>(
-    `
-    SELECT service_instance_id FROM file
-    WHERE id = ?
-    `,
-    [id]
-  );
-
-  return results[0][0].service_instance_id;
 };
