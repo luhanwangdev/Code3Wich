@@ -1,20 +1,20 @@
-import chokidar, { FSWatcher } from 'chokidar';
-import path from 'path';
-import AppError from './appError.js';
-import * as fileModel from '../models/file.js';
+import chokidar, { FSWatcher } from "chokidar";
+import path from "path";
+import AppError from "./appError.js";
+import * as fileModel from "../models/file.js";
 
-const watchDirectory = 'codeFiles';
+const watchDirectory = "codeFiles";
 
 export const watcher: FSWatcher = chokidar.watch(watchDirectory, {
   persistent: true,
   ignoreInitial: true,
-  ignored: path.join(watchDirectory, 'project*/node_modules'),
+  ignored: path.join(watchDirectory, "project*/node_modules"),
 });
 
 const getProjectIdFromPath = (filePath: string): any => {
   const relativePath = path.relative(watchDirectory, filePath);
   const match = relativePath.match(/^project(\d+)/);
-  return match ? match[1] : 'unknown';
+  return match ? match[1] : "unknown";
 };
 
 const addFile = async (filePath: string, projectId: number) => {
@@ -22,45 +22,45 @@ const addFile = async (filePath: string, projectId: number) => {
   const fileName = path.basename(filePath);
 
   if (
-    fileName !== 'index.js' &&
-    fileName !== 'index.html' &&
-    fileName !== 'style.css'
+    fileName !== "index.js" &&
+    fileName !== "index.html" &&
+    fileName !== "style.css"
   ) {
     const parentPath = path.dirname(filePath);
     const fullPath = path.join(projectPath);
     if (parentPath === fullPath) {
-      const ext = fileName.split('.').pop();
+      const ext = fileName.split(".").pop();
 
       switch (ext) {
-        case 'js':
+        case "js":
           fileModel.createFile(
             fileName,
-            'javascript',
+            "javascript",
             filePath,
             projectId,
             false,
             0
           );
           break;
-        case 'ts':
+        case "ts":
           fileModel.createFile(
             fileName,
-            'typescript',
+            "typescript",
             filePath,
             projectId,
             false,
             0
           );
           break;
-        case 'html':
-          fileModel.createFile(fileName, 'html', filePath, projectId, false, 0);
+        case "html":
+          fileModel.createFile(fileName, "html", filePath, projectId, false, 0);
           break;
-        case 'css':
-          fileModel.createFile(fileName, 'css', filePath, projectId, false, 0);
+        case "css":
+          fileModel.createFile(fileName, "css", filePath, projectId, false, 0);
           break;
 
         default:
-          fileModel.createFile(fileName, 'json', filePath, projectId, false, 0);
+          fileModel.createFile(fileName, "json", filePath, projectId, false, 0);
       }
     } else {
       const parentFolder = await fileModel.getFileByPath(parentPath);
@@ -69,43 +69,43 @@ const addFile = async (filePath: string, projectId: number) => {
         throw new AppError(`${filePath}'s folder doesn't exist`, 500);
       }
 
-      const ext = fileName.split('.').pop();
+      const ext = fileName.split(".").pop();
 
       switch (ext) {
-        case 'js':
+        case "js":
           fileModel.createFile(
             fileName,
-            'javascript',
+            "javascript",
             filePath,
             projectId,
             false,
             parentFolder.id
           );
           break;
-        case 'ts':
+        case "ts":
           fileModel.createFile(
             fileName,
-            'typescript',
+            "typescript",
             filePath,
             projectId,
             false,
             parentFolder.id
           );
           break;
-        case 'html':
+        case "html":
           fileModel.createFile(
             fileName,
-            'html',
+            "html",
             filePath,
             projectId,
             false,
             parentFolder.id
           );
           break;
-        case 'css':
+        case "css":
           await fileModel.createFile(
             fileName,
-            'css',
+            "css",
             filePath,
             projectId,
             false,
@@ -115,7 +115,7 @@ const addFile = async (filePath: string, projectId: number) => {
         default:
           await fileModel.createFile(
             fileName,
-            'json',
+            "json",
             filePath,
             projectId,
             false,
@@ -136,7 +136,7 @@ const addDir = async (dirPath: string, projectId: number) => {
     if (parentPath === fullPath) {
       await fileModel.createFile(
         dirName,
-        'folder',
+        "folder",
         dirPath,
         projectId,
         true,
@@ -150,7 +150,7 @@ const addDir = async (dirPath: string, projectId: number) => {
 
       await fileModel.createFile(
         dirName,
-        'folder',
+        "folder",
         dirPath,
         projectId,
         true,
@@ -162,26 +162,26 @@ const addDir = async (dirPath: string, projectId: number) => {
 
 export const startWatcher = (watcher: FSWatcher) => {
   watcher
-    .on('add', (filePath: string) => {
+    .on("add", (filePath: string) => {
       const projectId = getProjectIdFromPath(filePath);
       addFile(filePath, projectId);
     })
-    .on('addDir', (dirPath: string) => {
+    .on("addDir", (dirPath: string) => {
       const projectId = getProjectIdFromPath(dirPath);
       addDir(dirPath, projectId);
     })
-    .on('unlinkDir', (filePath: string) => {
-      if (filePath.charAt(0) === 'c') {
+    .on("unlinkDir", (filePath: string) => {
+      if (filePath.charAt(0) === "c") {
         fileModel.deleteFileByPath(filePath);
       } else {
-        fileModel.deleteFileByPath(filePath.split('server\\')[1]);
+        fileModel.deleteFileByPath(filePath.split("server\\")[1]);
       }
     })
-    .on('unlink', (filePath: string) => {
+    .on("unlink", (filePath: string) => {
       fileModel.deleteFileByPath(filePath);
     })
-    .on('error', (error: Error) => console.log(`Watcher error: ${error}`))
-    .on('ready', () => console.log('Initial scan complete. Ready for changes'));
+    .on("error", (error: Error) => console.log(`Watcher error: ${error}`))
+    .on("ready", () => console.log("Initial scan complete. Ready for changes"));
 };
 
 export async function stopWatcher(watcher: FSWatcher) {
