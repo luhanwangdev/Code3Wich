@@ -136,7 +136,7 @@ console.log('Server is running on port 3000');
 async function receiveMessages() {
   try {
     const connection = await amqp.connect(
-      `amqp://${process.env.RABBITMQ_SERVER}`
+      `amqp://${process.env.RABBITMQ_USER}:${process.env.RABBITMQ_PASSWORD}@${process.env.RABBITMQ_SERVER}:5672//`
     );
     const channel = await connection.createChannel();
     const queue = "createProjectQueue";
