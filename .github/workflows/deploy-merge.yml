@@ -26,6 +26,28 @@ jobs:
             npm run build
             npx pm2 restart all
 
+  deploy_service_instance_1:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: "${{ secrets.SERVICE_INSTANCE_DNS_1 }}"
+          username: "${{ secrets.SERVICE_INSTANCE_EC2_USERNAME_1 }}"
+          key: ${{ secrets.SERVICE_INSTANCE_EC2_SSH_KEY_1 }}
+          script: |
+            echo "Hello from github action, start deploy main to ec2"
+            cd /home/ubuntu/mySandBox
+            git pull
+            cd serviceInstance
+            npm install
+            npm run build
+            npx pm2 restart all
+
   deploy_vite:
     runs-on: ubuntu-latest
 
