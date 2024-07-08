@@ -3,7 +3,7 @@ import * as dotenv from "dotenv";
 
 dotenv.config();
 
-const localServerPath = "C:/Users/sherr/OneDrive/桌面/AWS/mySandBox/server/";
+const localServerPath = "http://localhost:3000";
 const local = process.env.SERVER_PATH === localServerPath;
 
 const host = local ? process.env.MYSQL_HOST : process.env.AWS_RDS_ENDPOINT;

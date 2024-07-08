@@ -34,7 +34,7 @@ export const connectProjectTerminal = async (req: Request, res: Response) => {
   const { id } = req.query as unknown as {
     id: number;
   };
-  const socket = io(process.env.HOST_PATH as string);
+  const socket = io(process.env.SERVER_PATH as string);
 
   socket.emit("register", `instance${id}`, (response: any) => {
     if (response === "success") {

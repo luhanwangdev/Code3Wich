@@ -9,7 +9,7 @@ import AppError from "../utils/appError.js";
 import { setUpContainer } from "../utils/container.js";
 
 dotenv.config();
-const socket = io(process.env.HOST_PATH as string);
+const socket = io(process.env.SERVER_PATH as string);
 
 const createFile = async (
   name: string,
