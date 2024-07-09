@@ -12,7 +12,9 @@ export async function getRabbitMQChannel(): Promise<amqp.Channel> {
   }
 
   if (!connection) {
-    connection = await amqp.connect(`amqp://${process.env.RABBITMQ_SERVER}`);
+    connection = await amqp.connect(
+      `amqps://${process.env.AWS_MQ_USER}:${process.env.AWS_MQ_PASSWORD}@${process.env.AWS_MQ_ENDPOINT}:5671`
+    );
   }
 
   channel = await connection.createChannel();
