@@ -4,8 +4,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import { Server } from 'socket.io';
 import { createServer } from 'http';
-import { createClient } from 'redis';
-import dotenv from 'dotenv';
+
 import { createAdapter } from '@socket.io/redis-adapter';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import projectRoutes from './routers/project.js';
@@ -16,28 +15,16 @@ import { closeRabbitMQConnection } from './utils/rabbitmq.js';
 import setUpLogLogic from './utils/cloudClient.js';
 import { getServiceInstanceUrl } from './models/serviceInstance.js';
 import { userSocketMap, socketIo } from './utils/socketio.js';
-
-dotenv.config();
-
-const pubClient = createClient({
-  url: `redis://${process.env.AWS_REDIS_ENDPOINT}:6379`,
-});
-const subClient = pubClient.duplicate();
+import connectPubAndSub from './utils/redisCleint.js';
 
 const app = express();
 const server = createServer(app);
 
 setUpLogLogic();
 
-// const { pubClient, subClient } = await returnPubAndSub();
+const { pubClient, subClient } = await connectPubAndSub();
 
-// const io = new Server(server, {
-//   cors: {
-//     origin: '*',
-//   },
-// });
-
-const io = new Server({
+const io = new Server(server, {
   adapter: createAdapter(pubClient, subClient),
   cors: {
     origin: '*',
