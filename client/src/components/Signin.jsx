@@ -54,7 +54,7 @@ const Signin = () => {
     <DarkMode>
       <Box minH="100vh" bg="#2C2C32" color="gray.500">
         <Header />
-        <Flex justifyContent="space-evenly" alignItems="center" h="87vh">
+        <Flex justifyContent="space-evenly" alignItems="center" h="89vh">
           <Flex justifyContent="center" alignItems="center" direction="column">
             <Image
               w="15rem"

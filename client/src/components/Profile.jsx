@@ -101,7 +101,7 @@ const Profile = () => {
             </ModalFooter>
           </ModalContent>
         </Modal>
-        <Flex justifyContent="space-evenly" alignItems="center" h="87vh">
+        <Flex justifyContent="space-evenly" alignItems="center" h="89vh">
           <Flex justifyContent="center" alignItems="center" direction="column">
             <Image
               w="15rem"
