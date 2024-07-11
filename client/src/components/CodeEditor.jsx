@@ -26,7 +26,10 @@ import { url } from "../constants.js";
 const CodeEditor = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const editorRef = useRef();
+  const editorRef = useRef(null);
+  const activeFileRef = useRef(null);
+  const valueRef = useRef(null);
+  const renderRef = useRef(null);
   const socketRef = useRef(null);
   const [value, setValue] = useState("");
   const [auth, setAuth] = useState("");
@@ -37,13 +40,18 @@ const CodeEditor = () => {
   const [isSocketConnected, setIsSocketConnected] = useState(false);
   const { isOpen, onOpen } = useDisclosure();
 
-  const onMount = (editor) => {
+  const onMount = (editor, monaco) => {
     editorRef.current = editor;
     editor.focus();
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
+      saveFile();
+      setTimeout(() => renderView(), 300);
+    });
   };
 
   const saveFile = async () => {
-    const { name, type, project_id, parentId } = activeFile;
+    const { name, type, project_id, parentId } = activeFileRef.current;
+
     await fetch(`${url}/api/file/edit`, {
       method: "POST",
       headers: {
@@ -54,7 +62,7 @@ const CodeEditor = () => {
         type,
         projectId: project_id,
         parentId,
-        code: value,
+        code: valueRef.current,
       }),
     });
   };
@@ -117,7 +125,7 @@ const CodeEditor = () => {
   };
 
   const renderView = () => {
-    setRender(!render);
+    setRender(!renderRef.current);
   };
 
   useEffect(() => {
@@ -163,7 +171,16 @@ const CodeEditor = () => {
       fetchCode();
       // fetchProject();
     }
+    activeFileRef.current = activeFile;
   }, [activeFile]);
+
+  useEffect(() => {
+    valueRef.current = value;
+  }, [value]);
+
+  useEffect(() => {
+    renderRef.current = render;
+  }, [render]);
 
   return (
     <DarkMode>
@@ -187,7 +204,7 @@ const CodeEditor = () => {
             </ModalFooter>
           </ModalContent>
         </Modal>
-        <Flex px={6} py={6}>
+        <Flex px={6} py={6} h="89vh">
           <Box flex="1">
             <SideBar
               files={files}
@@ -205,7 +222,7 @@ const CodeEditor = () => {
               setActiveFile={setActiveFile}
             />
             <Editor
-              height="70vh"
+              height="72%"
               theme="vs-dark"
               language={activeFile.type}
               value={value}
@@ -223,9 +240,9 @@ const CodeEditor = () => {
                 setFiles={setFiles}
               />
             )}
-            <Flex alignItems="center">
+            {/* <Flex alignItems="center">
               <Button
-                mt="0.5rem"
+                // mt="0.5rem"
                 onClick={() => {
                   saveFile();
                   renderView();
@@ -233,7 +250,7 @@ const CodeEditor = () => {
               >
                 Save
               </Button>
-            </Flex>
+            </Flex> */}
           </Box>
           <Box flex="3">
             {project.id && (

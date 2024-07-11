@@ -79,7 +79,8 @@ const Signup = () => {
           <Box
             w="30vw"
             h="70vh"
-            maxW="800px"
+            maxW="500px"
+            maxH="600px"
             p="20px"
             bg="gray.800"
             boxShadow="lg"
@@ -87,49 +88,78 @@ const Signup = () => {
             border="1px"
             borderColor="gray.600"
           >
-            <FormControl mb="4" p="0 2rem">
-              <FormLabel color="lightblue" my="1rem">
-                Name
-              </FormLabel>
-              <Input
-                type="text"
-                bg="gray.700"
-                borderColor="gray.600"
-                ref={userNameRef}
-              />
-              <FormLabel color="lightblue" my="1rem">
-                Email
-              </FormLabel>
-              <Input
-                type="email"
-                bg="gray.700"
-                borderColor="gray.600"
-                ref={userEmailRef}
-              />
-              <FormLabel color="lightblue" my="1rem">
-                Password
-              </FormLabel>
-              <Input
-                type="password"
-                bg="gray.700"
-                borderColor="gray.600"
-                ref={userPasswordRef}
-              />
-            </FormControl>
-            <Flex justifyContent="center" alignItems="center" h="20vh">
-              <Button
-                colorScheme="cyan"
-                width="80%"
-                onClick={() =>
-                  createUser(
-                    userNameRef.current.value,
-                    userEmailRef.current.value,
-                    userPasswordRef.current.value
-                  )
-                }
-              >
-                Sign up
-              </Button>
+            <Flex
+              flexDirection="column"
+              w="100%"
+              h="100%"
+              justifyContent="center"
+              alignItems="center"
+            >
+              <Box w="80%">
+                <FormControl mb="4">
+                  <FormLabel color="lightblue" mb="1rem">
+                    Name
+                  </FormLabel>
+                  <Input
+                    type="text"
+                    bg="gray.700"
+                    borderColor="gray.600"
+                    ref={userNameRef}
+                  />
+                  <FormLabel color="lightblue" my="1rem">
+                    Email
+                  </FormLabel>
+                  <Input
+                    type="email"
+                    bg="gray.700"
+                    borderColor="gray.600"
+                    ref={userEmailRef}
+                  />
+                  <FormLabel color="lightblue" my="1rem">
+                    Password
+                  </FormLabel>
+                  <Input
+                    type="password"
+                    bg="gray.700"
+                    borderColor="gray.600"
+                    ref={userPasswordRef}
+                  />
+                </FormControl>
+                <Flex justifyContent="center" alignItems="center" h="10vh">
+                  <Button
+                    colorScheme="cyan"
+                    width="100%"
+                    onClick={() =>
+                      createUser(
+                        userNameRef.current.value,
+                        userEmailRef.current.value,
+                        userPasswordRef.current.value
+                      )
+                    }
+                  >
+                    Sign Up
+                  </Button>
+                </Flex>
+                <Flex justifyContent="center" alignItems="center" h="5vh">
+                  <Box
+                    width="80%"
+                    height="3px"
+                    bg="gray.600"
+                    my="2"
+                    mb="1rem"
+                  />
+                </Flex>
+                <Flex justifyContent="center" alignItems="center">
+                  <Button
+                    colorScheme="cyan"
+                    variant="outline"
+                    width="100%"
+                    onClick={() => navigate("/user/signin")}
+                  >
+                    Sign In
+                  </Button>
+                </Flex>
+              </Box>
             </Flex>
           </Box>
         </Flex>

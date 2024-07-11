@@ -1,4 +1,4 @@
-import { Routes, Route, BrowserRouter } from "react-router-dom";
+import { Routes, Route, BrowserRouter, Navigate } from "react-router-dom";
 import ReactDOM from "react-dom/client";
 import { ChakraProvider, ColorModeScript } from "@chakra-ui/react";
 import "./index.css";
@@ -22,6 +22,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           <Route path="/user/signup" element={<Signup />} />
           <Route path="/projects" element={<Project />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </BrowserRouter>
     </ChakraProvider>

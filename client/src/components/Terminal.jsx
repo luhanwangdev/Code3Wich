@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import * as xterm from "@xterm/xterm";
+import { FitAddon } from "xterm-addon-fit";
 import "@xterm/xterm/css/xterm.css";
 import { WebLinksAddon } from "@xterm/addon-web-links";
 import { Box, DarkMode } from "@chakra-ui/react";
@@ -7,6 +8,7 @@ import { url } from "../constants";
 
 const Terminal = ({ files, setFiles, socket, project }) => {
   const terminalRef = useRef(null);
+  const fitAddonRef = useRef(null);
   const termRef = useRef(null);
 
   let command = "";
@@ -48,13 +50,17 @@ const Terminal = ({ files, setFiles, socket, project }) => {
     const term = new xterm.Terminal({
       rows: 7,
     });
-    termRef.current = term;
-
+    const fitAddon = new FitAddon();
     const webLinksAddon = new WebLinksAddon();
 
+    termRef.current = term;
+    fitAddonRef.current = fitAddon;
+
+    term.loadAddon(fitAddon);
     term.loadAddon(webLinksAddon);
 
     term.open(terminalRef.current);
+    fitAddon.fit();
     term.write("Code3Wich $ Welcome to \x1B[38;5;208mCode3Wich\x1B[0m!\r\n");
 
     socket.on("execOutput", (data) => {
@@ -110,8 +116,14 @@ const Terminal = ({ files, setFiles, socket, project }) => {
 
   return (
     <DarkMode>
-      <Box>
-        <div ref={terminalRef} style={{ width: "100%" }} />
+      <Box h="24%">
+        <div
+          ref={terminalRef}
+          style={{
+            width: "100%",
+            height: "100%",
+          }}
+        />
       </Box>
     </DarkMode>
   );

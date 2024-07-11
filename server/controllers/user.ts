@@ -90,32 +90,28 @@ export const handleSignin = async (req: Request, res: Response) => {
 
   const hashedPassword = await userModel.getUserPasswordByEmail(email);
 
-  bcrypt.compare(password, hashedPassword, async (err, decoded) => {
-    if (err) {
-      throw new AppError(err.message, 500);
-    }
+  const decoded = bcrypt.compareSync(password, hashedPassword);
 
-    if (decoded) {
-      const existUser = await userModel.checkUserByEmail(email);
-      const payload = {
-        id: existUser.id,
-        name: existUser.name,
-        email: existUser.email,
-      };
+  if (decoded) {
+    const existUser = await userModel.checkUserByEmail(email);
+    const payload = {
+      id: existUser.id,
+      name: existUser.name,
+      email: existUser.email,
+    };
 
-      const { accessToken, user } = jwtTokenGenerator(payload);
+    const { accessToken, user } = jwtTokenGenerator(payload);
 
-      res.cookie('token', accessToken, {
-        maxAge: JWTExpired,
-        secure: true,
-        sameSite: 'none',
-      });
+    res.cookie('token', accessToken, {
+      maxAge: JWTExpired,
+      secure: true,
+      sameSite: 'none',
+    });
 
-      res.status(200).send(user);
-    } else {
-      throw new AppError('Incorrect email or password', 403);
-    }
-  });
+    res.status(200).send(user);
+  } else {
+    throw new AppError('Incorrect email or password', 403);
+  }
 };
 
 export const handleLogout = async (req: Request, res: Response) => {

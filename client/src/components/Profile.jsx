@@ -119,7 +119,8 @@ const Profile = () => {
           <Box
             w="30vw"
             h="70vh"
-            maxW="800px"
+            maxW="500px"
+            maxH="600px"
             p="20px"
             bg="gray.800"
             boxShadow="lg"
@@ -127,34 +128,62 @@ const Profile = () => {
             border="1px"
             borderColor="gray.600"
           >
-            <Box mb="4" p="0 2rem">
-              <Text color="lightblue" my="1rem">
-                Name
-              </Text>
-              <Text my="1rem" color="teal.300" fontSize={28} fontWeight="bold">
-                {user.name}
-              </Text>
-              <Text color="lightblue" my="1rem">
-                Email
-              </Text>
-              <Text my="1rem" color="teal.300" fontSize={28} fontWeight="bold">
-                {user.email}
-              </Text>
-              <Text color="lightblue" my="1rem">
-                Project count
-              </Text>
-              <Text my="1rem" color="teal.300" fontSize={28} fontWeight="bold">
-                {projects.length}
-              </Text>
-            </Box>
-            <Flex justifyContent="center" alignItems="center" h="20vh">
-              <Button
-                colorScheme="cyan"
-                width="80%"
-                onClick={() => handleLogout()}
-              >
-                Log out
-              </Button>
+            <Flex
+              flexDirection="column"
+              w="100%"
+              h="100%"
+              justifyContent="center"
+              alignItems="center"
+            >
+              <Box w="80%">
+                <Box mb="4">
+                  <Text color="lightblue" my="1rem">
+                    Name
+                  </Text>
+                  <Text
+                    my="1rem"
+                    bgGradient="linear(to-r, #add8e6, #ece75f)"
+                    bgClip="text"
+                    fontSize={28}
+                    fontWeight="bold"
+                  >
+                    {user.name}
+                  </Text>
+                  <Text color="lightblue" my="1rem">
+                    Email
+                  </Text>
+                  <Text
+                    my="1rem"
+                    bgGradient="linear(to-r, #add8e6, #ece75f)"
+                    bgClip="text"
+                    fontSize={28}
+                    fontWeight="bold"
+                  >
+                    {user.email}
+                  </Text>
+                  <Text color="lightblue" my="1rem">
+                    Project count
+                  </Text>
+                  <Text
+                    my="1rem"
+                    bgGradient="linear(to-r, #add8e6, #ece75f)"
+                    bgClip="text"
+                    fontSize={28}
+                    fontWeight="bold"
+                  >
+                    {projects.length}
+                  </Text>
+                </Box>
+                <Flex justifyContent="center" alignItems="center" h="20vh">
+                  <Button
+                    colorScheme="cyan"
+                    width="100%"
+                    onClick={() => handleLogout()}
+                  >
+                    Log Out
+                  </Button>
+                </Flex>
+              </Box>
             </Flex>
           </Box>
         </Flex>
