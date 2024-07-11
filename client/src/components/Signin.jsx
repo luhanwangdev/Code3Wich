@@ -35,7 +35,7 @@ const Signin = () => {
       return;
     }
 
-    await fetch(`${url}/api/user/signin`, {
+    const signInResponse = await fetch(`${url}/api/user/signin`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -47,7 +47,14 @@ const Signin = () => {
       }),
     });
 
-    navigate(`/projects`);
+    if (signInResponse.status === 200) {
+      navigate(`/projects`);
+      return;
+    }
+
+    alert("Wrong Email or Password!");
+    userEmailRef.current.value = null;
+    userPasswordRef.current.value = null;
   };
 
   return (
@@ -72,7 +79,8 @@ const Signin = () => {
           <Box
             w="30vw"
             h="70vh"
-            maxW="800px"
+            maxW="500px"
+            maxH="600px"
             p="20px"
             bg="gray.800"
             boxShadow="lg"
@@ -80,52 +88,68 @@ const Signin = () => {
             border="1px"
             borderColor="gray.600"
           >
-            <FormControl mb="4" p="0 2rem">
-              <FormLabel color="lightblue" my="1rem">
-                Email
-              </FormLabel>
-              <Input
-                type="email"
-                bg="gray.700"
-                borderColor="gray.600"
-                ref={userEmailRef}
-              />
-              <FormLabel color="lightblue" my="1rem">
-                Password
-              </FormLabel>
-              <Input
-                type="password"
-                bg="gray.700"
-                borderColor="gray.600"
-                ref={userPasswordRef}
-              />
-            </FormControl>
-            <Flex justifyContent="center" alignItems="center" h="15vh">
-              <Button
-                colorScheme="cyan"
-                width="80%"
-                onClick={() =>
-                  handleSignin(
-                    userEmailRef.current.value,
-                    userPasswordRef.current.value
-                  )
-                }
-              >
-                Sign in
-              </Button>
-            </Flex>
-            <Flex flexDirection="column" alignItems="center" h="15vh">
-              <Box width="80%" height="3px" bg="gray.600" my="4" mb="3rem" />
-              <Button
-                colorScheme="cyan"
-                variant="outline"
-                width="80%"
-                onClick={() => {
-                  navigate("/user/signup");
-                }}
-              >
-                Register New Account
-              </Button>
+            <Flex
+              flexDirection="column"
+              w="100%"
+              h="100%"
+              justifyContent="center"
+              alignItems="center"
+            >
+              <Box w="80%">
+                <FormControl mb="4">
+                  <FormLabel color="lightblue" my="1rem">
+                    Email
+                  </FormLabel>
+                  <Input
+                    type="email"
+                    bg="gray.700"
+                    borderColor="gray.600"
+                    ref={userEmailRef}
+                  />
+                  <FormLabel color="lightblue" my="1rem">
+                    Password
+                  </FormLabel>
+                  <Input
+                    type="password"
+                    bg="gray.700"
+                    borderColor="gray.600"
+                    ref={userPasswordRef}
+                  />
+                </FormControl>
+                <Flex justifyContent="center" alignItems="center" h="15vh">
+                  <Button
+                    colorScheme="cyan"
+                    width="100%"
+                    onClick={() =>
+                      handleSignin(
+                        userEmailRef.current.value,
+                        userPasswordRef.current.value
+                      )
+                    }
+                  >
+                    Sign In
+                  </Button>
+                </Flex>
+                <Flex flexDirection="column" alignItems="center" h="15vh">
+                  <Box
+                    width="80%"
+                    height="3px"
+                    bg="gray.600"
+                    my="4"
+                    mb="3rem"
+                  />
+                  <Button
+                    colorScheme="cyan"
+                    variant="outline"
+                    width="100%"
+                    onClick={() => {
+                      navigate("/user/signup");
+                    }}
+                  >
+                    Sign Up
+                  </Button>
+                </Flex>
+              </Box>
             </Flex>
           </Box>
         </Flex>

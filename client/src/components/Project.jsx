@@ -51,7 +51,6 @@ function Project() {
 
     if (projectReponse.status === 200) {
       const projects = await projectReponse.json();
-      console.log(projects);
       setProjects(projects);
     } else {
       console.log(projectReponse.status);
@@ -176,24 +175,23 @@ function Project() {
           </ModalContent>
         </Modal>
         <Box px={6}>
-          {user.name && (
-            <Text
-              m="2rem"
-              ml="7rem"
-              color="teal.300"
-              fontSize={32}
-              fontWeight="bold"
-            >
-              {`${user.name}'s Projects:`}
-            </Text>
-          )}
+          <Text
+            m="2rem"
+            ml="7rem"
+            fontSize={32}
+            fontWeight="bold"
+            bgGradient="linear(to-r, #add8e6, #ece75f)"
+            bgClip="text"
+          >
+            {`${user.name}'s Projects:`}
+          </Text>
 
-          <Flex wrap="wrap" w="75vw" mx="auto">
+          <Flex wrap="wrap" w="80vw" mx="auto">
             {projects.map((project) => (
               <Box
-                w="20vw"
+                w="21vw"
                 h="40vh"
-                maxH="300px"
+                maxH="350px"
                 maxW="400px"
                 p="20px"
                 bg="gray.700"
@@ -201,72 +199,76 @@ function Project() {
                 borderRadius="10%"
                 border="2px"
                 borderColor="gray.600"
-                m="2rem"
+                m="2rem 2.5rem"
               >
-                <Box p="0 1rem">
-                  <Text color="lightblue" my="0.5rem">
-                    Project Name
-                  </Text>
-                  <Text
-                    my="0.5rem"
-                    color="teal.200"
-                    fontSize={28}
-                    fontWeight="bold"
-                  >
-                    {project.name}
-                  </Text>
-                  {project.status === "loading" && (
-                    <Text color="lightblue" my="0.5rem">
-                      Loading Project...
-                    </Text>
-                  )}
-                  {project.status === "done" && (
-                    <Text color="lightblue" my="0.5rem">
-                      Project URL
-                    </Text>
-                  )}
-                  {project.status === "done" && (
-                    <Box
-                      my="0.5rem"
-                      color="gray.300"
-                      fontSize="14px"
-                      fontWeight="bold"
-                    >
-                      <ChakraLink href={project.url} isExternal>
-                        {project.url}
-                      </ChakraLink>
+                <Flex h="100%" justifyContent="center" alignItems="center">
+                  <Box w="90%">
+                    <Box p="0 1rem">
+                      <Text color="lightblue" my="0.5rem">
+                        Project Name
+                      </Text>
+                      <Text
+                        my="0.5rem"
+                        color="teal.200"
+                        fontSize={28}
+                        fontWeight="bold"
+                      >
+                        {project.name}
+                      </Text>
+                      {project.status === "loading" && (
+                        <Text color="lightblue" my="0.5rem">
+                          Loading Project...
+                        </Text>
+                      )}
+                      {project.status === "done" && (
+                        <Text color="lightblue" my="0.5rem">
+                          Project URL
+                        </Text>
+                      )}
+                      {project.status === "done" && (
+                        <Box
+                          my="0.5rem"
+                          color="gray.300"
+                          fontSize="14px"
+                          fontWeight="bold"
+                        >
+                          <ChakraLink href={project.url} isExternal>
+                            {project.url}
+                          </ChakraLink>
+                        </Box>
+                      )}
                     </Box>
-                  )}
-                </Box>
-                {project.status === "done" && (
-                  <Flex
-                    justifyContent="space-between"
-                    alignItems="center"
-                    h="13vh"
-                  >
-                    <Link to={{ pathname: `/project/${project.id}` }}>
-                      <Button colorScheme="cyan" width="13vw">
-                        Edit
-                      </Button>
-                    </Link>
-                    <Button
-                      colorScheme="gray"
-                      width="3vw"
-                      onClick={() => deleteProject(project.id)}
-                    >
-                      <FontAwesomeIcon
-                        icon={faTrashCan}
-                        style={{ fontSize: "1rem", color: "#9DECF9" }}
-                      />
-                    </Button>
-                  </Flex>
-                )}
+                    {project.status === "done" && (
+                      <Flex
+                        justifyContent="space-between"
+                        alignItems="center"
+                        mt="3vh"
+                      >
+                        <Link to={{ pathname: `/project/${project.id}` }}>
+                          <Button colorScheme="cyan" width="12vw">
+                            Edit
+                          </Button>
+                        </Link>
+                        <Button
+                          colorScheme="gray"
+                          width="2vw"
+                          onClick={() => deleteProject(project.id)}
+                        >
+                          <FontAwesomeIcon
+                            icon={faTrashCan}
+                            style={{ fontSize: "1rem", color: "#9DECF9" }}
+                          />
+                        </Button>
+                      </Flex>
+                    )}
+                  </Box>
+                </Flex>
               </Box>
             ))}
             <Box
-              w="20vw"
+              w="21vw"
               h="40vh"
-              maxH="300px"
+              maxH="350px"
               maxW="400px"
               p="20px"
               bg="gray.700"
@@ -274,22 +276,21 @@ function Project() {
               borderRadius="10%"
               border="2px"
               borderColor="gray.600"
-              m="2rem"
+              m="2rem 2.5rem"
             >
-              <Flex justifyContent="center">
-                <Box w="200px">
+              <Flex h="100%" justifyContent="center" alignItems="center">
+                <Box w="80%">
                   <FormControl>
                     <Text color="lightblue" my="0.5rem">
                       Project Name:
                     </Text>
-                    <Input type="text" ref={projectNameRef} width="200px" />
+                    <Input type="text" ref={projectNameRef} />
                     <Text color="lightblue" my="0.5rem">
                       Project Type:
                     </Text>
                     <Select
                       placeholder="Select project type"
                       ref={projectTypeRef}
-                      width="200px"
                     >
                       <option>Vanilla JS</option>
                       <option>Node</option>

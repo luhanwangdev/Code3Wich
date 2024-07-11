@@ -177,8 +177,8 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
       <Box
         onContextMenu={(e) => handleContextMenu(e)}
         as="nav"
-        w="200px"
-        h="92vh"
+        w="100%"
+        h="95%"
         padding="5"
         boxShadow="md"
         mt="2.5rem"
