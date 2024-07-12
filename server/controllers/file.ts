@@ -80,3 +80,22 @@ export const deleteFile = async (req: Request, res: Response) => {
     .status(200)
     .json({ status: true, message: 'Folder deleted successfully' });
 };
+
+export const checkFileExisted = async (req: Request, res: Response) => {
+  const { name, projectId } = req.body as unknown as {
+    name: string;
+    projectId: number;
+  };
+
+  const existFile = await fileModel.getFileByFileNameandProjectId(
+    name,
+    projectId
+  );
+
+  if (existFile) {
+    res.status(200).json({ existed: true });
+    return;
+  }
+
+  res.status(200).json({ existed: false });
+};

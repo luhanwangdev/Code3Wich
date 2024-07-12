@@ -81,6 +81,11 @@ function Project() {
       return;
     }
 
+    if (name.length > 10) {
+      alert("Project name can have a maximum of 10 characters!");
+      return;
+    }
+
     if (loading) {
       return;
     }
@@ -92,10 +97,6 @@ function Project() {
           return "vanilla";
         case "Node":
           return "node";
-        case "React":
-          return "react";
-        case "Bun":
-          return "bun";
       }
     })();
 
@@ -183,7 +184,7 @@ function Project() {
             bgGradient="linear(to-r, #add8e6, #ece75f)"
             bgClip="text"
           >
-            {`${user.name}'s Projects:`}
+            Your Projects:
           </Text>
 
           <Flex wrap="wrap" w="80vw" mx="auto">
@@ -294,8 +295,6 @@ function Project() {
                     >
                       <option>Vanilla JS</option>
                       <option>Node</option>
-                      {/* <option>Bun</option> */}
-                      {/* <option>React</option> */}
                     </Select>
                     <Button
                       mt="2rem"

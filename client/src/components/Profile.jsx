@@ -146,8 +146,9 @@ const Profile = () => {
                     bgClip="text"
                     fontSize={28}
                     fontWeight="bold"
+                    visibility={user.name ? "visible" : "hidden"}
                   >
-                    {user.name}
+                    {user.name ? user.name : "name"}
                   </Text>
                   <Text color="lightblue" my="1rem">
                     Email
@@ -158,8 +159,9 @@ const Profile = () => {
                     bgClip="text"
                     fontSize={28}
                     fontWeight="bold"
+                    visibility={user.name ? "visible" : "hidden"}
                   >
-                    {user.email}
+                    {user.name ? user.email : "email"}
                   </Text>
                   <Text color="lightblue" my="1rem">
                     Project count
@@ -170,8 +172,9 @@ const Profile = () => {
                     bgClip="text"
                     fontSize={28}
                     fontWeight="bold"
+                    visibility={user.name ? "visible" : "hidden"}
                   >
-                    {projects.length}
+                    {user.name ? projects.length : "0"}
                   </Text>
                 </Box>
                 <Flex justifyContent="center" alignItems="center" h="20vh">
