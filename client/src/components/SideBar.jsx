@@ -81,6 +81,24 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
   };
 
   const handleCreateFile = async (name, isFolder) => {
+    const fileResponse = await fetch(`${url}/api/file/check`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name,
+        projectId,
+      }),
+    });
+
+    const { existed } = await fileResponse.json();
+    if (existed) {
+      if (isFolder) alert("Folder is existed");
+      else alert("File is existed");
+      return;
+    }
+
     const parentId = menuFile ? menuFile.id : 0;
 
     await fetch(`${url}/api/file/edit`, {

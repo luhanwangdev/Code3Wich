@@ -25,10 +25,6 @@ export const setUpContainer = async (id: number, type: string) => {
           return 80;
         case "node":
           return 3000;
-        case "bun":
-          return 3000;
-        case "react":
-          return 5173;
         default:
           throw new AppError("Unknown Type for port", 500);
       }
@@ -40,10 +36,6 @@ export const setUpContainer = async (id: number, type: string) => {
           return "/usr/share/nginx/html";
         case "node":
           return "/app";
-        case "bun":
-          return "/app";
-        case "react":
-          return "/react";
         default:
           throw new AppError("Unknown Type for containerPath", 500);
       }
@@ -68,25 +60,6 @@ export const setUpContainer = async (id: number, type: string) => {
         EXPOSE ${port}
         CMD ["nodemon", "-L", "index.js"]
         `;
-        case "bun":
-          return `
-        FROM oven/bun:1.1.17-alpine
-        WORKDIR /app
-        COPY ${projectDir} .
-        RUN bun init -y
-        EXPOSE ${port}
-        CMD ["bun", "--watch", "index.js"]
-        `;
-        case "react":
-          return `
-        FROM node:22-alpine
-        WORKDIR /react
-        COPY ${projectDir} .
-        RUN npm init -y && npm install -g nodemon
-        RUN npx create-vite@5.2.3 react-app --template react -y
-        EXPOSE ${port}
-        CMD ["nodemon", "-L", "index.js"]
-        `;
         default:
           throw new AppError("Unknown Type for dockerfileContent", 500);
       }
@@ -107,30 +80,6 @@ export const setUpContainer = async (id: number, type: string) => {
           `docker run -d --name temp-container-${id} ${imageName}`
         );
         await execAsync(`docker cp temp-container-${id}:/app/. ${projectDir}`);
-        await execAsync(`docker stop temp-container-${id}`);
-        await execAsync(`docker rm temp-container-${id}`);
-        await execAsync(
-          `docker container run -d -p 0:${port} --name ${containerName} -v "${absolutePath}:${containerPath}" -m 100m ${imageName}`
-        );
-        break;
-      case "bun":
-        await execAsync(
-          `docker run -d --name temp-container-${id} ${imageName}`
-        );
-        await execAsync(`docker cp temp-container-${id}:/app/. ${projectDir}`);
-        await execAsync(`docker stop temp-container-${id}`);
-        await execAsync(`docker rm temp-container-${id}`);
-        await execAsync(
-          `docker container run -d -p 0:${port} --name ${containerName} -v "${absolutePath}:${containerPath}" -m 100m ${imageName}`
-        );
-        break;
-      case "react":
-        await execAsync(
-          `docker run -d --name temp-container-${id} ${imageName}`
-        );
-        await execAsync(
-          `docker cp temp-container-${id}:/react/. ${projectDir}`
-        );
         await execAsync(`docker stop temp-container-${id}`);
         await execAsync(`docker rm temp-container-${id}`);
         await execAsync(

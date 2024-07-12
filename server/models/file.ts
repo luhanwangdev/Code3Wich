@@ -51,3 +51,19 @@ export const getFileServiceInstance = async (id: number): Promise<number> => {
 
   return results[0][0].service_instance_id;
 };
+
+export const getFileByFileNameandProjectId = async (
+  name: string,
+  projectId: number
+) => {
+  const results = await pool.query(
+    `
+    SELECT * FROM file
+    WHERE name = ? AND project_id = ?
+    `,
+    [name, projectId]
+  );
+
+  const file = z.array(FileSchema).parse(results[0]);
+  return file[0];
+};
