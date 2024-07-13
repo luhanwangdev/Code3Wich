@@ -34,18 +34,19 @@ const App = () => {
   `;
 
   const blink = keyframes`
-    50% { border-color: transparent; }
+    50% { border-color: gray; }
     to { border-color: transparent; }
   `;
 
   const contentFadeIn = keyframes`
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-`;
+    from { opacity: 0; }
+    to { opacity: 1; }
+  `;
+
+  const textGradient = keyframes`
+    from { background-position: 100%; }
+    to { background-position: 0; }
+  `;
 
   useEffect(() => {
     checkLogIn();
@@ -65,7 +66,8 @@ const App = () => {
                 display="inline-block"
                 width="fit-content"
                 borderRight="2px solid"
-                animation={`${typing} 1s steps(23) 0.5s 1 normal both, ${blink} 1s step-end forwards 1s`}
+                borderColor="gray"
+                animation={`${typing} 1s steps(23) 0.5s 1 normal both, ${blink} 1s step-end forwards 0.6s`}
               >
                 <Text
                   mt="2rem"
@@ -88,7 +90,8 @@ const App = () => {
                 overflow="hidden"
                 display="inline-block"
                 borderRight="2px solid"
-                animation={`${typing} 1.2s steps(26) 1.5s 1 normal both, ${blink} 1s step-end infinite`}
+                borderColor="transparent"
+                animation={`${typing} 1.2s steps(26) 1.8s 1 normal both, ${blink} 1s step-end infinite 1.3s`}
               >
                 <Text
                   fontSize={70}
@@ -100,8 +103,10 @@ const App = () => {
                   Your Code Instantly{" "}
                   <Text
                     as="span"
-                    bgGradient="linear(to-r, #ee6b6e, #ece75f)"
+                    bgGradient="linear(to-r, #ee6b6e, #e9d062, #ee6b6e, #e9d062, #ee6b6e)"
                     bgClip="text"
+                    bgSize="200% 100%"
+                    animation={`${textGradient} 2s linear infinite`}
                   >
                     Online.
                   </Text>
@@ -120,8 +125,11 @@ const App = () => {
               color="#2C2C32"
               bg="#9ed1d7"
               _hover={{
-                bgGradient: "linear(to-r, #ee6b6e, #ece75f)",
-                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
+                // bgGradient: "linear(to-r, #ee6b6e, #ece75f)",
+                // boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)"
+                bgGradient: "linear(to-r, #ee6b6e, #e9d062, #ee6b6e, #e9d062)",
+                bgSize: "300% 100%",
+                animation: `${textGradient} 10s ease-in infinite`,
               }}
               onClick={() => {
                 if (login) {
@@ -304,14 +312,16 @@ const App = () => {
               </Text>
             </Box>
           </Flex>
-          <Flex mt="3rem" justifyContent="center">
+          <Flex mt="8rem" justifyContent="center">
             <Box>
               <Text
                 my="3rem"
-                fontSize={20}
+                fontSize={18}
                 fontWeight="bold"
-                bgGradient="linear(to-r, #ee6b6e, #ece75f)"
+                bgGradient="linear(to-r, #ee6b6e, #e9d062, #ee6b6e, #e9d062, #ee6b6e)"
                 bgClip="text"
+                bgSize="200% 100%"
+                animation={`${textGradient} 2s linear infinite`}
               >
                 &copy; Code3Wich Inc.
               </Text>

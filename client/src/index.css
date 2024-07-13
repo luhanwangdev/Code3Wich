@@ -2,3 +2,15 @@
   padding: 1rem;
   padding-right: 2rem;
 }
+
+.faStyle {
+  margin-top: 0.3rem;
+  padding: 0;
+  font-size: 1.5rem;
+  color: #2c2c32;
+  transition: 500ms ease-in-out;
+}
+
+.faStyle:hover {
+  color: #666;
+}

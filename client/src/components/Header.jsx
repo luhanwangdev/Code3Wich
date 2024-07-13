@@ -29,7 +29,7 @@ const Header = () => {
   }, []);
   return (
     <DarkMode>
-      <Box maxW="100vw" h="11vh" background="#9ed1d7" px="2rem">
+      <Box maxW="100vw" h="8vh" background="#9ed1d7" px="2rem">
         <Flex
           align="center"
           justifyContent="space-between"
@@ -38,38 +38,32 @@ const Header = () => {
           ml="0.5rem"
         >
           <Link to="/">
-            <Image w="15rem" src={logo}></Image>
+            <Image w="10rem" src={logo}></Image>
           </Link>
 
           {login && (
-            <Flex w="8vw" justifyContent="space-between" mr="2rem">
+            <Flex w="6vw" justifyContent="space-between" mr="1rem">
               <Link to="/projects">
-                <FontAwesomeIcon
-                  icon={faFolderOpen}
-                  style={{ fontSize: "2rem", color: "#2c2c32" }}
-                />
+                <FontAwesomeIcon icon={faFolderOpen} className="faStyle" />
               </Link>
               <Link to="/profile">
-                <FontAwesomeIcon
-                  icon={faUser}
-                  style={{ fontSize: "2rem", color: "#2c2c32" }}
-                />
+                <FontAwesomeIcon icon={faUser} className="faStyle" />
               </Link>
             </Flex>
           )}
           {!login && (
-            <Flex w="8vw" justifyContent="space-between" mr="2rem">
+            <Flex w="6vw" justifyContent="space-between" mr="1rem">
               <Link to="/user/signin">
                 <FontAwesomeIcon
                   icon={faFolderOpen}
-                  style={{ fontSize: "2rem", color: "#2c2c32" }}
+                  className="faStyle"
                   onClick={() => alert("Please sign in first")}
                 />
               </Link>
               <Link to="/user/signin">
                 <FontAwesomeIcon
                   icon={faUser}
-                  style={{ fontSize: "2rem", color: "#2c2c32" }}
+                  className="faStyle"
                   onClick={() => alert("Please sign in first")}
                 />
               </Link>

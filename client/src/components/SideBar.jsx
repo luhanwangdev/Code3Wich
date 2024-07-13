@@ -196,7 +196,7 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
         onContextMenu={(e) => handleContextMenu(e)}
         as="nav"
         w="100%"
-        h="95%"
+        h="96%"
         padding="5"
         boxShadow="md"
         mt="2.5rem"

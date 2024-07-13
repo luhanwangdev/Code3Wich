@@ -10,7 +10,7 @@ const WebView = ({ url, type }) => {
 
   return (
     <DarkMode>
-      <Box mt="2.5rem" height="95%" background="white">
+      <Box mt="2.5rem" height="96%" background="white">
         <iframe
           src={type === "node" ? url : reloadUrl}
           style={{ width: "100%", height: "100%", border: "none" }}
