@@ -1,5 +1,6 @@
 import chokidar, { FSWatcher } from "chokidar";
 import path from "path";
+import { exec } from "child_process";
 import AppError from "./appError.js";
 import * as fileModel from "../models/file.js";
 
@@ -30,8 +31,11 @@ const addFile = async (filePath: string, projectId: number) => {
     return;
   }
 
+  exec(`sudo chmod -R 777 ${projectPath}`);
+
   const parentPath = path.dirname(filePath);
   const fullPath = path.join(projectPath);
+
   if (parentPath === fullPath) {
     const ext = fileName.split(".").pop();
 
@@ -142,6 +146,8 @@ const addDir = async (dirPath: string, projectId: number) => {
     return;
   }
 
+  exec(`sudo chmod -R 777 ${projectPath}`);
+
   if (dirName !== `project${projectId}`) {
     const parentPath = path.dirname(dirPath);
     const fullPath = path.join(projectPath);
@@ -186,7 +192,7 @@ export const startWatcher = (watcher: FSWatcher) => {
       if (filePath.charAt(0) === "c") {
         fileModel.deleteFileByPath(filePath);
       } else {
-        fileModel.deleteFileByPath(filePath.split("serviceInstance\\")[1]);
+        fileModel.deleteFileByPath(filePath.split("serviceInstance/")[1]);
       }
     })
     .on("unlink", (filePath: string) => {
