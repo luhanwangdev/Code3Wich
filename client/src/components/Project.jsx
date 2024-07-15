@@ -7,17 +7,10 @@ import {
   Flex,
   FormControl,
   Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Select,
   Text,
-  useDisclosure,
   Link as ChakraLink,
+  useToast,
 } from "@chakra-ui/react";
 import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import Header from "./Header";
@@ -32,13 +25,7 @@ function Project() {
   const [loading, setLoading] = useState(false);
   const projectNameRef = useRef();
   const projectTypeRef = useRef();
-
-  const { isOpen, onOpen, onClose } = useDisclosure();
-
-  const handleNavigate = () => {
-    navigate("/user/signin");
-    onClose();
-  };
+  const toast = useToast();
 
   const fetchProjects = async () => {
     const projectReponse = await fetch(`${url}/api/user/projects`, {
@@ -53,8 +40,16 @@ function Project() {
       const projects = await projectReponse.json();
       setProjects(projects);
     } else {
-      console.log(projectReponse.status);
-      onOpen();
+      toast({
+        title: "Not Signed in!",
+        position: "top",
+        description: "Please sign in first.",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+        variant: "subtle",
+      });
+      navigate("/user/signin");
     }
   };
 
@@ -71,18 +66,43 @@ function Project() {
       const user = await infoReponse.json();
       setUser(user);
     } else {
-      onOpen();
+      toast({
+        title: "Not Signed in!",
+        position: "top",
+        description: "Please sign in first.",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+        variant: "subtle",
+      });
+      navigate("/user/signin");
     }
   };
 
   const createProject = async (name, typeSeletor) => {
     if (!(name && typeSeletor)) {
-      alert("Project name and Project rype are both required!");
+      toast({
+        title: "Project name and Project type are both required!",
+        position: "top",
+        description: "Please fill them both.",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+        variant: "subtle",
+      });
       return;
     }
 
     if (name.length > 10) {
-      alert("Project name can have a maximum of 10 characters!");
+      toast({
+        title: "Project name can have a maximum of 10 characters!",
+        position: "top",
+        description: "Please set the name less then 10 characters.",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+        variant: "subtle",
+      });
       return;
     }
 
@@ -121,7 +141,15 @@ function Project() {
     if (createResponse.status === 200) {
       fetchProjects();
     } else {
-      alert("Project creation failed. Please try again.");
+      toast({
+        title: "Project creation failed.",
+        position: "top",
+        description: "Something goes wrong, please try again.",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+        variant: "subtle",
+      });
     }
   };
 
@@ -161,20 +189,6 @@ function Project() {
     <DarkMode>
       <Box minH="100vh" bg="#2C2C32" color="gray.500">
         <Header />
-        <Modal isOpen={isOpen} onClose={handleNavigate}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader color="white">Alert</ModalHeader>
-            <ModalCloseButton onClick={handleNavigate} color="gray.500" />
-            <ModalBody color="white">Please Sign in first.</ModalBody>
-
-            <ModalFooter>
-              <Button colorScheme="blue" mr={3} onClick={handleNavigate}>
-                Sign In Now!
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
         <Box px={6}>
           <Text
             m="2rem"
@@ -205,9 +219,13 @@ function Project() {
                 <Flex h="100%" justifyContent="center" alignItems="center">
                   <Box w="90%">
                     <Box p="0 1rem">
-                      <Text color="lightblue" my="0.5rem">
-                        Project Name
-                      </Text>
+                      <Flex my="0.5rem">
+                        <Text color="lightblue">Project Name</Text>
+                        <Box color="teal.100" ml="auto" fontWeight="bold">
+                          {project.type === "node" ? "Node" : "VanillaJS"}
+                        </Box>
+                      </Flex>
+
                       <Text
                         my="0.5rem"
                         color="teal.200"
@@ -217,7 +235,7 @@ function Project() {
                         {project.name}
                       </Text>
                       {project.status === "loading" && (
-                        <Text color="lightblue" my="0.5rem">
+                        <Text color="lightblue" mt="0.5rem" mb="7rem">
                           Loading Project...
                         </Text>
                       )}

@@ -1,19 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-  Box,
-  Button,
-  Flex,
-  DarkMode,
-  useDisclosure,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
-} from "@chakra-ui/react";
+import { Box, Flex, DarkMode, useDisclosure, useToast } from "@chakra-ui/react";
 import { Editor } from "@monaco-editor/react";
 import SideBar from "./SideBar.jsx";
 import TabNavigation from "./TabNavigator";
@@ -32,20 +19,19 @@ const CodeEditor = () => {
   const renderRef = useRef(null);
   const socketRef = useRef(null);
   const [value, setValue] = useState("");
-  const [auth, setAuth] = useState("");
   const [activeFile, setActiveFile] = useState({});
   const [files, setFiles] = useState([]);
   const [project, setProject] = useState({});
   const [render, setRender] = useState(false);
   const [isSocketConnected, setIsSocketConnected] = useState(false);
-  const { isOpen, onOpen } = useDisclosure();
+  const toast = useToast();
 
   const onMount = (editor, monaco) => {
     editorRef.current = editor;
     editor.focus();
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
       saveFile();
-      setTimeout(() => renderView(), 300);
+      setTimeout(() => renderView(), 500);
     });
   };
 
@@ -76,7 +62,6 @@ const CodeEditor = () => {
         ...file,
         isTab: index === 0 ? true : file.isTab || false,
       }));
-      console.log(updatedFiles);
 
       setFiles(updatedFiles);
       setActiveFile(updatedFiles[0]);
@@ -107,15 +92,32 @@ const CodeEditor = () => {
     });
 
     if (infoReponse.status !== 200) {
-      setAuth("TokenExpired");
-      onOpen();
+      toast({
+        title: "Permission denied.",
+        position: "top",
+        description: "Your token is expired, please sign in again!",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+        variant: "subtle",
+      });
+      navigate("/user/signin");
       return;
     }
 
     const user = await infoReponse.json();
     if (user.id !== project.user_id) {
-      setAuth("NotUser");
-      onOpen();
+      toast({
+        title: "Permission denied.",
+        position: "top",
+        description:
+          "Your account have no authentication to edit this project, please sign in with right account!",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+        variant: "subtle",
+      });
+      navigate("/user/signin");
       return;
     }
   };
@@ -134,13 +136,11 @@ const CodeEditor = () => {
   }, []);
 
   useEffect(() => {
-    console.log(project);
     if (project.id) {
       checkAuth(project);
       socketRef.current = io(url);
 
       socketRef.current.on("connect", () => {
-        console.log("Connected to server");
         setIsSocketConnected(true);
 
         socketRef.current.emit(
@@ -148,15 +148,10 @@ const CodeEditor = () => {
           `project${project.id}`,
           (response) => {
             if (response === "success") {
-              console.log("success");
               fetch(`${url}/api/project/terminal?id=${project.id}`);
             }
           }
         );
-
-        // socketRef.current.on("registered", () => {
-        //   fetch(`${url}/api/project/terminal?id=${project.id}`);
-        // });
       });
 
       return () => {
@@ -186,24 +181,6 @@ const CodeEditor = () => {
     <DarkMode>
       <Box minH="100vh" bg="#2C2C32" color="gray.500">
         <Header />
-        <Modal isOpen={isOpen} onClose={handleNavigate}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader color="white">Alert</ModalHeader>
-            <ModalCloseButton onClick={handleNavigate} color="gray.500" />
-            <ModalBody color="white">
-              {auth === "TokenExpired"
-                ? "Your token is expired, please sign in again!"
-                : "Your account have no authentication to edit this project, please sign in with right account!"}
-            </ModalBody>
-
-            <ModalFooter>
-              <Button colorScheme="blue" mr={3} onClick={handleNavigate}>
-                Sign In Now!
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
         <Flex px={6} py={6} h="89vh">
           <Box flex="1">
             <SideBar
@@ -220,6 +197,7 @@ const CodeEditor = () => {
               setFiles={setFiles}
               activeFile={activeFile}
               setActiveFile={setActiveFile}
+              setValue={setValue}
             />
             <Editor
               height="72%"

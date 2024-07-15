@@ -6,12 +6,19 @@ import {
   DarkMode,
   Button,
   IconButton,
+  Box,
 } from "@chakra-ui/react";
 import { CloseIcon } from "@chakra-ui/icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ICON } from "../constants";
 
-const TabNavigation = ({ files, setFiles, activeFile, setActiveFile }) => {
+const TabNavigation = ({
+  files,
+  setFiles,
+  activeFile,
+  setActiveFile,
+  setValue,
+}) => {
   const fileNames = files.map((file) => file.name);
 
   const removeTab = (id) => {
@@ -29,6 +36,11 @@ const TabNavigation = ({ files, setFiles, activeFile, setActiveFile }) => {
     <DarkMode>
       <Tabs index={fileNames.indexOf(activeFile.name)}>
         <TabList>
+          {!files[0] && (
+            <>
+              <Box my="1.25rem"></Box> {setValue(null)}
+            </>
+          )}
           {files.map((file) => (
             <Tab onClick={() => setActiveFile(file)}>
               <FontAwesomeIcon

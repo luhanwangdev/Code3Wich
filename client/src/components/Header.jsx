@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Box, DarkMode, Flex, Image } from "@chakra-ui/react";
+import { Box, DarkMode, Flex, Image, useToast } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFolderOpen } from "@fortawesome/free-regular-svg-icons";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
@@ -9,6 +9,7 @@ import { url } from "../constants";
 
 const Header = () => {
   const [login, setLogin] = useState(false);
+  const toast = useToast();
 
   const checkLogIn = async () => {
     const infoReponse = await fetch(`${url}/api/user/info`, {
@@ -57,14 +58,34 @@ const Header = () => {
                 <FontAwesomeIcon
                   icon={faFolderOpen}
                   className="faStyle"
-                  onClick={() => alert("Please sign in first")}
+                  onClick={() =>
+                    toast({
+                      title: "Not Signed in.",
+                      position: "top",
+                      description: "Please sign in first.",
+                      status: "warning",
+                      duration: 1500,
+                      isClosable: true,
+                      variant: "subtle",
+                    })
+                  }
                 />
               </Link>
               <Link to="/user/signin">
                 <FontAwesomeIcon
                   icon={faUser}
                   className="faStyle"
-                  onClick={() => alert("Please sign in first")}
+                  onClick={() =>
+                    toast({
+                      title: "Not Signed in.",
+                      position: "top",
+                      description: "Please sign in first.",
+                      status: "warning",
+                      duration: 1500,
+                      isClosable: true,
+                      variant: "subtle",
+                    })
+                  }
                 />
               </Link>
             </Flex>

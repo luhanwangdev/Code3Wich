@@ -125,8 +125,6 @@ const App = () => {
               color="#2C2C32"
               bg="#9ed1d7"
               _hover={{
-                // bgGradient: "linear(to-r, #ee6b6e, #ece75f)",
-                // boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)"
                 bgGradient: "linear(to-r, #ee6b6e, #e9d062, #ee6b6e, #e9d062)",
                 bgSize: "300% 100%",
                 animation: `${textGradient} 10s ease-in infinite`,
@@ -160,57 +158,6 @@ const App = () => {
         style={{ opacity: 0 }}
       >
         <Box>
-          <Flex my="3rem">
-            <Box flex="4">
-              <Text
-                my="3rem"
-                fontSize={40}
-                fontWeight="bold"
-                bgColor="lightblue"
-                bgClip="text"
-              >
-                Cross-Platform Compatibility
-              </Text>
-              <Text
-                fontSize={20}
-                fontWeight="bold"
-                bgColor="lightblue"
-                bgClip="text"
-              >
-                Whether you're using a smartphone, iPad, or computer, you can
-                compile code directly from our website.
-              </Text>
-            </Box>
-            <Box flex="3">
-              <Image mx="auto" w="15rem" src={crossPlatform}></Image>
-            </Box>
-          </Flex>
-          <Flex my="3rem">
-            <Box flex="3">
-              <Image mx="auto" w="15rem" src={fileSharing}></Image>
-            </Box>
-            <Box flex="4">
-              <Text
-                my="3rem"
-                fontSize={40}
-                fontWeight="bold"
-                bgColor="lightblue"
-                bgClip="text"
-              >
-                Persistent and Shareable Projects
-              </Text>
-              <Text
-                fontSize={20}
-                fontWeight="bold"
-                bgColor="lightblue"
-                bgClip="text"
-              >
-                Your compiled projects are preserved and can be accessed via a
-                unique URL, allowing you to share your creations with friends
-                and family.
-              </Text>
-            </Box>
-          </Flex>
           <Flex my="3rem">
             <Box flex="4">
               <Text
@@ -309,6 +256,57 @@ const App = () => {
               >
                 Instantly see your web project results on the screen as you
                 code.
+              </Text>
+            </Box>
+          </Flex>
+          <Flex my="3rem">
+            <Box flex="4">
+              <Text
+                my="3rem"
+                fontSize={40}
+                fontWeight="bold"
+                bgColor="lightblue"
+                bgClip="text"
+              >
+                Cross-Platform Compatibility
+              </Text>
+              <Text
+                fontSize={20}
+                fontWeight="bold"
+                bgColor="lightblue"
+                bgClip="text"
+              >
+                Whether you're using a smartphone, iPad, or computer, you can
+                compile code directly from our website.
+              </Text>
+            </Box>
+            <Box flex="3">
+              <Image mx="auto" w="15rem" src={crossPlatform}></Image>
+            </Box>
+          </Flex>
+          <Flex my="3rem">
+            <Box flex="3">
+              <Image mx="auto" w="15rem" src={fileSharing}></Image>
+            </Box>
+            <Box flex="4">
+              <Text
+                my="3rem"
+                fontSize={40}
+                fontWeight="bold"
+                bgColor="lightblue"
+                bgClip="text"
+              >
+                Persistent and Shareable Projects
+              </Text>
+              <Text
+                fontSize={20}
+                fontWeight="bold"
+                bgColor="lightblue"
+                bgClip="text"
+              >
+                Your compiled projects are preserved and can be accessed via a
+                unique URL, allowing you to share your creations with friends
+                and family.
               </Text>
             </Box>
           </Flex>

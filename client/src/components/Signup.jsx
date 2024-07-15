@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -10,6 +10,7 @@ import {
   Image,
   Input,
   Text,
+  useToast,
 } from "@chakra-ui/react";
 import Header from "./Header";
 import { url } from "../constants";
@@ -20,6 +21,21 @@ const Signup = () => {
   const userNameRef = useRef();
   const userEmailRef = useRef();
   const userPasswordRef = useRef();
+  const toast = useToast();
+
+  const checkLogIn = async () => {
+    const infoReponse = await fetch(`${url}/api/user/info`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+
+    if (infoReponse.status === 200) {
+      navigate("/profile");
+    }
+  };
 
   const isValidEmail = (email) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -27,21 +43,58 @@ const Signup = () => {
 
   const createUser = async (name, email, password) => {
     if (!name) {
-      alert("Please enter your name.");
+      toast({
+        title: "Name is empty.",
+        position: "top",
+        description: "Please enter your name.",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+        variant: "subtle",
+      });
+      return;
+    }
+
+    if (name.length > 20) {
+      toast({
+        title: "Name can have a maximum of 10 characters!",
+        position: "top",
+        description: "Please set the name less then 10 characters.",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+        variant: "subtle",
+      });
       return;
     }
 
     if (!email || !isValidEmail(email)) {
-      alert("Please enter a valid email address.");
+      toast({
+        title: "Invalid email address.",
+        position: "top",
+        description: "Please enter a valid email address.",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+        variant: "subtle",
+      });
       return;
     }
 
     if (!password) {
-      alert("Please enter your password.");
+      toast({
+        title: "Password is empty.",
+        position: "top",
+        description: "Please enter your password.",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+        variant: "subtle",
+      });
       return;
     }
 
-    await fetch(`${url}/api/user/signup`, {
+    const signUpResponse = await fetch(`${url}/api/user/signup`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -54,8 +107,28 @@ const Signup = () => {
       }),
     });
 
-    navigate(`/projects`);
+    if (signUpResponse.status === 200) {
+      navigate(`/projects`);
+      return;
+    }
+
+    toast({
+      title: "The email is already registered!",
+      position: "top",
+      description: "Please try another email.",
+      status: "error",
+      duration: 2000,
+      isClosable: true,
+      variant: "subtle",
+    });
+    userNameRef.current.value = null;
+    userEmailRef.current.value = null;
+    userPasswordRef.current.value = null;
   };
+
+  useEffect(() => {
+    checkLogIn();
+  }, []);
 
   return (
     <DarkMode>
