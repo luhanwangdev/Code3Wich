@@ -72,7 +72,7 @@ export const setUpContainer = async (id: number, type: string) => {
     switch (type) {
       case "vanilla":
         await execAsync(
-          `docker container run -d -p 0:${port} --name ${containerName} -v "${absolutePath}:${containerPath}" -m 50m ${imageName}`
+          `docker container run -d -p 0:${port} --name ${containerName} -v "${absolutePath}:${containerPath}" --cpus 0.1 -m 50m ${imageName}`
         );
         break;
       case "node":
@@ -83,7 +83,7 @@ export const setUpContainer = async (id: number, type: string) => {
         await execAsync(`docker stop temp-container-${id}`);
         await execAsync(`docker rm temp-container-${id}`);
         await execAsync(
-          `docker container run -d -p 0:${port} --name ${containerName} -v "${absolutePath}:${containerPath}" -m 100m ${imageName}`
+          `docker container run -d -p 0:${port} --name ${containerName} -v "${absolutePath}:${containerPath}" --cpus 0.1 -m 50m ${imageName}`
         );
         break;
       default:
