@@ -20,6 +20,7 @@
     "socket.io": "^4.7.5",
     "socket.io-client": "^4.7.5",
     "util": "^0.12.5",
+    "vitest": "^2.0.3",
     "zod": "^3.23.8"
   },
   "name": "server",

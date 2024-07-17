@@ -64,7 +64,6 @@ const Terminal = ({ files, setFiles, socket, project }) => {
     term.write("Code3Wich $ Welcome to \x1B[38;5;208mCode3Wich\x1B[0m!\r\n");
 
     socket.on("execOutput", (data) => {
-      console.log("Output from container:", data);
       term.write(`\r\n${data} $ `);
     });
 
@@ -72,10 +71,6 @@ const Terminal = ({ files, setFiles, socket, project }) => {
       console.error("Error during command execution:", error);
       term.write(`\n${error}`);
       term.write(`\nCode3Wich/${project.name} $ `);
-    });
-
-    socket.on("disconnect", () => {
-      console.log("Terminal is disconnected from server");
     });
 
     term.onKey((e) => {

@@ -23,6 +23,7 @@ import {
   ModalCloseButton,
   ModalBody,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ICON } from "../constants";
@@ -38,6 +39,7 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
   const [fileName, setFileName] = useState("");
   const [mouseFile, setMouseFile] = useState("");
   const [menuFile, setMenuFile] = useState("");
+  const toast = useToast();
 
   const handleContextMenu = (event) => {
     event.preventDefault();
@@ -94,8 +96,28 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
 
     const { existed } = await fileResponse.json();
     if (existed) {
-      if (isFolder) alert("Folder is existed");
-      else alert("File is existed");
+      if (isFolder) {
+        toast({
+          title: "Folder name is existed",
+          position: "top",
+          description: "Please try another name.",
+          status: "error",
+          duration: 2000,
+          isClosable: true,
+          variant: "subtle",
+        });
+      } else {
+        toast({
+          title: "File name is existed",
+          position: "top",
+          description: "Please try another name.",
+          status: "error",
+          duration: 2000,
+          isClosable: true,
+          variant: "subtle",
+        });
+      }
+      setFileName("");
       return;
     }
 
@@ -117,7 +139,6 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
 
     setTimeout(() => updateFiles(), 100);
 
-    // alert(`File created: ${fileName}`);
     setFileName("");
     onClose();
   };

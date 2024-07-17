@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -10,6 +10,7 @@ import {
   Image,
   Input,
   Text,
+  useToast,
 } from "@chakra-ui/react";
 import Header from "./Header";
 import { url } from "../constants";
@@ -19,6 +20,21 @@ const Signin = () => {
   const navigate = useNavigate();
   const userEmailRef = useRef();
   const userPasswordRef = useRef();
+  const toast = useToast();
+
+  const checkLogIn = async () => {
+    const infoReponse = await fetch(`${url}/api/user/info`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+
+    if (infoReponse.status === 200) {
+      navigate("/profile");
+    }
+  };
 
   const isValidEmail = (email) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -26,12 +42,32 @@ const Signin = () => {
 
   const handleSignin = async (email, password) => {
     if (!email || !isValidEmail(email)) {
-      alert("Please enter a valid email address.");
+      toast({
+        title: "Invalid email address.",
+        position: "top",
+        description: "Please enter a valid email address.",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+        variant: "subtle",
+      });
+      userEmailRef.current.value = null;
+      userPasswordRef.current.value = null;
       return;
     }
 
     if (!password) {
-      alert("Please enter your password.");
+      toast({
+        title: "Password is empty.",
+        position: "top",
+        description: "Please enter your password.",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+        variant: "subtle",
+      });
+      userEmailRef.current.value = null;
+      userPasswordRef.current.value = null;
       return;
     }
 
@@ -52,10 +88,22 @@ const Signin = () => {
       return;
     }
 
-    alert("Wrong Email or Password!");
+    toast({
+      title: "Wrong Email or Password!",
+      position: "top",
+      description: "Please check them all again.",
+      status: "error",
+      duration: 2000,
+      isClosable: true,
+      variant: "subtle",
+    });
     userEmailRef.current.value = null;
     userPasswordRef.current.value = null;
   };
+
+  useEffect(() => {
+    checkLogIn();
+  }, []);
 
   return (
     <DarkMode>
