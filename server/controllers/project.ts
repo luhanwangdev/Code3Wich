@@ -8,7 +8,7 @@ import AppError from '../utils/appError.js';
 
 dotenv.config();
 
-const processLimit = parseInt(process.env.PROCESS_LIMIT as string, 10);
+const projectLimit = parseInt(process.env.PROJECT_LIMIT as string, 10);
 
 export const getFilesByProject = async (req: Request, res: Response) => {
   const { id } = req.query as unknown as { id: number };
@@ -75,7 +75,7 @@ export const createProject = async (req: Request, res: Response) => {
   };
   const projects = await projectModel.getProjectsByUserId(userId);
 
-  if (projects.length >= processLimit) {
+  if (projects.length >= projectLimit) {
     throw new AppError(
       'Project holding limit reached. Please delete some of project before creating a new one',
       403
