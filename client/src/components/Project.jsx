@@ -15,7 +15,7 @@ import {
 import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import Header from "./Header";
 import { io } from "socket.io-client";
-import { url } from "../constants";
+import { url, projectLimit } from "../constants";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function Project() {
@@ -80,6 +80,22 @@ function Project() {
   };
 
   const createProject = async (name, typeSeletor) => {
+    if (projects.length >= projectLimit) {
+      toast({
+        title: `Member in free trial can only have up to ${projectLimit} projects at the same time.`,
+        position: "top",
+        description: "Please delete some of them before creating new project.",
+        status: "warning",
+        duration: 3000,
+        isClosable: true,
+        variant: "subtle",
+      });
+
+      projectNameRef.current.value = null;
+      projectTypeRef.current.value = "Select project type";
+      return;
+    }
+
     if (!(name && typeSeletor)) {
       toast({
         title: "Project name and Project type are both required!",

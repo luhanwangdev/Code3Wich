@@ -17,5 +17,7 @@ export const ICON = {
   folder: { icon: faFolder, style: { color: "#a6a6a6" } },
 };
 
+export const projectLimit = 2;
+
 export const url = "https://code3wich-api.luhanwang.com";
 // export const url = "http://localhost:3000";
