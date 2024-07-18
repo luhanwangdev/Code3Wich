@@ -133,7 +133,7 @@ console.log('Server is running on port 3000');
   return { projectId, url: containerUrl };
 };
 
-async function receiveMessages() {
+const receiveMessages = async () => {
   try {
     const connection = await amqp.connect(
       `amqps://${process.env.AWS_MQ_USER}:${process.env.AWS_MQ_PASSWORD}@${process.env.AWS_MQ_ENDPOINT}:5671`
@@ -185,6 +185,6 @@ async function receiveMessages() {
   } catch (error) {
     console.error("Error:", error);
   }
-}
+};
 
 receiveMessages();

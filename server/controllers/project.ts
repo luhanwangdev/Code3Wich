@@ -1,8 +1,14 @@
+import dotenv from 'dotenv';
 import { Request, Response } from 'express';
 import * as projectModel from '../models/project.js';
 import * as fileModel from '../models/file.js';
 import * as serviceInstanceModel from '../models/serviceInstance.js';
 import { getRabbitMQChannel } from '../utils/rabbitmq.js';
+import AppError from '../utils/appError.js';
+
+dotenv.config();
+
+const processLimit = parseInt(process.env.PROCESS_LIMIT as string, 10);
 
 export const getFilesByProject = async (req: Request, res: Response) => {
   const { id } = req.query as unknown as { id: number };
@@ -67,6 +73,14 @@ export const createProject = async (req: Request, res: Response) => {
     userId: number;
     type: string;
   };
+  const projects = await projectModel.getProjectsByUserId(userId);
+
+  if (projects.length >= processLimit) {
+    throw new AppError(
+      'Project holding limit reached. Please delete some of project before creating a new one',
+      403
+    );
+  }
 
   const project = await projectModel.createProject(name, userId, type);
 

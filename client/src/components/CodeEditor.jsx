@@ -122,10 +122,6 @@ const CodeEditor = () => {
     }
   };
 
-  const handleNavigate = () => {
-    navigate("/user/signin");
-  };
-
   const renderView = () => {
     setRender(!renderRef.current);
   };
