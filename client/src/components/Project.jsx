@@ -211,8 +211,8 @@ function Project() {
         <LightMode>
           <Alert status="info" variant="solid">
             <AlertIcon />
-            Due to cost considerations, all projects will be deleted daily at
-            3:00 am.
+            During the website's trial operation period, all projects will be
+            deleted at 3:00 AM every day.
           </Alert>
         </LightMode>
 
