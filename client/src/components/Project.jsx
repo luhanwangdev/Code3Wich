@@ -11,6 +11,9 @@ import {
   Text,
   Link as ChakraLink,
   useToast,
+  Alert,
+  AlertIcon,
+  LightMode,
 } from "@chakra-ui/react";
 import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import Header from "./Header";
@@ -205,6 +208,14 @@ function Project() {
     <DarkMode>
       <Box minH="100vh" bg="#2C2C32" color="gray.500">
         <Header />
+        <LightMode>
+          <Alert status="info" variant="solid">
+            <AlertIcon />
+            During the website's trial operation period, all projects will be
+            deleted at 3:00 AM every day.
+          </Alert>
+        </LightMode>
+
         <Box px={6}>
           <Text
             m="2rem"
