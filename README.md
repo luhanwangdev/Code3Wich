@@ -50,7 +50,7 @@ In Code3wich, after reviewing all functionalities, the bottleneck seems to occur
 
 ### Test Tool
 
-[k6](https://k6.io/docs/)
+<a href="https://k6.io/docs/" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/e/ef/K6-logo.svg" style="width: 5rem;"></a>
 
 ### Result
 
