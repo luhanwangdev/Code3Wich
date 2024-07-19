@@ -5,7 +5,6 @@ import fileRoutes from "./routers/file.js";
 import userRoutes from "./routers/project.js";
 import globalErrorHandlerMiddleware from "./middlewares/errorHandler.js";
 import { watcher, startWatcher, stopWatcher } from "./utils/watcher.js";
-import { closeRabbitMQConnection } from "./utils/rabbitmq.js";
 import setUpLogLogic from "./utils/cloudClient.js";
 
 const app = express();
@@ -29,11 +28,9 @@ app.listen(5000, () => {
 });
 
 process.on("SIGINT", async () => {
-  await closeRabbitMQConnection();
   await stopWatcher(watcher);
 });
 
 process.on("SIGTERM", async () => {
-  await closeRabbitMQConnection();
   await stopWatcher(watcher);
 });

@@ -5,13 +5,7 @@ import io from "socket.io-client";
 import * as projectModel from "../models/project.js";
 import * as fileModel from "../models/file.js";
 import AppError from "../utils/appError.js";
-import {
-  execContainer,
-  removeContainer,
-  removeImage,
-} from "../utils/container.js";
-import { getRabbitMQChannel } from "../utils/rabbitmq.js";
-// import { getRabbitMQChannel } from "../utils/rabbitmq.js";
+import { execContainer, removeContainer } from "../utils/container.js";
 
 export const getFilesByProject = async (req: Request, res: Response) => {
   const { id } = req.query as unknown as { id: number };
@@ -60,7 +54,6 @@ export const deleteProject = async (req: Request, res: Response) => {
   projectModel.deleteProject(id);
   fs.rmSync(path.join(folderPath), { recursive: true });
   await removeContainer(id);
-  await removeImage(id);
 
   res.status(200).json({ id, message: `Delete project${id} successfully` });
 };

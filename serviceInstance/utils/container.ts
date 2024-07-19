@@ -1,5 +1,4 @@
 import dotenv from "dotenv";
-import fs from "fs";
 import { promisify } from "util";
 import { Socket } from "socket.io-client";
 import { exec } from "child_process";
@@ -14,9 +13,9 @@ export const setUpContainer = async (id: number, type: string) => {
   try {
     const projectDir = `codeFiles/project${id}`;
     const absolutePath = process.env.SERVICE_INSTANCE_PATH + projectDir;
-    const dockerfilePath = "Dockerfile";
 
-    const imageName = `project_${id}_image`;
+    const imageName =
+      type === "node" ? "luhanwang/node" : "luhanwang/vanilla_js";
     const containerName = `project_${id}_container`;
 
     const port = (() => {
@@ -40,34 +39,6 @@ export const setUpContainer = async (id: number, type: string) => {
           throw new AppError("Unknown Type for containerPath", 500);
       }
     })();
-
-    const dockerfileContent = (() => {
-      switch (type) {
-        case "vanilla":
-          return `
-        FROM nginx:1.27.0-alpine
-        WORKDIR ${containerPath}
-        COPY ${projectDir} .
-        EXPOSE ${port}
-        CMD ["nginx", "-g", "daemon off;"]
-        `;
-        case "node":
-          return `
-        FROM node:22-alpine
-        WORKDIR /app
-        COPY ${projectDir} .
-        RUN npm init -y && npm install -g nodemon
-        EXPOSE ${port}
-        CMD ["nodemon", "-L", "index.js"]
-        `;
-        default:
-          throw new AppError("Unknown Type for dockerfileContent", 500);
-      }
-    })();
-
-    fs.writeFileSync(dockerfilePath, dockerfileContent);
-
-    await execAsync(`docker image build -t ${imageName} .`);
 
     switch (type) {
       case "vanilla":
@@ -133,7 +104,6 @@ export const execContainer = async (
       throw new AppError(err.message, 500);
     }
 
-    // console.log("Container exec session started");
     let dataOutput = "";
 
     stream.on("data", (data: any) => {
@@ -153,10 +123,10 @@ export const execContainer = async (
 
         const contentList = dataOutput.split("\n");
         contentList.shift();
+
         const output = contentList.join("\n");
         const finalOutput = output.trim();
 
-        // console.log('Received data from container:', finalOutput);
         socket.emit("execOutput", finalOutput);
 
         dataOutput = "";
@@ -175,7 +145,6 @@ export const execContainer = async (
     });
 
     socket.on("execCommand", (command) => {
-      // console.log("Received command from client:", command);
       if (stream.writable) {
         stream.write(command + "\n");
       } else {
@@ -184,10 +153,8 @@ export const execContainer = async (
     });
 
     socket.on("clientDisconnect", () => {
-      // userSocketMap[user] = socket.id;
       stream.end();
       socket.disconnect();
-      // console.log("client disconnect");
     });
   });
 };
@@ -209,23 +176,4 @@ export const removeContainer = async (id: number) => {
   const containerInstance = docker.getContainer(container.Id);
 
   await containerInstance.remove({ force: true });
-};
-
-export const removeImage = async (id: number) => {
-  const imageName = `project_${id}_image`;
-
-  const images = await docker.listImages();
-
-  const image = images.find(
-    (img) => img.RepoTags && img.RepoTags.includes(`${imageName}:latest`)
-  );
-
-  if (!image) {
-    console.log(`Image '${imageName}' not found.`);
-    return;
-  }
-
-  const imageInstance = docker.getImage(image.Id);
-
-  await imageInstance.remove({ force: true });
 };
