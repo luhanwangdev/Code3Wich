@@ -9,7 +9,7 @@ const UserSchema = z.object({
   name: z.string(),
   email: z.string(),
   password: z.string(),
-  picture: z.any(),
+  picture: z.any()
 });
 
 interface UserRow extends RowDataPacket {
@@ -30,7 +30,12 @@ export const getUser = async (id: number) => {
   );
 
   const user = z.array(UserSchema).parse(results[0]);
-  return user[0];
+
+  if (user[0]) {
+    return user[0];
+  }
+
+  throw new AppError('User not found', 404);
 };
 
 export const createUser = async (
@@ -76,5 +81,9 @@ export const getUserPasswordByEmail = async (
     [email]
   );
 
-  return results[0].password;
+  if (results[0]) {
+    return results[0].password;
+  }
+
+  throw new AppError('User not found', 404);
 };

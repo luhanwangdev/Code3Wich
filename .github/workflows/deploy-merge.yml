@@ -11,6 +11,12 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Automation Test
+        run: |
+          cd server
+          npm install
+          npm run test
+
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
