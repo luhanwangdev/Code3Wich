@@ -30,12 +30,12 @@ interface Payload {
 
 const jwtTokenGenerator = (payload: Payload) => {
   const token = jwt.sign(payload, process.env.JWT_SECRET_KEY as string, {
-    expiresIn: JWTExpired,
+    expiresIn: JWTExpired
   });
 
   return {
     accessToken: token,
-    user: payload,
+    user: payload
   };
 };
 
@@ -72,7 +72,7 @@ export const handleSignup = async (req: Request, res: Response) => {
   res.cookie('token', accessToken, {
     maxAge: JWTExpired,
     secure: true,
-    sameSite: 'none',
+    sameSite: 'none'
   });
 
   res.status(200).send(user);
@@ -97,7 +97,7 @@ export const handleSignin = async (req: Request, res: Response) => {
     const payload = {
       id: existUser.id,
       name: existUser.name,
-      email: existUser.email,
+      email: existUser.email
     };
 
     const { accessToken, user } = jwtTokenGenerator(payload);
@@ -105,7 +105,7 @@ export const handleSignin = async (req: Request, res: Response) => {
     res.cookie('token', accessToken, {
       maxAge: JWTExpired,
       secure: true,
-      sameSite: 'none',
+      sameSite: 'none'
     });
 
     res.status(200).send(user);
