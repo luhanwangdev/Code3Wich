@@ -1,8 +1,9 @@
 import express from 'express';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import request from 'supertest';
 import router from './user.ts';
 import * as userModel from '../models/user.ts';
+import AppError from '../utils/appError.ts';
 import globalErrorHandlerMiddleware from '../middlewares/errorHandler.ts';
 
 const app = express();
@@ -11,20 +12,40 @@ app.use('/api/user', router);
 app.use(globalErrorHandlerMiddleware);
 
 describe('GET /api/user?id', () => {
+  beforeEach(() => {
+    vi.spyOn(userModel, 'getUser').mockClear();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it('should return user details when user is found', async () => {
-    const response = await request(app).get('/api/user?id=2');
+    vi.spyOn(userModel, 'getUser').mockResolvedValueOnce({
+      email: 'test@example.com',
+      id: 1,
+      name: 'Test',
+      password: 'password',
+      picture: null
+    });
+
+    const response = await request(app).get('/api/user?id=1');
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
-      email: 'elmo@gmail.com',
-      id: 2,
-      name: 'Elmo',
-      password: 'elmo',
+      email: 'test@example.com',
+      id: 1,
+      name: 'Test',
+      password: 'password',
       picture: null
     });
   });
 
   it('should return 404 when user is not found', async () => {
+    vi.spyOn(userModel, 'getUser').mockImplementationOnce(() => {
+      throw new AppError('User not found', 404);
+    });
+
     const response = await request(app).get('/api/user?id=999');
 
     expect(response.status).toBe(404);
