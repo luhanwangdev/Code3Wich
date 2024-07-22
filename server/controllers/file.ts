@@ -2,15 +2,17 @@ import { Request, Response } from 'express';
 import * as fileModel from '../models/file.js';
 import * as projectModel from '../models/project.js';
 import * as serviceInstanceModel from '../models/serviceInstance.js';
+import {
+  checkFileExistedSchema,
+  deleteFileSchema,
+  loadFileSchema,
+  updateFileSchema
+} from '../schemas/file.js';
 
 export const updateFile = async (req: Request, res: Response) => {
-  const { name, isFolder, projectId, parentId, code } = req.body as unknown as {
-    name: string;
-    isFolder: boolean;
-    projectId: number;
-    parentId: number;
-    code: string;
-  };
+  const { name, isFolder, projectId, parentId, code } = updateFileSchema.parse(
+    req.body
+  );
 
   const serviceInstanceId = await projectModel.getProjectServiceInstance(
     projectId
@@ -24,15 +26,15 @@ export const updateFile = async (req: Request, res: Response) => {
     {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
         name,
         isFolder,
         projectId,
         parentId,
-        code,
-      }),
+        code
+      })
     }
   );
 
@@ -44,9 +46,7 @@ export const updateFile = async (req: Request, res: Response) => {
 };
 
 export const loadFile = async (req: Request, res: Response) => {
-  const { id } = req.query as unknown as {
-    id: number;
-  };
+  const { id } = loadFileSchema.parse(req.query);
 
   const serviceInstanceId = await fileModel.getFileServiceInstance(id);
   const serviceInstanceUrl = await serviceInstanceModel.getServiceInstanceUrl(
@@ -63,9 +63,7 @@ export const loadFile = async (req: Request, res: Response) => {
 };
 
 export const deleteFile = async (req: Request, res: Response) => {
-  const { id } = req.params as unknown as {
-    id: number;
-  };
+  const { id } = deleteFileSchema.parse(req.params);
 
   const serviceInstanceId = await fileModel.getFileServiceInstance(id);
   const serviceInstanceUrl = await serviceInstanceModel.getServiceInstanceUrl(
@@ -73,7 +71,7 @@ export const deleteFile = async (req: Request, res: Response) => {
   );
 
   await fetch(`http://${serviceInstanceUrl}:5000/api/file/${id}`, {
-    method: 'DELETE',
+    method: 'DELETE'
   });
 
   res
@@ -82,10 +80,7 @@ export const deleteFile = async (req: Request, res: Response) => {
 };
 
 export const checkFileExisted = async (req: Request, res: Response) => {
-  const { name, projectId } = req.body as unknown as {
-    name: string;
-    projectId: number;
-  };
+  const { name, projectId } = checkFileExistedSchema.parse(req.body);
 
   const existFile = await fileModel.getFileByFileNameandProjectId(
     name,

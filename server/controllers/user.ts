@@ -5,6 +5,13 @@ import dotenv from 'dotenv';
 import AppError from '../utils/appError.js';
 import * as userModel from '../models/user.js';
 import * as projectModel from '../models/project.js';
+import {
+  getUserInfoSchema,
+  getUserProjectsSchema,
+  getUserSchema,
+  handleSigninSchema,
+  handleSignupSchema
+} from '../schemas/user.js';
 
 dotenv.config();
 
@@ -14,6 +21,7 @@ interface User {
   email: string;
 }
 
+// for req.user
 declare module 'express' {
   export interface Request {
     user?: User;
@@ -40,7 +48,7 @@ const jwtTokenGenerator = (payload: Payload) => {
 };
 
 export const getUser = async (req: Request, res: Response) => {
-  const { id } = req.query as unknown as { id: number };
+  const { id } = getUserSchema.parse(req.query);
 
   const user = await userModel.getUser(id);
 
@@ -48,11 +56,7 @@ export const getUser = async (req: Request, res: Response) => {
 };
 
 export const handleSignup = async (req: Request, res: Response) => {
-  const { name, email, password } = req.body as unknown as {
-    name: string;
-    email: string;
-    password: string;
-  };
+  const { name, email, password } = handleSignupSchema.parse(req.body);
 
   if (!(name && email && password)) {
     throw new AppError('Name, email and password are required!', 400);
@@ -79,10 +83,7 @@ export const handleSignup = async (req: Request, res: Response) => {
 };
 
 export const handleSignin = async (req: Request, res: Response) => {
-  const { email, password } = req.body as unknown as {
-    email: string;
-    password: string;
-  };
+  const { email, password } = handleSigninSchema.parse(req.body);
 
   if (!(email && password)) {
     throw new AppError('Email and password are required!', 400);
@@ -121,7 +122,7 @@ export const handleLogout = async (req: Request, res: Response) => {
 };
 
 export const getUserProjects = async (req: Request, res: Response) => {
-  const { id } = req.user as unknown as { id: number };
+  const { id } = getUserProjectsSchema.parse(req.user);
 
   const projects = await projectModel.getProjectsByUserId(id);
 
@@ -129,11 +130,7 @@ export const getUserProjects = async (req: Request, res: Response) => {
 };
 
 export const getUserInfo = async (req: Request, res: Response) => {
-  const { id, name, email } = req.user as unknown as {
-    id: number;
-    name: string;
-    email: string;
-  };
+  const { id, name, email } = getUserInfoSchema.parse(req.user);
 
   res.status(200).json({ id, name, email });
 };
