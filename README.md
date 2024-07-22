@@ -1,6 +1,52 @@
 # Code3Wich
 
+![Code3Wich](./assets/animation.gif)
+
 Website Link: [Code3Wich](https://code3wich.luhanwang.com/)
+
+## Introduction
+
+Code3Wich is an online IDE that allows users to deploy static websites and dynamic servers directly through the platform. It aims to leverage cross-platform capabilities to enable developers to work more easily and quickly anytime, anywhere.
+
+## Tutorial
+
+Currently, Code3Wich supports 2 project types:
+
+- **_Vanilla JS_** for static website deployment.
+- **_Node_** for server deployment.
+
+### How to create a project
+
+1. Sign in or sign up first.
+2. Click the 'folder' icon in the navigator.
+3. Enter project name (up to 10 characters).
+4. Select project type (**_Vanilla JS_** or **_Node_**).
+5. Click 'Create' button.
+
+![Create Project](./assets/create_project.gif)
+
+### How to edit existed project
+
+1. Sign in or sign up first.
+2. Click the 'folder' icon in the navigator.
+3. Select the project you want to edit and click 'Edit' button.
+4. Make changes in the code editor, then press Control + S or Command + S to save.
+5. The changes will be immediately displayed in the live preview window.
+
+![Edit Project](./assets/edit_project.gif)
+
+### How to share the results of the project
+
+1. Sign in or sign up first.
+2. Share the url we provide!
+
+- In the project list (inside the project box)
+
+  <img src="./assets/project_url.png" width="400" />
+
+- In the project editing page (inside the terminal area)
+
+  <img src="./assets/terminal_url.png" width="700" />
 
 ## Motivation
 
@@ -37,7 +83,7 @@ While exploring Three.js, I realized that if I wanted to compile and execute Jav
 
 ## Architecture
 
-![Architecture](./assets/code3wich.drawio.png)
+![Architecture](./assets/arcitecture.drawio.png)
 
 ## Stress Test
 
@@ -54,7 +100,7 @@ In Code3wich, after reviewing all functionalities, the bottleneck seems to occur
 
 ### Result
 
-![Stress test result](./assets/stressTest.png)
+![Stress test result](./assets/stress_test.png)
 
 ### Conclusion
 
