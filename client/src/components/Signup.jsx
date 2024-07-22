@@ -57,9 +57,9 @@ const Signup = () => {
 
     if (name.length > 20) {
       toast({
-        title: "Name can have a maximum of 10 characters!",
+        title: "Name can have a maximum of 20 characters!",
         position: "top",
-        description: "Please set the name less then 10 characters.",
+        description: "Please set the name less then 20 characters.",
         status: "error",
         duration: 2000,
         isClosable: true,

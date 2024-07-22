@@ -5,13 +5,20 @@ import * as fileModel from '../models/file.js';
 import * as serviceInstanceModel from '../models/serviceInstance.js';
 import { getRabbitMQChannel } from '../utils/rabbitmq.js';
 import AppError from '../utils/appError.js';
+import {
+  connectProjectTerminalSchema,
+  createProjectSchema,
+  deleteProjectSchema,
+  getFilesByProjectSchema,
+  getProjectSchema
+} from '../schemas/project.js';
 
 dotenv.config();
 
 const projectLimit = parseInt(process.env.PROJECT_LIMIT as string, 10);
 
 export const getFilesByProject = async (req: Request, res: Response) => {
-  const { id } = req.query as unknown as { id: number };
+  const { id } = getFilesByProjectSchema.parse(req.query);
 
   const files = await fileModel.getFilesByProjectId(id);
 
@@ -19,7 +26,7 @@ export const getFilesByProject = async (req: Request, res: Response) => {
 };
 
 export const getProject = async (req: Request, res: Response) => {
-  const { id } = req.query as unknown as { id: number };
+  const { id } = getProjectSchema.parse(req.query);
 
   const project = await projectModel.getProject(id);
 
@@ -27,8 +34,7 @@ export const getProject = async (req: Request, res: Response) => {
 };
 
 export const connectProjectTerminal = async (req: Request, res: Response) => {
-  // console.log('connecting to terminal...');
-  const { id } = req.query as unknown as { id: number };
+  const { id } = connectProjectTerminalSchema.parse(req.query);
 
   const serviceInstanceId = await projectModel.getProjectServiceInstance(id);
   const serviceInstanceUrl = await serviceInstanceModel.getServiceInstanceUrl(
@@ -68,11 +74,8 @@ export const connectProjectTerminal = async (req: Request, res: Response) => {
 };
 
 export const createProject = async (req: Request, res: Response) => {
-  const { name, userId, type } = req.body as unknown as {
-    name: string;
-    userId: number;
-    type: string;
-  };
+  const { name, userId, type } = createProjectSchema.parse(req.body);
+
   const projects = await projectModel.getProjectsByUserId(userId);
 
   if (projects.length >= projectLimit) {
@@ -88,7 +91,7 @@ export const createProject = async (req: Request, res: Response) => {
   const queue = 'createProjectQueue';
 
   await channel.assertQueue(queue, {
-    durable: false,
+    durable: false
   });
 
   const message = { projectId: project.id, type };
@@ -100,12 +103,12 @@ export const createProject = async (req: Request, res: Response) => {
 
   res.status(200).json({
     status: true,
-    message: 'The project is passed to worker successfuly',
+    message: 'The project is passed to worker successfuly'
   });
 };
 
 export const deleteProject = async (req: Request, res: Response) => {
-  const { id } = req.query as unknown as { id: number };
+  const { id } = deleteProjectSchema.parse(req.query);
 
   const serviceInstanceId = await projectModel.getProjectServiceInstance(id);
   const serviceInstanceUrl = await serviceInstanceModel.getServiceInstanceUrl(
@@ -113,7 +116,7 @@ export const deleteProject = async (req: Request, res: Response) => {
   );
 
   await fetch(`http://${serviceInstanceUrl}:5000/api/project?id=${id}`, {
-    method: 'DELETE',
+    method: 'DELETE'
   });
 
   res.status(200).json({ id, message: `Delete project${id} successfully` });

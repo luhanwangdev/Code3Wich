@@ -7,8 +7,8 @@ export default defineConfig({
     environment: 'node',
     coverage: {
       provider: 'istanbul',
-      reporter: ['text', 'json', 'html'],
+      reporter: ['text', 'json', 'html']
     },
-    env: loadEnv('test', process.cwd(), ''),
-  },
+    env: loadEnv('test', process.cwd(), '')
+  }
 });

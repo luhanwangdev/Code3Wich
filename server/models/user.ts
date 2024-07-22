@@ -1,13 +1,13 @@
 import { z } from 'zod';
+import { RowDataPacket } from 'mysql2';
 import pool from './databasePool.js';
 import instanceOfSetHeader from '../utils/instanceOfSetHeader.js';
 import AppError from '../utils/appError.js';
-import { RowDataPacket } from 'mysql2';
 
 const UserSchema = z.object({
-  id: z.number(),
-  name: z.string(),
-  email: z.string(),
+  id: z.number().int().positive(),
+  name: z.string().max(20),
+  email: z.string().email(),
   password: z.string(),
   picture: z.any()
 });
