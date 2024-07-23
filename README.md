@@ -57,7 +57,7 @@ While exploring Three.js, I realized that if I wanted to compile and execute Jav
 ## Tech / Framwork used
 
 - Docker
-- Socket.io
+- Socket.IO
 - AWS AmazonMQ (RabbitMQ)
 - AWS RDS (MySQL)
 - Vite + React
@@ -83,7 +83,7 @@ While exploring Three.js, I realized that if I wanted to compile and execute Jav
 
 ## Architecture
 
-![Architecture](./assets/arcitecture.drawio.png)
+![Architecture](./assets/architecture.drawio.png)
 
 ## Stress Test
 
