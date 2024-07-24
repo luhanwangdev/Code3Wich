@@ -1,5 +1,8 @@
 # Code3Wich
 
+[![build-passing](https://img.shields.io/badge/build-passing-brightgreen)](https://next-antd-scaffold.luffyzh.now.sh/)
+![MIT License](https://img.shields.io/badge/license-MIT-blue)
+
 ![Code3Wich](./assets/animation.gif)
 
 Website Link: [Code3Wich](https://code3wich.luhanwang.com/)
@@ -57,7 +60,7 @@ While exploring Three.js, I realized that if I wanted to compile and execute Jav
 ## Tech / Framwork used
 
 - Docker
-- Socket.io
+- Socket.IO
 - AWS AmazonMQ (RabbitMQ)
 - AWS RDS (MySQL)
 - Vite + React
@@ -83,7 +86,7 @@ While exploring Three.js, I realized that if I wanted to compile and execute Jav
 
 ## Architecture
 
-![Architecture](./assets/arcitecture.drawio.png)
+![Architecture](./assets/architecture.drawio.png)
 
 ## Stress Test
 
