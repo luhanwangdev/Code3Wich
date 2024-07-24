@@ -1,7 +1,7 @@
 # Code3Wich
 
-[![build-passing](https://img.shields.io/badge/build-passing-brightgreen)](https://next-antd-scaffold.luffyzh.now.sh/)
-![MIT License](https://img.shields.io/badge/license-MIT-blue)
+[![build-passing](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/luhanwangdev/Code3Wich)
+[![MIT License](https://img.shields.io/badge/license-MIT-blue)](https://github.com/luhanwangdev/Code3Wich)
 
 ![Code3Wich](./assets/animation.gif)
 
