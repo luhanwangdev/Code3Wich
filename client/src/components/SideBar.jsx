@@ -90,7 +90,7 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
       },
       body: JSON.stringify({
         name,
-        projectId,
+        projectId: Number(projectId),
       }),
     });
 
@@ -131,7 +131,7 @@ const SideBar = ({ files, setFiles, activeFile, setActiveFile, projectId }) => {
       body: JSON.stringify({
         name,
         isFolder,
-        projectId,
+        projectId: Number(projectId),
         parentId,
         code: "",
       }),
