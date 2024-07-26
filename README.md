@@ -38,6 +38,26 @@ Currently, Code3Wich supports 2 project types:
 
 ![Edit Project](./assets/edit_project.gif)
 
+### How to create new file/folder inside a project
+
+1. Sign in or sign up first.
+2. Click the 'folder' icon in the navigator.
+3. Select the project you want to edit and click 'Edit' button.
+4. Right-click in the SideBar and select 'New File' or 'New folder'.
+5. Alternatively, you can use the **touch** command to create a file or the **mkdir** command to create a folder in the terminal.
+
+![Create File](./assets/create_file.gif)
+
+### How to delete existed file/folder inside a project
+
+1. Sign in or sign up first.
+2. Click the 'folder' icon in the navigator.
+3. Select the project you want to edit and click 'Edit' button.
+4. Hover over the file or folder you want to delete, right-click, and select 'Delete'.
+5. Alternatively, you can use the **rm** command to delete a file or the **rm -rf** command to delete a folder in the terminal.
+
+![Delete File](./assets/delete_file.gif)
+
 ### How to share the results of the project
 
 1. Sign in or sign up first.
