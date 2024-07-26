@@ -153,6 +153,7 @@ const Signin = () => {
                     bg="gray.700"
                     borderColor="gray.600"
                     ref={userEmailRef}
+                    defaultValue="test@example.com"
                   />
                   <FormLabel color="lightblue" my="1rem">
                     Password
@@ -162,6 +163,7 @@ const Signin = () => {
                     bg="gray.700"
                     borderColor="gray.600"
                     ref={userPasswordRef}
+                    defaultValue="test"
                   />
                 </FormControl>
                 <Flex justifyContent="center" alignItems="center" h="15vh">
